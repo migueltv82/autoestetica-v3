@@ -1,0 +1,17 @@
+.section-card-ui {
+  padding: 1.4rem;
+  border-radius: 24px;
+  border: 1px solid var(--color-border);
+  background: linear-gradient(180deg, rgba(24, 29, 39, 0.92), rgba(14, 17, 24, 0.98));
+  min-height: 220px;
+}
+
+.section-card-ui-title {
+  margin-bottom: 0.8rem;
+  font-size: 1.2rem;
+}
+
+.section-card-ui-text {
+  color: var(--color-text-soft);
+  line-height: 1.8;
+}
