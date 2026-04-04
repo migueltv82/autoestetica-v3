@@ -1,11 +1,11 @@
-import AdminSidebar from "./AdminSidebar";
+import AdminNavbar from "./AdminNavbar";
 import AdminTopbar from "./AdminTopbar";
 import "./AdminLayout.css";
 
 function AdminLayout({ title, subtitle, children }) {
   return (
     <div className="admin-shell">
-      <AdminSidebar />
+      <AdminNavbar />
       <div className="admin-content-area">
         <AdminTopbar title={title} subtitle={subtitle} />
         <main className="admin-main">{children}</main>
