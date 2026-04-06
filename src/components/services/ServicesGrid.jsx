@@ -1,4 +1,5 @@
 import { Sparkles, Droplets, ShieldCheck, Bike, CarFront } from "lucide-react";
+import { motion } from "framer-motion";
 import "./ServicesGrid.css";
 
 const servicesList = [
@@ -40,29 +41,59 @@ const servicesList = [
   },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
 function ServicesGrid() {
   return (
-    <section className="section">
-      <div className="container">
-        <div className="section-heading">
+    <section className="section services-page relative">
+      <div className="services-grid-glow top-glow"></div>
+      <div className="services-grid-glow bottom-glow"></div>
+      <div className="container relative-z">
+        <motion.div 
+          className="section-heading centered-heading"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
           <span className="section-kicker">Catálogo</span>
           <h1 className="section-title">Servicios disponibles</h1>
           <p className="section-text">
             Cada servicio se coordina de manera personalizada para asegurar una
             atención más precisa y un mejor resultado final.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="services-grid">
+        <motion.div 
+          className="services-grid"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           {servicesList.map((service) => (
-            <article className="service-card" key={service.title}>
+            <motion.article 
+              className="service-card glass-panel-card" 
+              key={service.title}
+              variants={cardVariants}
+              whileHover={{ y: -8, transition: { duration: 0.3 } }}
+            >
               <div className="service-card-icon">{service.icon}</div>
               <h3>{service.title}</h3>
               <p>{service.description}</p>
               <span className="service-card-duration">{service.duration}</span>
-            </article>
+            </motion.article>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

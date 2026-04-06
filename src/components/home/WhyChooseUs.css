@@ -1,34 +1,78 @@
+.why-choose-us {
+  position: relative;
+  overflow: hidden;
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+.why-glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(0, 191, 166, 0.05), transparent 70%);
+  top: 50%;
+  right: -200px;
+  transform: translateY(-50%);
+  filter: blur(60px);
+  z-index: 1;
+  pointer-events: none;
+}
+
 .why-choose-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  align-items: start;
+  gap: 4rem;
+  align-items: center;
 }
 
 .why-list {
   display: grid;
-  gap: 1rem;
+  gap: 1.25rem;
+}
+
+.glass-panel-sm {
+  position: relative;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: linear-gradient(145deg, rgba(29, 35, 48, 0.3), rgba(16, 19, 26, 0.5));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  overflow: hidden;
+}
+
+.glass-panel-sm:hover {
+  border-color: rgba(0, 191, 166, 0.3);
+  box-shadow: 0 12px 32px rgba(0, 191, 166, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .why-item {
   display: flex;
-  align-items: flex-start;
-  gap: 0.85rem;
-  padding: 1rem 1.1rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.02);
-  color: var(--color-text-soft);
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
-.why-item svg {
-  color: #8ef8e7;
+.why-icon-wrapper {
+  color: #00bfa6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  margin-top: 2px;
+  padding: 0.5rem;
+  background: rgba(0, 191, 166, 0.1);
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 191, 166, 0.15);
 }
 
 @media (max-width: 900px) {
   .why-choose-grid {
     grid-template-columns: 1fr;
+    gap: 3rem;
   }
 }
