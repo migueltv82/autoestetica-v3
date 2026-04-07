@@ -1,5 +1,5 @@
 import EmptyState from "../ui/EmptyState";
-import { Edit2, Trash2, Calendar, Clock, User, Phone, Wrench, Car, Bike, Truck, Box } from "lucide-react";
+import { Edit2, Trash2, Calendar, Clock, User, Phone, Wrench, Car, Bike, Truck, Box, ChevronRight } from "lucide-react";
 import "./TurnsTable.css";
 
 const STATUS_OPTIONS = ["Pendiente", "Confirmado", "Finalizado", "Cancelado"];
@@ -16,10 +16,10 @@ function TurnsTable({ turns, onStatusChange, onDeleteTurn }) {
 
   const getVehicleIcon = (type) => {
     switch (type?.toLowerCase()) {
-      case "moto": return <Bike size={14} />;
-      case "camioneta": return <Truck size={14} />;
-      case "suv": return <Box size={14} />;
-      default: return <Car size={14} />;
+      case "moto": return <Bike size={16} />;
+      case "camioneta": return <Truck size={16} />;
+      case "suv": return <Box size={16} />;
+      default: return <Car size={16} />;
     }
   };
 
@@ -35,7 +35,8 @@ function TurnsTable({ turns, onStatusChange, onDeleteTurn }) {
 
   return (
     <div className="admin-table-wrap">
-      <table className="admin-table">
+      {/* Desktop Table View */}
+      <table className="admin-table desktop-only-table">
         <thead>
           <tr>
             <th style={{ width: "120px" }}>Agenda</th>
@@ -50,51 +51,47 @@ function TurnsTable({ turns, onStatusChange, onDeleteTurn }) {
           {turns.map((turn) => (
             <tr key={turn.id} className={turn.status === "Finalizado" ? "row-finished" : ""}>
               <td>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-                   <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontWeight: 800, color: "var(--color-white)", fontSize: "1rem" }}>
+                <div className="turn-agenda-cell">
+                   <div className="turn-time-val">
                      <Clock size={14} className="text-primary" /> {turn.time}
                    </div>
-                   <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.8rem", color: "var(--color-text-soft)" }}>
+                   <div className="turn-date-val">
                      <Calendar size={12} /> {turn.date}
                    </div>
                 </div>
               </td>
               <td>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-                  <div style={{ fontWeight: 700, display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "1.05rem", color: "var(--color-white)" }}>
-                    {turn.client}
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.85rem", color: "var(--color-text-soft)" }}>
+                <div className="turn-client-cell">
+                  <div className="turn-client-name">{turn.client}</div>
+                  <div className="turn-client-phone">
                     <Phone size={12} /> {turn.phone || "N/A"}
                   </div>
                 </div>
               </td>
               <td>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: "var(--color-text)", fontWeight: 500 }}>
-                  <Wrench size={16} className="text-secondary" style={{ opacity: 0.8 }} />
+                <div className="turn-service-cell">
+                  <Wrench size={16} className="text-secondary" />
                   {turn.service}
                 </div>
               </td>
               <td>
-                <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", background: "rgba(255,255,255,0.03)", padding: "0.4rem 0.75rem", borderRadius: "10px", fontSize: "0.85rem", fontWeight: 600, border: "1px solid rgba(255,255,255,0.05)" }}>
+                <div className="vehicle-badge">
                   {getVehicleIcon(turn.vehicle)}
                   {turn.vehicle}
                 </div>
               </td>
               <td style={{ textAlign: "center" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem" }}>
+                <div className="status-selector-wrap">
                   <div 
+                    className="status-dot"
                     style={{ 
-                      width: "8px", 
-                      height: "8px", 
-                      borderRadius: "50%", 
                       background: getStatusColor(turn.status),
                       boxShadow: `0 0 10px ${getStatusColor(turn.status)}`
                     }} 
                   />
                   <select
                     className="admin-input-minimal"
-                    style={{ color: getStatusColor(turn.status), fontWeight: 700 }}
+                    style={{ color: getStatusColor(turn.status) }}
                     value={turn.status}
                     onChange={(event) => onStatusChange(turn.id, event.target.value)}
                   >
@@ -107,7 +104,7 @@ function TurnsTable({ turns, onStatusChange, onDeleteTurn }) {
                 </div>
               </td>
               <td>
-                <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
+                <div className="turn-actions-cell">
                   <button className="btn-ghost btn-mini-action" title="Editar"><Edit2 size={14} /></button>
                   <button className="btn-danger btn-mini-action" onClick={() => onDeleteTurn(turn.id)} title="Borrar"><Trash2 size={14} /></button>
                 </div>
@@ -116,8 +113,69 @@ function TurnsTable({ turns, onStatusChange, onDeleteTurn }) {
           ))}
         </tbody>
       </table>
+
+      {/* Mobile Card View */}
+      <div className="mobile-only-card">
+        {turns.map((turn) => (
+          <div key={turn.id} className={`turn-mobile-card ${turn.status === "Finalizado" ? "row-finished" : ""}`}>
+            <div className="card-header-mobile">
+              <div className="card-agenda-mobile">
+                <span className="time-val-mobile">{turn.time}</span>
+                <span className="date-val-mobile">{turn.date}</span>
+              </div>
+              <div 
+                className="status-badge-mobile"
+                style={{ background: `${getStatusColor(turn.status)}20`, color: getStatusColor(turn.status), border: `1px solid ${getStatusColor(turn.status)}40` }}
+              >
+                {turn.status}
+              </div>
+            </div>
+
+            <div className="card-body-mobile">
+              <div className="card-client-row">
+                <div className="client-avatar-mini">{turn.client.charAt(0)}</div>
+                <div className="client-info-mini">
+                  <strong>{turn.client}</strong>
+                  <span>{turn.phone || "Sin teléfono"}</span>
+                </div>
+              </div>
+              
+              <div className="card-details-grid-mobile">
+                <div className="detail-item-mobile">
+                  <span className="detail-label">Servicio</span>
+                  <div className="detail-val"><Wrench size={14} /> {turn.service}</div>
+                </div>
+                <div className="detail-item-mobile">
+                  <span className="detail-label">Vehículo</span>
+                  <div className="detail-val">{getVehicleIcon(turn.vehicle)} {turn.vehicle}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="card-footer-mobile">
+              <div className="status-quick-change">
+                <select
+                  className="admin-input-minimal full-width"
+                  value={turn.status}
+                  onChange={(event) => onStatusChange(turn.id, event.target.value)}
+                >
+                  {STATUS_OPTIONS.map((status) => (
+                    <option key={status} value={status}>
+                      Marcar como {status}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="card-actions-mobile">
+                <button className="btn-ghost-mini"><Edit2 size={16} /></button>
+                <button className="btn-danger-mini" onClick={() => onDeleteTurn(turn.id)}><Trash2 size={16} /></button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
-export default TurnsTable;
+export default TurnsTable;

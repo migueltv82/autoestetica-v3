@@ -11,7 +11,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import "./AdminNavbar.css";
 
@@ -50,9 +50,18 @@ const items = [
 
 function AdminNavbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <nav className="admin-navbar">
+    <nav className={`admin-navbar ${isScrolled ? "scrolled" : ""}`}>
       <div className="admin-navbar-container">
         <div className="admin-navbar-brand">
           <span className="admin-navbar-dot"></span>
@@ -118,3 +127,4 @@ function AdminNavbar() {
 }
 
 export default AdminNavbar;
+

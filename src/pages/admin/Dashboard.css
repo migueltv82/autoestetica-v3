@@ -57,93 +57,56 @@
   transition: var(--transition-premium);
 }
 
-.status-mini-card.green {
-  background: rgba(0, 191, 166, 0.06);
-  color: #4ade80;
-  border-color: rgba(0, 191, 166, 0.1);
-}
-
-.status-mini-card.orange {
-  background: rgba(249, 115, 22, 0.06);
-  color: #fb923c;
-  border-color: rgba(249, 115, 22, 0.1);
-}
-
-/* Quick Actions List */
-.quick-actions-list-horizontal {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 1rem;
-}
-
-.action-item-compact {
+/* New Layout Classes */
+.dashboard-heading {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  padding: 1.5rem 1rem;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  color: var(--color-text);
-  transition: var(--transition-premium);
-  font-weight: 600;
-  font-size: 0.9rem;
-  text-align: center;
+  margin-bottom: 2rem;
+  gap: 1.5rem;
 }
 
-.action-item-compact:hover {
-  background: rgba(0, 191, 166, 0.1);
-  border-color: var(--color-primary);
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-.action-item-compact svg {
-  color: var(--color-primary);
-}
-
-/* System Status */
-.status-indicators {
+.dashboard-heading-left {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 1.25rem;
 }
 
-.indicator-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  font-size: 0.95rem;
-  color: var(--color-text-soft);
-  font-weight: 500;
+.dashboard-heading-info h2 {
+  font-size: clamp(1.4rem, 4vw, 1.75rem);
+  font-weight: 800;
+  color: var(--color-white);
+  letter-spacing: -0.01em;
 }
 
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.dot.active {
-  background: #22c55e;
-  box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
-}
-
-.dot.warning {
-  background: #f59e0b;
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
-}
-
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
   .dashboard-secondary-grid {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1024px) {
+  .dashboard-main-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
   .dashboard-secondary-grid {
     grid-template-columns: 1fr;
   }
+  
+  .status-summary-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-heading-left {
+    gap: 1rem;
+  }
 }
+

@@ -11,6 +11,7 @@
   min-width: 0;
   flex: 1;
   position: relative;
+  padding-top: 74px; /* Space for the fixed navbar */
   background: 
     radial-gradient(circle at 100% 0%, rgba(0, 191, 166, 0.08) 0%, transparent 40%),
     radial-gradient(circle at 0% 100%, rgba(0, 191, 166, 0.04) 0%, transparent 30%);
@@ -31,10 +32,34 @@
 .admin-main {
   position: relative;
   z-index: 1;
-  padding: 3rem 2rem;
-  max-width: var(--container);
+  padding: var(--admin-padding);
+  max-width: var(--container-admin);
   margin: 0 auto;
   width: 100%;
+}
+
+.admin-watermark {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.04;
+  width: min(80vw, 700px);
+  pointer-events: none;
+  z-index: 0;
+  filter: grayscale(1) brightness(1.5);
+  transition: var(--transition-premium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-watermark img {
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+  object-fit: cover;
+  aspect-ratio: 1/1; /* Ensure it stays circular */
 }
 
 @media (max-width: 1024px) {

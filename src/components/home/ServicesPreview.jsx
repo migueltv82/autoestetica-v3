@@ -1,34 +1,14 @@
 import { Link } from "react-router-dom";
-import { Sparkles, Droplets, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
+import { useServices } from "../../hooks/useServices";
+import { getIcon } from "../../utils/iconMapper";
 import "./ServicesPreview.css";
-
-const featuredServices = [
-  {
-    icon: <Sparkles size={26} />,
-    title: "Lavado premium",
-    text: "Una limpieza exterior cuidada, con terminación prolija y presencia visual.",
-  },
-  {
-    icon: <Droplets size={26} />,
-    title: "Limpieza de interior",
-    text: "Trabajo detallado para renovar la imagen interior y mejorar la experiencia del vehículo.",
-  },
-  {
-    icon: <ShieldCheck size={26} />,
-    title: "Pulido y abrillantado",
-    text: "Tratamientos estéticos para recuperar brillo, profundidad y mejor terminación.",
-  },
-];
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.2,
-    },
+    transition: { staggerChildren: 0.15, delayChildren: 0.2 },
   },
 };
 
@@ -38,6 +18,12 @@ const cardVariants = {
 };
 
 function ServicesPreview() {
+  const { featuredServices, services } = useServices();
+  // Show up to 3: prefer featured, fall back to first 3 if no featured
+  const display = featuredServices.length > 0
+    ? featuredServices.slice(0, 3)
+    : services.slice(0, 3);
+
   return (
     <section className="section services-preview">
       <div className="container">
@@ -48,11 +34,11 @@ function ServicesPreview() {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
         >
-          <span className="section-kicker">Servicios</span>
-          <h2 className="section-title">Soluciones pensadas para cada detalle</h2>
+          <span className="section-kicker">Lo que hacemos</span>
+          <h2 className="section-title">Servicios diseñados<br />para la excelencia</h2>
           <p className="section-text">
-            Trabajamos cada vehículo con criterio estético, atención personalizada
-            y un enfoque práctico para que el resultado se note de verdad.
+            Cada servicio es un estándar en sí mismo. Trabajamos con técnicas
+            profesionales y productos de primer nivel para que el resultado supere tus expectativas.
           </p>
         </motion.div>
 
@@ -63,13 +49,18 @@ function ServicesPreview() {
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
         >
-          {featuredServices.map((service) => (
-            <motion.article className="service-preview-card" key={service.title} variants={cardVariants}>
-              <div className="service-preview-icon">{service.icon}</div>
-              <h3>{service.title}</h3>
-              <p>{service.text}</p>
-            </motion.article>
-          ))}
+          {display.map((service) => {
+            const d = service.display || {};
+            return (
+              <motion.article className="service-preview-card" key={service.id} variants={cardVariants}>
+                <div className="service-preview-icon">
+                  {getIcon(service.iconName, { size: 26 })}
+                </div>
+                {d.name !== false && <h3>{service.name}</h3>}
+                {d.description !== false && <p>{service.description}</p>}
+              </motion.article>
+            );
+          })}
         </motion.div>
 
         <motion.div

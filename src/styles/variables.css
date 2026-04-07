@@ -18,10 +18,17 @@
   --shadow-premium: 0 12px 40px rgba(0, 0, 0, 0.35);
   --shadow-glow: 0 0 25px rgba(0, 191, 166, 0.15);
   
-  --radius-panel: 28px;
-  --radius-input: 16px;
-  --radius-badge: 10px;
+  --radius-panel: clamp(16px, 2vw, 28px);
+  --radius-input: 14px;
+  --radius-badge: 8px;
   
-  --container: 1280px;
+  --container: 1440px;
+  --container-admin: 1280px;
+
+  /* Responsive Spacing */
+  --spacing-section: clamp(2rem, 5vw, 5rem);
+  --admin-padding: clamp(1rem, 3vw, 2.5rem);
+  
   --transition-premium: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 0.2s ease;
 }
