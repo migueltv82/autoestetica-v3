@@ -1,3 +1,6 @@
+@import "./variables.css";
+@import "./buttons.css";
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -5,14 +8,16 @@
 }
 
 html {
-  font-family: Inter, Arial, sans-serif;
+  font-family: var(--font-main), Arial, sans-serif;
   scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
   background: var(--color-bg);
   color: var(--color-text);
   min-height: 100vh;
+  font-weight: 400;
 }
 
 a {

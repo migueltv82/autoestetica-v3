@@ -1,4 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
+import { ShieldCheck, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
+import PageTransition from "../../components/ui/PageTransition";
+import loginBg from "../../assets/login_bg.png";
+import businessLogo from "../../assets/logo.jpg";
 import "./Login.css";
 
 function Login() {
@@ -10,45 +14,68 @@ function Login() {
   }
 
   return (
-    <main className="admin-login-page">
-      <div className="admin-login-card">
-        <span className="admin-login-kicker">Acceso interno</span>
-
-        <h1 className="admin-login-title">Ingresar al panel</h1>
-
-        <p className="admin-login-text">
-          Este acceso es solo para administración interna de Autoestética Tucumán.
-        </p>
-
-        <form onSubmit={handleSubmit} className="admin-login-form">
-          <div className="admin-login-group">
-            <label>Usuario</label>
-            <input
-              className="admin-login-input"
-              type="text"
-              placeholder="Ingresá tu usuario"
-            />
-          </div>
-
-          <div className="admin-login-group">
-            <label>Contraseña</label>
-            <input
-              className="admin-login-input"
-              type="password"
-              placeholder="Ingresá tu contraseña"
-            />
-          </div>
-
-          <button type="submit" className="admin-login-button">
-            Ingresar
-          </button>
-        </form>
-
-        <div className="admin-login-back">
-          <Link to="/">Volver al sitio</Link>
+    <PageTransition>
+      <main className="super-premium-login">
+        <div className="login-background-overlay">
+          <img src={loginBg} alt="Cinematic Detailing Background" className="login-bg-img" />
+          <div className="login-glass-blur" />
         </div>
-      </div>
-    </main>
+
+        <div className="login-content-wrapper">
+          <div className="admin-login-card-v3 glass-panel-premium">
+            <div className="login-brand-header">
+               <div className="brand-logo-container">
+                 <img src={businessLogo} alt="Autoestética Logo" className="login-brand-logo" />
+               </div>
+               <div className="login-title-group">
+                 <span className="premium-badge">Acceso Reservado</span>
+                 <h1 className="login-main-title">Sistema de Gestión</h1>
+                 <p className="login-sub-text">Iniciá sesión para administrar la estética de vanguardia.</p>
+               </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="premium-login-form">
+              <div className="premium-input-group">
+                <label className="premium-input-label"><User size={14} /> Identificador de Usuario</label>
+                <div className="premium-input-wrapper">
+                  <input
+                    className="admin-input-premium-v2"
+                    type="text"
+                    placeholder="Tu usuario"
+                    required
+                  />
+                  <div className="input-focus-glow" />
+                </div>
+              </div>
+
+              <div className="premium-input-group">
+                <label className="premium-input-label"><Lock size={14} /> Código de Seguridad</label>
+                <div className="premium-input-wrapper">
+                  <input
+                    className="admin-input-premium-v2"
+                    type="password"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <div className="input-focus-glow" />
+                </div>
+              </div>
+
+              <button type="submit" className="login-submit-premium">
+                <span>Ingresar al Panel</span>
+                <ArrowRight size={20} className="btn-icon-move" />
+              </button>
+            </form>
+
+            <footer className="login-footer-minimal">
+              <Link to="/" className="back-link-v3">
+                <ArrowLeft size={16} /> <span>Volver al centro de servicios</span>
+              </Link>
+            </footer>
+          </div>
+        </div>
+      </main>
+    </PageTransition>
   );
 }
 

@@ -1,10 +1,13 @@
 import "./StatCard.css";
 
-function StatCard({ label, value }) {
+function StatCard({ label, value, icon }) {
   return (
     <article className="stat-card">
-      <span className="stat-card-label">{label}</span>
-      <strong className="stat-card-value">{value}</strong>
+      <div className="stat-card-content">
+        <span className="stat-card-label">{label}</span>
+        <strong className="stat-card-value">{value}</strong>
+      </div>
+      {icon && <div className="stat-card-icon">{icon}</div>}
     </article>
   );
 }

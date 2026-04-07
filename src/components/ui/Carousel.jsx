@@ -1,0 +1,72 @@
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, Hash } from "lucide-react";
+import "./Carousel.css";
+
+function Carousel({ images = [] }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  if (!images.length) {
+    return (
+      <div className="carousel-empty">
+        <p>No hay imágenes disponibles para este servicio todavía.</p>
+      </div>
+    );
+  }
+
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  return (
+    <div className="carousel-wrapper">
+      <div className="carousel-main">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentIndex}
+            className="carousel-slide"
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -100 }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          >
+            <img src={images[currentIndex].url} alt={`Slide ${currentIndex}`} />
+            {images[currentIndex].label && (
+              <div className="carousel-caption">
+                <Hash size={14} />
+                <span>{images[currentIndex].label}</span>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        {images.length > 1 && (
+          <>
+            <button className="carousel-nav prev" onClick={prevSlide}>
+              <ChevronLeft size={24} />
+            </button>
+            <button className="carousel-nav next" onClick={nextSlide}>
+              <ChevronRight size={24} />
+            </button>
+          </>
+        )}
+      </div>
+
+      <div className="carousel-dots">
+        {images.map((_, index) => (
+          <button
+            key={index}
+            className={`carousel-dot ${index === currentIndex ? "active" : ""}`}
+            onClick={() => setCurrentIndex(index)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default Carousel;
