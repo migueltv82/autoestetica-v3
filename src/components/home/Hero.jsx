@@ -15,7 +15,6 @@ const BG_IMAGES = [
 
 const STATS = [
   { value: "+10", label: "Años de experiencia" },
-  { value: "+300", label: "Clientes atendidos" },
   { value: "100%", label: "Atención personalizada" },
 ];
 

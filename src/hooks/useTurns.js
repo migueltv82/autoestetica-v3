@@ -37,24 +37,33 @@ export function useTurns() {
   const [filters, setFilters] = useState(initialFilters);
 
   useEffect(() => {
-    // Simular carga de base de datos
     setIsLoading(true);
+    const savedTurns = localStorage.getItem("turns");
+    const loadedTurns = savedTurns ? JSON.parse(savedTurns) : initialTurns;
+    
+    // Si era la primera vez, guardamos los mocks
+    if (!savedTurns) {
+      localStorage.setItem("turns", JSON.stringify(initialTurns));
+    }
+
     const timer = setTimeout(() => {
-      setTurns(initialTurns);
+      setTurns(loadedTurns);
       setIsLoading(false);
-    }, 1200);
+    }, 800); // reduced timeout slightly for better UX
 
     return () => clearTimeout(timer);
   }, []);
 
   function addTurn(newTurn) {
-    setTurns((prev) =>
-      [newTurn, ...prev].sort((a, b) => {
+    setTurns((prev) => {
+      const updated = [newTurn, ...prev].sort((a, b) => {
         const aDateTime = `${a.date} ${a.time}`;
         const bDateTime = `${b.date} ${b.time}`;
         return aDateTime.localeCompare(bDateTime);
-      })
-    );
+      });
+      localStorage.setItem("turns", JSON.stringify(updated));
+      return updated;
+    });
   }
 
   function handleFilterChange(event) {
@@ -70,18 +79,24 @@ export function useTurns() {
   }
 
   function updateTurnStatus(turnId, nextStatus) {
-    setTurns((prev) =>
-      prev.map((turn) =>
+    setTurns((prev) => {
+      const updated = prev.map((turn) =>
         turn.id === turnId ? { ...turn, status: nextStatus } : turn
-      )
-    );
+      );
+      localStorage.setItem("turns", JSON.stringify(updated));
+      return updated;
+    });
   }
 
   function deleteTurn(turnId) {
     const confirmed = window.confirm("¿Querés eliminar este turno?");
     if (!confirmed) return;
 
-    setTurns((prev) => prev.filter((turn) => turn.id !== turnId));
+    setTurns((prev) => {
+      const updated = prev.filter((turn) => turn.id !== turnId);
+      localStorage.setItem("turns", JSON.stringify(updated));
+      return updated;
+    });
   }
 
   const filteredTurns = useMemo(() => {

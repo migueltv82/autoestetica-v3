@@ -15,6 +15,7 @@ const Turns = lazy(() => import("../pages/admin/Turns"));
 const Cash = lazy(() => import("../pages/admin/Cash"));
 const Clients = lazy(() => import("../pages/admin/Clients"));
 const AdminServices = lazy(() => import("../pages/admin/AdminServices"));
+const Gallery = lazy(() => import("../pages/admin/Gallery"));
 const Settings = lazy(() => import("../pages/admin/Settings"));
 
 export default function RouterProviderApp() {
@@ -36,6 +37,7 @@ export default function RouterProviderApp() {
           <Route path="/admin/caja" element={<Cash />} />
           <Route path="/admin/clientes" element={<Clients />} />
           <Route path="/admin/servicios" element={<AdminServices />} />
+          <Route path="/admin/galeria" element={<Gallery />} />
           <Route path="/admin/configuracion" element={<Settings />} />
 
           {/* Fallback */}

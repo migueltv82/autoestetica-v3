@@ -37,7 +37,7 @@ function WhyChooseUs() {
           transition={{ duration: 0.65 }}
         >
           <span className="section-kicker">Diferencial</span>
-          <h2 className="section-title">Por qué más de 300 clientes<br />confían en nosotros</h2>
+          <h2 className="section-title">Por qué nuestros clientes <br />confían en nosotros</h2>
         </motion.div>
 
         <motion.div

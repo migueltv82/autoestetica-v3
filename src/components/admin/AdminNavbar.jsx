@@ -10,6 +10,7 @@ import {
   Globe,
   Menu,
   X,
+  Image as ImageIcon,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -40,6 +41,11 @@ const items = [
     to: "/admin/servicios",
     label: "Servicios",
     icon: <Wrench size={18} />,
+  },
+  {
+    to: "/admin/galeria",
+    label: "Galería",
+    icon: <ImageIcon size={18} />,
   },
   {
     to: "/admin/configuracion",

@@ -1,84 +1,202 @@
+.inquiry-section {
+  position: relative;
+  padding: 120px 0;
+  background: var(--color-bg);
+  overflow: hidden;
+}
+
+.inquiry-bg-glow {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 500px;
+  height: 500px;
+  background: rgba(0, 191, 166, 0.15);
+  filter: blur(150px);
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
 .inquiry-grid {
+  position: relative;
+  z-index: 1;
   display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 3rem;
-  align-items: start;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 4rem;
+  align-items: center;
 }
 
 .inquiry-header {
   margin-bottom: 2rem;
 }
 
+.inquiry-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 8px 16px;
+  border-radius: 100px;
+  background: rgba(0, 191, 166, 0.1);
+  color: var(--color-primary);
+  border: 1px solid rgba(0, 191, 166, 0.2);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 2rem;
+  box-shadow: 0 0 20px rgba(0, 191, 166, 0.15);
+}
+
+.inquiry-title {
+  font-size: clamp(2.8rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #fff 0%, #a0aec0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.03em;
+}
+
+.inquiry-text {
+  font-size: 1.15rem;
+  color: var(--color-text-soft);
+  line-height: 1.8;
+}
+
 .step-indicator {
   display: flex;
   gap: 0.5rem;
-  margin-top: 1.5rem;
+  margin-top: 3rem;
+  align-items: center;
 }
 
 .step-dot {
-  width: 40px;
+  flex-grow: 1;
   height: 6px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  transition: background var(--transition-medium);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .step-dot.active {
+  background: rgba(0, 191, 166, 0.3);
+}
+
+.step-dot.active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
   background: var(--color-primary);
+  border-radius: 6px;
+  box-shadow: 0 0 10px var(--color-primary);
+  animation: fillStep 0.4s ease forwards;
+}
+
+@keyframes fillStep {
+  from { width: 0; }
+  to { width: 100%; }
 }
 
 .inquiry-form-container {
   position: relative;
-  min-height: 400px;
-  padding: 2rem;
-  border-radius: 28px;
-  border: 1px solid var(--color-border);
-  background: linear-gradient(180deg, rgba(24, 29, 39, 0.92), rgba(14, 17, 24, 0.98));
-  box-shadow: var(--shadow-soft);
+  min-height: 480px;
+  padding: 3.5rem;
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 191, 166, 0.05);
   overflow: hidden;
+}
+
+/* Glassmorphism gradient border */
+.inquiry-form-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 32px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(0, 191, 166, 0.4), transparent 40%, transparent 60%, rgba(0, 210, 255, 0.4));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .form-step {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 2rem;
+  height: 100%;
 }
 
-.form-step h3 {
-  font-size: 1.4rem;
-  margin-bottom: 1rem;
+.step-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--color-white);
+  letter-spacing: -0.02em;
 }
 
 .options-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1.25rem;
 }
 
 .option-card {
-  padding: 1.25rem 1rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 2px solid transparent;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   color: var(--color-text);
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 1.05rem;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  overflow: hidden;
 }
 
 .option-card:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
 }
 
 .option-card.selected {
-  background: rgba(0, 191, 166, 0.1);
+  background: linear-gradient(135deg, rgba(0, 191, 166, 0.15), rgba(0, 191, 166, 0.05));
   border-color: var(--color-primary);
+  color: var(--color-white);
+  box-shadow: 0 10px 20px rgba(0, 191, 166, 0.15);
+}
+
+.option-icon {
+  color: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.option-card.selected .option-icon {
+  color: var(--color-primary);
 }
 
 .step-actions {
   display: flex;
   gap: 1rem;
-  margin-top: 1.5rem;
+  margin-top: auto;
+  padding-top: 1rem;
 }
 
 .mt-4 {
@@ -87,42 +205,124 @@
 
 .inquiry-form-group {
   display: grid;
-  gap: 0.6rem;
+  gap: 0.75rem;
 }
 
 .inquiry-form-group label {
   font-weight: 600;
+  color: var(--color-text-soft);
+  font-size: 0.95rem;
 }
 
 .inquiry-form-group input,
 .inquiry-form-group textarea {
   width: 100%;
-  padding: 1rem 1.1rem;
+  padding: 1.1rem 1.25rem;
   border-radius: 16px;
-  border: 1px solid var(--color-border);
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--color-text);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--color-white);
   outline: none;
   font-family: inherit;
-  font-size: 1rem;
-  transition: border-color var(--transition-fast), background var(--transition-fast);
+  font-size: 1.05rem;
+  transition: all 0.3s ease;
 }
 
 .inquiry-form-group input:focus,
 .inquiry-form-group textarea:focus {
-  border-color: rgba(0, 191, 166, 0.4);
-  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--color-primary);
+  background: rgba(0, 191, 166, 0.03);
+  box-shadow: 0 0 0 4px rgba(0, 191, 166, 0.1);
 }
 
-button:disabled {
-  opacity: 0.5;
+.inquiry-form-group input::placeholder,
+.inquiry-form-group textarea::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-form-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 1.1rem 2rem;
+  border-radius: 16px;
+  background: var(--gradient-primary);
+  color: #000;
+  font-weight: 800;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 25px rgba(0, 191, 166, 0.3);
+}
+
+.btn-form-primary:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(0, 191, 166, 0.4);
+}
+
+.btn-form-primary:disabled {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.3);
+  box-shadow: none;
   cursor: not-allowed;
-  pointer-events: none;
+}
+
+.btn-form-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.1rem 1.5rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text);
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-form-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* WhatsApp specific submit button */
+.btn-whatsapp {
+  background: #25D366;
+  color: #fff;
+  box-shadow: 0 10px 25px rgba(37, 211, 102, 0.3);
+}
+
+.btn-whatsapp:hover {
+  background: #1EBE5D;
+  box-shadow: 0 15px 35px rgba(37, 211, 102, 0.4);
 }
 
 @media (max-width: 980px) {
   .inquiry-grid {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 3rem;
+  }
+  
+  .inquiry-form-container {
+    padding: 2rem;
+  }
+  
+  .inquiry-title {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .options-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .step-actions {
+    flex-direction: column-reverse;
   }
 }

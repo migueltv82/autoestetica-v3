@@ -43,7 +43,7 @@ function Turns() {
         </div>
 
         {showForm && (
-          <div className="dashboard-panel" style={{ marginBottom: "3rem", animation: "slideDown 0.4s ease-out" }}>
+          <div style={{ marginBottom: "3rem", animation: "slideDown 0.4s ease-out" }}>
             <TurnForm onAddTurn={(t) => {
               addTurn(t);
               setShowForm(false);
