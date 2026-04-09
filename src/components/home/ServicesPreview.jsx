@@ -4,11 +4,32 @@ import { useServices } from "../../hooks/useServices";
 import { getIcon } from "../../utils/iconMapper";
 import "./ServicesPreview.css";
 
+const featuredServices = [
+  {
+    icon: <Sparkles size={26} />,
+    title: "Lavado premium",
+    text: "Una limpieza exterior cuidada, con terminación prolija y presencia visual.",
+  },
+  {
+    icon: <Droplets size={26} />,
+    title: "Limpieza de interior",
+    text: "Trabajo detallado para renovar la imagen interior y mejorar la experiencia del vehículo.",
+  },
+  {
+    icon: <ShieldCheck size={26} />,
+    title: "Pulido y abrillantado",
+    text: "Tratamientos estéticos para recuperar brillo, profundidad y mejor terminación.",
+  },
+];
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.15, delayChildren: 0.2 },
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
+    },
   },
 };
 
@@ -34,8 +55,8 @@ function ServicesPreview() {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
         >
-          <span className="section-kicker">Lo que hacemos</span>
-          <h2 className="section-title">Servicios diseñados<br />para la excelencia</h2>
+          <span className="section-kicker">Servicios</span>
+          <h2 className="section-title">Soluciones pensadas para cada detalle</h2>
           <p className="section-text">
             Cada servicio es un estándar en sí mismo. Trabajamos con técnicas
             profesionales y productos de primer nivel para que el resultado supere tus expectativas.
@@ -49,31 +70,20 @@ function ServicesPreview() {
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
         >
-          {display.map((service) => {
-            const d = service.display || {};
-            return (
-              <motion.article className="service-preview-card" key={service.id} variants={cardVariants}>
-                <div className="service-preview-icon">
-                  {getIcon(service.iconName, { size: 26 })}
-                </div>
-                {d.name !== false && <h3>{service.name}</h3>}
-                {d.description !== false && <p>{service.description}</p>}
-              </motion.article>
-            );
-          })}
+          {featuredServices.map((service) => (
+            <motion.article className="service-preview-card" key={service.title} variants={cardVariants}>
+              <div className="service-preview-icon">{service.icon}</div>
+              <h3>{service.title}</h3>
+              <p>{service.text}</p>
+            </motion.article>
+          ))}
         </motion.div>
 
-        <motion.div
-          className="services-preview-actions"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-        >
+        <div className="services-preview-actions">
           <Link to="/servicios" className="btn-primary">
             Ver todos los servicios
           </Link>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

@@ -1,102 +1,79 @@
 .services-preview {
-  padding: var(--spacing-section) 0;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), transparent);
 }
 
 .section-heading {
   max-width: 720px;
-  margin-bottom: 3.5rem;
-}
-
-@media (max-width: 1024px) {
-  .section-heading {
-    text-align: center;
-    margin-inline: auto;
-  }
+  margin-bottom: 2.5rem;
 }
 
 .section-kicker {
   display: inline-block;
   margin-bottom: 0.85rem;
-  color: var(--color-primary);
+  color: #8ef8e7;
   font-size: 0.85rem;
-  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
 }
 
 .section-title {
-  font-size: clamp(2.25rem, 5vw, 3.5rem);
-  line-height: 1.1;
-  margin-bottom: 1.25rem;
-  letter-spacing: -0.03em;
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin-bottom: 1rem;
 }
 
 .section-text {
-  color: var(--color-text-soft);
+  color: rgba(255, 255, 255, 0.65);
   line-height: 1.8;
-  font-size: 1.1rem;
+  font-size: 1.02rem;
 }
 
 .services-preview-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.75rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.4rem;
 }
 
 .service-preview-card {
-  padding: 2.25rem;
-  border-radius: 24px;
+  padding: 1.6rem;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
-  background: var(--gradient-surface);
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  background: linear-gradient(180deg, rgba(29, 35, 48, 0.8), rgba(15, 17, 21, 0.95));
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
 }
 
 .service-preview-card:hover {
-  transform: translateY(-8px);
-  border-color: rgba(0, 191, 166, 0.3);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  transform: translateY(-4px);
+  border-color: rgba(0, 191, 166, 0.35);
 }
 
 .service-preview-icon {
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 18px;
+  margin-bottom: 1rem;
   background: rgba(0, 191, 166, 0.1);
-  color: var(--color-primary);
-  margin-bottom: 0.5rem;
+  color: #8ef8e7;
 }
 
 .service-preview-card h3 {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--color-white);
+  margin-bottom: 0.8rem;
+  font-size: 1.2rem;
 }
 
 .service-preview-card p {
   color: var(--color-text-soft);
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
 .services-preview-actions {
-  margin-top: 3.5rem;
-  display: flex;
-  justify-content: center;
+  margin-top: 2rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .services-preview-grid {
     grid-template-columns: 1fr;
-    gap: 1.25rem;
   }
-  
-  .service-preview-card {
-    padding: 1.75rem;
-  }
-}
+}

@@ -2,67 +2,57 @@ import { motion } from "framer-motion";
 import { Phone, Zap, ShieldCheck, Clock } from "lucide-react";
 import "./WhyChooseUs.css";
 
-const features = [
-  {
-    icon: <Zap size={28} />,
-    title: "Resultados que se ven",
-    text: "Técnicas de detailing profesional que transforman cada vehículo. No prometemos, demostramos.",
-  },
-  {
-    icon: <Clock size={28} />,
-    title: "+10 años en el mercado",
-    text: "Una década de experiencia perfeccionando cada proceso. Conocemos cada tipo de pintura y material.",
-  },
-  {
-    icon: <ShieldCheck size={28} />,
-    title: "Productos premium",
-    text: "Usamos insumos y ceras de primera línea para garantizar un acabado duradero y de alto impacto.",
-  },
-  {
-    icon: <Phone size={28} />,
-    title: "Coordinación por WhatsApp",
-    text: "Sin formularios complicados. Consultá, coordiná y seguí tu turno directamente desde tu celular.",
-  },
+const items = [
+  "Atención personalizada por WhatsApp",
+  "Trabajo prolijo y enfocado en el detalle",
+  "Proceso simple para consultar y coordinar",
+  "Seguimiento interno ordenado de turnos y servicios",
 ];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.4 } },
+};
 
 function WhyChooseUs() {
   return (
-    <section className="why-section">
-      <div className="container">
+    <section className="section why-choose-us">
+      <div className="container why-choose-grid">
         <motion.div
-          className="why-heading"
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.65 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
         >
           <span className="section-kicker">Diferencial</span>
-          <h2 className="section-title">Por qué nuestros clientes <br />confían en nosotros</h2>
+          <h2 className="section-title">Una experiencia simple, clara y bien cuidada</h2>
+          <p className="section-text">
+            La idea no es solo que el vehículo quede bien. También buscamos que
+            todo el proceso sea más cómodo, prolijo y confiable desde el primer contacto.
+          </p>
         </motion.div>
 
         <motion.div
-          className="why-grid"
+          className="why-list"
+          variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
-          variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.12 } },
-          }}
         >
-          {features.map((f) => (
-            <motion.div
-              key={f.title}
-              className="why-card"
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: "easeOut" } },
-              }}
-              whileHover={{ y: -6, transition: { duration: 0.25 } }}
-            >
-              <div className="why-card-icon">{f.icon}</div>
-              <h3 className="why-card-title">{f.title}</h3>
-              <p className="why-card-text">{f.text}</p>
+          {items.map((item) => (
+            <motion.div className="why-item" key={item} variants={itemVariants}>
+              <CheckCircle2 size={20} />
+              <span>{item}</span>
             </motion.div>
           ))}
         </motion.div>

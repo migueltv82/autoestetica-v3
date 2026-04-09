@@ -7,16 +7,21 @@ const interiorImg = "https://images.unsplash.com/photo-1503376780353-7e6692767b7
 const engineImg = "https://images.unsplash.com/photo-1486006920555-64acf2078ed9?q=80&w=1200&auto=format&fit=crop";
 import "./Hero.css";
 
-const BG_IMAGES = [
-  { src: polishingImg, label: "Tratamiento Acrílico" },
-  { src: interiorImg, label: "Limpieza de Interior" },
-  { src: engineImg, label: "Lavado de Motor" },
-];
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
+    },
+  },
+};
 
-const STATS = [
-  { value: "+10", label: "Años de experiencia" },
-  { value: "100%", label: "Atención personalizada" },
-];
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
 
 function Hero() {
   const [current, setCurrent] = useState(0);
@@ -81,64 +86,32 @@ function Hero() {
       {/* Main content */}
       <div className="container hero-body">
         <motion.div
-          className="hero-content-wrap"
+          className="hero-content"
+          variants={containerVariants}
           initial="hidden"
           animate="visible"
-          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.14, delayChildren: 0.2 } } }}
         >
-          {/* Badge */}
-          <motion.div
-            className="hero-badge-pill"
-            variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
-          >
-            <Sparkles size={14} />
-            Estética Vehicular Premium
-          </motion.div>
+          <motion.span className="hero-badge" variants={itemVariants}>
+            Estética vehicular premium
+          </motion.span>
 
-          {/* Headline */}
-          <motion.h1
-            className="hero-headline"
-            variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.75, ease: "easeOut" } } }}
-          >
-            Tu auto merece<br />
-            <span className="hero-headline-accent">lo mejor.</span>
+          <motion.h1 className="hero-title" variants={itemVariants}>
+            Cuidamos cada detalle para que tu vehículo se vea impecable.
           </motion.h1>
 
-          {/* Subtext */}
-          <motion.p
-            className="hero-subtext"
-            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
-          >
-            Más de una década cuidando cada milímetro de tu vehículo con
-            técnicas profesionales, productos premium y atención a medida.
+          <motion.p className="hero-text" variants={itemVariants}>
+            Servicios de estética vehicular con atención personalizada, imagen
+            profesional y una experiencia simple para consultar y coordinar por
+            WhatsApp.
           </motion.p>
 
-          {/* CTA Buttons */}
-          <motion.div
-            className="hero-cta-row"
-            variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
-          >
-            <Link to="/consulta" className="btn-hero-primary">
-              <MessageCircle size={20} />
-              Consultá por WhatsApp
+          <motion.div className="hero-actions" variants={itemVariants}>
+            <Link to="/consulta" className="btn-primary">
+              Hacer una consulta
             </Link>
             <Link to="/servicios" className="btn-hero-secondary">
               Ver servicios
             </Link>
-          </motion.div>
-
-          {/* Stats strip */}
-          <motion.div
-            className="hero-stats-strip"
-            variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.8, delay: 0.3 } } }}
-          >
-            {STATS.map((stat, i) => (
-              <div key={stat.label} className="hero-stat">
-                <span className="hero-stat-value">{stat.value}</span>
-                <span className="hero-stat-label">{stat.label}</span>
-                {i < STATS.length - 1 && <div className="hero-stat-divider" />}
-              </div>
-            ))}
           </motion.div>
         </motion.div>
       </div>
@@ -151,10 +124,13 @@ function Hero() {
         transition={{ delay: 1.4, duration: 0.8 }}
       >
         <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+          className="hero-visual"
+          initial={{ opacity: 0, scale: 0.94, x: 25 }}
+          animate={{ opacity: 1, scale: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
         >
-          <ArrowDown size={22} />
+          <img src={carImage} alt="Luxury Car Detailing" className="hero-car-img" />
+          <div className="hero-glow"></div>
         </motion.div>
       </motion.div>
     </section>
