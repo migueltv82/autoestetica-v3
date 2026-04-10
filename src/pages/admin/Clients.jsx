@@ -1,10 +1,11 @@
 import { useState, useMemo } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import PageTransition from "../../components/ui/PageTransition";
+import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import StatCard from "../../components/ui/StatCard";
 import { Search, Plus, Users, Star, TrendingUp, Edit2, Trash2, X, Phone, Car } from "lucide-react";
 import { useClients } from "../../hooks/useClients";
-import "../../components/admin/TurnsTable.css"; // Usa los estilos premium de las tablas
+import "../../components/admin/TurnsTable.css";
 
 function Clients() {
   const { clients, totalClients, search, setSearch, addClient, updateClient, deleteClient } = useClients();
@@ -12,19 +13,24 @@ function Clients() {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({ name: "", phone: "", vehicle: "Auto" });
 
-  const vipClients = useMemo(() => clients.filter(c => parseInt(c.visits) >= 3).length, [clients]);
+  const vipClients = useMemo(
+    () => clients.filter((client) => Number.parseInt(client.visits, 10) >= 3).length,
+    [clients]
+  );
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    if (!formData.name || !formData.phone) return;
-    
+  function handleSubmit(event) {
+    event.preventDefault();
+    if (!formData.name || !formData.phone) {
+      return;
+    }
+
     if (editingId) {
       updateClient(editingId, formData);
       setEditingId(null);
     } else {
       addClient(formData);
     }
-    
+
     setFormData({ name: "", phone: "", vehicle: "Auto" });
     setShowForm(false);
   }
@@ -37,7 +43,7 @@ function Clients() {
   }
 
   function handleDelete(id) {
-    if (window.confirm("¿Seguro que querés borrar este cliente? Se perderá todo su historial.")) {
+    if (window.confirm("Queres borrar este cliente? Se perdera todo su historial.")) {
       deleteClient(id);
     }
   }
@@ -46,112 +52,139 @@ function Clients() {
     <PageTransition>
       <AdminLayout
         title="Directorio de Clientes"
-        subtitle="Historial, datos y seguimiento de clientes del negocio."
+        subtitle="Historial, datos de contacto y seguimiento comercial en una sola vista."
       >
         <section className="admin-stats-grid">
-          <StatCard label="Total Clientes" value={totalClients} icon={<Users size={24} />} color="var(--color-primary)"/>
-          <StatCard label="Clientes VIP" value={vipClients} icon={<Star size={24} />} trend="+2 este mes" color="#facc15" />
-          <StatCard label="Eficiencia" value="94%" icon={<TrendingUp size={24} />} color="#38bdf8" />
+          <StatCard label="Total clientes" value={totalClients} icon={<Users size={24} />} color="var(--color-primary)" trend="Base activa" />
+          <StatCard label="Clientes VIP" value={vipClients} icon={<Star size={24} />} trend="Alta recurrencia" color="#facc15" />
+          <StatCard label="Eficiencia" value="94%" icon={<TrendingUp size={24} />} trend="Retencion estimada" color="#38bdf8" />
         </section>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "3rem", gap: "2rem", flexWrap: "wrap" }}>
-          <div style={{ position: "relative", flex: 1, minWidth: "260px" }}>
-            <Search size={18} style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "var(--color-text-soft)" }} />
-            <input 
-              type="text" 
-              placeholder="Buscar por nombre o teléfono..." 
-              value={search} 
-              onChange={(e) => setSearch(e.target.value)}
-              style={{ width: "100%", padding: "1rem 1rem 1rem 3.2rem", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", color: "var(--color-white)", fontSize: "0.95rem" }}
+        <AdminPageHeader
+          eyebrow="CRM"
+          icon={<Users size={18} />}
+          title="Base de clientes"
+          subtitle="Busca, edita y registra perfiles sin salir de la misma grilla."
+          actions={
+            <button
+              className={showForm ? "btn-ghost" : "btn-premium"}
+              onClick={() => {
+                setShowForm((current) => !current);
+                if (editingId) {
+                  setEditingId(null);
+                  setFormData({ name: "", phone: "", vehicle: "Auto" });
+                }
+              }}
+            >
+              {showForm ? <X size={18} /> : <Plus size={18} />}
+              <span>{showForm ? "Cancelar alta" : "Nuevo cliente"}</span>
+            </button>
+          }
+        />
+
+        <div className="admin-inline-actions">
+          <div className="admin-search-shell">
+            <Search size={18} className="admin-search-icon" />
+            <input
+              type="text"
+              className="admin-search-input"
+              placeholder="Buscar por nombre o telefono..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
             />
           </div>
-          <button 
-            className={showForm ? "btn-ghost" : "btn-premium"} 
-            style={{ height: "50px", minWidth: "180px", justifyContent: "center" }}
-            onClick={() => {
-              setShowForm(!showForm);
-              if (editingId) {
-                setEditingId(null);
-                setFormData({ name: "", phone: "", vehicle: "Auto" });
-              }
-            }}
-          >
-            {showForm ? <X size={18} /> : <Plus size={18} />}
-            <span>{showForm ? "Cancelar Alta" : "Nuevo Cliente"}</span>
-          </button>
         </div>
 
-        {showForm && (
-          <div className="inquiry-form-container" style={{ marginBottom: "3rem", padding: "2.5rem", minHeight: "auto", animation: "slideDown 0.4s ease-out" }}>
-            <h3 style={{ marginBottom: "2rem", fontSize: "1.1rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-primary)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              {editingId ? <Edit2 size={18} /> : <Plus size={18} />}
-              {editingId ? "Editar perfil del cliente" : "Registrar nuevo cliente"}
-            </h3>
-            <form onSubmit={handleSubmit} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2rem", alignItems: "end" }}>
-              <div className="inquiry-form-group">
-                <label><Users size={14} style={{display:'inline', marginRight: '5px'}}/> Nombre Completo</label>
-                <input 
-                  type="text" 
-                  required 
-                  value={formData.name} 
-                  onChange={e => setFormData({...formData, name: e.target.value})} 
-                  placeholder="Ej: Roberto Gómez" 
-                />
+        {showForm ? (
+          <section className="admin-form-shell">
+            <div className="admin-form-header">
+              <div>
+                <span className="admin-form-kicker">{editingId ? "Edicion" : "Alta"}</span>
+                <h3 className="admin-form-title">
+                  {editingId ? "Actualizar perfil del cliente" : "Registrar nuevo cliente"}
+                </h3>
               </div>
-              <div className="inquiry-form-group">
-                <label><Phone size={14} style={{display:'inline', marginRight: '5px'}}/> Teléfono WhatsApp</label>
-                <input 
-                  type="text" 
-                  required 
-                  value={formData.phone} 
-                  onChange={e => setFormData({...formData, phone: e.target.value})} 
-                  placeholder="Ej: 3814000000" 
-                />
+            </div>
+
+            <form onSubmit={handleSubmit}>
+              <div className="admin-form-grid wide">
+                <div className="admin-form-group">
+                  <label>
+                    <Users size={14} /> Nombre completo
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(event) => setFormData({ ...formData, name: event.target.value })}
+                    placeholder="Ej: Roberto Gomez"
+                  />
+                </div>
+
+                <div className="admin-form-group">
+                  <label>
+                    <Phone size={14} /> Telefono WhatsApp
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.phone}
+                    onChange={(event) => setFormData({ ...formData, phone: event.target.value })}
+                    placeholder="Ej: 3814000000"
+                  />
+                </div>
+
+                <div className="admin-form-group">
+                  <label>
+                    <Car size={14} /> Vehiculo principal
+                  </label>
+                  <select
+                    value={formData.vehicle}
+                    onChange={(event) => setFormData({ ...formData, vehicle: event.target.value })}
+                  >
+                    <option value="Auto">Auto estandar</option>
+                    <option value="Camioneta">Camioneta</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Moto">Moto</option>
+                    <option value="Furgon">Furgon utilitario</option>
+                  </select>
+                </div>
               </div>
-              <div className="inquiry-form-group">
-                <label><Car size={14} style={{display:'inline', marginRight: '5px'}}/> Vehículo Principal</label>
-                <select 
-                  value={formData.vehicle} 
-                  onChange={e => setFormData({...formData, vehicle: e.target.value})}
-                >
-                  <option value="Auto">Auto Estandar</option>
-                  <option value="Camioneta">Camioneta</option>
-                  <option value="SUV">SUV</option>
-                  <option value="Moto">Motoneta / Moto</option>
-                  <option value="Furgón">Furgón utilitario</option>
-                </select>
+
+              <div className="admin-form-actions">
+                <button type="submit" className="btn-form-primary">
+                  {editingId ? "Guardar cambios" : "Confirmar alta"}
+                </button>
               </div>
-              <button type="submit" className="btn-form-primary" style={{ height: "56px", margin: 0 }}>
-                {editingId ? "Guardar Cambios" : "Confirmar Alta"}
-              </button>
             </form>
-          </div>
-        )}
+          </section>
+        ) : null}
 
         <div className="admin-table-wrap">
-          {/* Desktop Table View */}
           <table className="admin-table desktop-only-table">
             <thead>
               <tr>
-                <th>CLIENTE</th>
-                <th>CONTACTO</th>
-                <th>VEHÍCULO</th>
-                <th>FIDELIDAD</th>
-                <th>FLUJO GENERADO</th>
-                <th style={{ textAlign: "right" }}>ACCIONES</th>
+                <th>Cliente</th>
+                <th>Contacto</th>
+                <th>Vehiculo</th>
+                <th>Fidelidad</th>
+                <th>Flujo generado</th>
+                <th style={{ textAlign: "right" }}>Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {clients.map(client => {
-                const isVip = parseInt(client.visits) >= 3;
+              {clients.map((client) => {
+                const visits = Number.parseInt(client.visits, 10);
+                const isVip = visits >= 3;
+
                 return (
-                  <tr key={client.id} className={isVip ? 'row-vip' : ''}>
+                  <tr key={client.id} className={isVip ? "row-vip" : ""}>
                     <td>
                       <div className="turn-client-cell">
-                        <div className="turn-client-name" style={{ color: "var(--color-white)" }}>
-                          {client.name}
+                        <div className="turn-client-name">{client.name}</div>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-soft)", fontWeight: 600 }}>
+                          ID #{String(client.id).slice(-4)}
                         </div>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-soft)", fontWeight: 600 }}>ID #{client.id.toString().slice(-4)}</div>
                       </div>
                     </td>
                     <td>
@@ -165,14 +198,21 @@ function Clients() {
                       </div>
                     </td>
                     <td>
-                      <div style={{ 
-                        display: "inline-flex", alignItems: "center", gap: "0.3rem", fontWeight: 800, padding: "0.3rem 0.6rem", borderRadius: "8px",
-                        background: isVip ? "rgba(250, 204, 21, 0.15)" : "rgba(255,255,255,0.03)",
-                        border: `1px solid ${isVip ? "rgba(250, 204, 21, 0.3)" : "rgba(255,255,255,0.05)"}`,
-                        color: isVip ? "#facc15" : "var(--color-text-soft)"
-                       }}>
-                        {isVip && <Star size={12} fill="currentColor" />}
-                        {client.visits} {parseInt(client.visits) === 1 ? 'visita' : 'visitas'}
+                      <div
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.3rem",
+                          fontWeight: 800,
+                          padding: "0.3rem 0.6rem",
+                          borderRadius: "8px",
+                          background: isVip ? "rgba(250, 204, 21, 0.15)" : "rgba(255,255,255,0.03)",
+                          border: `1px solid ${isVip ? "rgba(250, 204, 21, 0.3)" : "rgba(255,255,255,0.05)"}`,
+                          color: isVip ? "#facc15" : "var(--color-text-soft)",
+                        }}
+                      >
+                        {isVip ? <Star size={12} fill="currentColor" /> : null}
+                        {visits} {visits === 1 ? "visita" : "visitas"}
                       </div>
                     </td>
                     <td style={{ fontWeight: 800, color: "var(--color-white)" }}>{client.amount}</td>
@@ -192,64 +232,71 @@ function Clients() {
             </tbody>
           </table>
 
-          {/* Mobile Card View */}
           <div className="mobile-only-card">
-            {clients.map(client => {
-              const isVip = parseInt(client.visits) >= 3;
+            {clients.map((client) => {
+              const visits = Number.parseInt(client.visits, 10);
+              const isVip = visits >= 3;
+
               return (
-              <div key={client.id} className={`turn-mobile-card ${isVip ? 'row-vip' : ''}`}>
-                <div className="card-header-mobile" style={{ marginBottom: "0.5rem" }}>
-                  <div className="date-val-mobile"><Phone size={12} style={{display:'inline'}}/> {client.phone}</div>
-                  {isVip && (
-                    <div style={{ fontWeight: 800, color: "#facc15", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: "0.2rem" }}>
-                      <Star size={12} fill="currentColor"/> VIP
+                <div key={client.id} className={`turn-mobile-card ${isVip ? "row-vip" : ""}`}>
+                  <div className="card-header-mobile" style={{ marginBottom: "0.5rem" }}>
+                    <div className="date-val-mobile">
+                      <Phone size={12} style={{ display: "inline" }} /> {client.phone}
                     </div>
-                  )}
-                </div>
+                    {isVip ? (
+                      <div style={{ fontWeight: 800, color: "#facc15", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: "0.2rem" }}>
+                        <Star size={12} fill="currentColor" /> VIP
+                      </div>
+                    ) : null}
+                  </div>
 
-                <div className="client-info-mini">
-                   <strong>{client.name}</strong>
-                </div>
+                  <div className="client-info-mini">
+                    <strong>{client.name}</strong>
+                  </div>
 
-                <div className="card-details-grid-mobile" style={{ padding: "0.8rem" }}>
-                   <div className="detail-item-mobile">
-                     <span className="detail-label">Vehículo</span>
-                     <div className="detail-val">{client.vehicle}</div>
-                   </div>
-                   <div className="detail-item-mobile">
-                     <span className="detail-label">Historial</span>
-                     <div className="detail-val" style={{ color: isVip ? "#facc15" : "inherit" }}>
-                        {client.visits} Visitas
-                     </div>
-                   </div>
-                </div>
+                  <div className="card-details-grid-mobile" style={{ padding: "0.8rem" }}>
+                    <div className="detail-item-mobile">
+                      <span className="detail-label">Vehiculo</span>
+                      <div className="detail-val">{client.vehicle}</div>
+                    </div>
+                    <div className="detail-item-mobile">
+                      <span className="detail-label">Historial</span>
+                      <div className="detail-val" style={{ color: isVip ? "#facc15" : "inherit" }}>
+                        {visits} visitas
+                      </div>
+                    </div>
+                  </div>
 
-                <div className="card-footer-mobile" style={{ paddingTop: "0.5rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                   <div>
-                     <span style={{ fontSize: "0.7rem", color: "var(--color-text-soft)", textTransform: "uppercase" }}>Acumulado</span>
-                     <br/>
-                     <strong style={{ fontSize: "1.1rem" }}>{client.amount}</strong>
-                   </div>
-                   <div className="card-actions-mobile">
-                     <button className="btn-ghost-mini" onClick={() => handleEdit(client)}><Edit2 size={16} /></button>
-                     <button className="btn-danger-mini" onClick={() => handleDelete(client.id)}><Trash2 size={16} /></button>
-                   </div>
+                  <div className="card-footer-mobile" style={{ paddingTop: "0.5rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <span style={{ fontSize: "0.7rem", color: "var(--color-text-soft)", textTransform: "uppercase" }}>Acumulado</span>
+                      <br />
+                      <strong style={{ fontSize: "1.1rem" }}>{client.amount}</strong>
+                    </div>
+                    <div className="card-actions-mobile">
+                      <button className="btn-ghost-mini" onClick={() => handleEdit(client)}>
+                        <Edit2 size={16} />
+                      </button>
+                      <button className="btn-danger-mini" onClick={() => handleDelete(client.id)}>
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )})}
+              );
+            })}
           </div>
 
-          {clients.length === 0 && (
-            <div style={{ padding: "6rem", textAlign: "center", color: "var(--color-text-soft)" }}>
-               <Users size={48} style={{ opacity: 0.2, margin: "0 auto 1rem auto" }} />
-               <p style={{ fontStyle: "italic" }}>No se encontraron clientes registrados.</p>
+          {clients.length === 0 ? (
+            <div className="admin-empty-state">
+              <Users size={48} />
+              <p>No se encontraron clientes registrados.</p>
             </div>
-          )}
+          ) : null}
         </div>
-
       </AdminLayout>
     </PageTransition>
   );
 }
 
-export default Clients;
+export default Clients;

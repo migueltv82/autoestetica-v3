@@ -1,29 +1,65 @@
 .admin-topbar {
-  padding: 3rem 2rem 0;
-  max-width: var(--container);
+  width: min(100% - 2rem, var(--container-admin));
   margin: 0 auto;
-  width: 100%;
+  padding: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.admin-topbar > div {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.4rem, 3vw, 2rem);
+  border-radius: calc(var(--radius-panel) + 4px);
+  border: 1px solid rgba(125, 228, 209, 0.15);
+  background:
+    linear-gradient(180deg, rgba(16, 26, 42, 0.86), rgba(9, 15, 25, 0.96)),
+    rgba(9, 15, 25, 0.9);
+  box-shadow:
+    var(--shadow-premium),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.admin-topbar > div::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(125, 228, 209, 0.45),
+    rgba(105, 167, 255, 0.45),
+    transparent
+  );
 }
 
 .admin-topbar h1 {
-  font-size: clamp(2rem, 3.5vw, 2.75rem);
-  font-weight: 800;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
   color: var(--color-white);
-  letter-spacing: -0.04em;
-  margin-bottom: 0.65rem;
-  line-height: 1.1;
+  letter-spacing: -0.05em;
+  margin-bottom: 0.7rem;
+  line-height: 0.98;
+  max-width: 12ch;
 }
 
 .admin-topbar p {
   color: var(--color-text-soft);
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 500;
-  line-height: 1.6;
-  max-width: 700px;
+  line-height: 1.8;
+  max-width: 62ch;
 }
 
 @media (max-width: 1024px) {
   .admin-topbar {
-    padding: 2rem 1.5rem 0;
+    width: min(100% - 1.5rem, var(--container-admin));
+  }
+}
+
+@media (max-width: 720px) {
+  .admin-topbar {
+    width: min(100% - 1rem, var(--container-admin));
   }
 }

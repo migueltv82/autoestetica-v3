@@ -1,4 +1,3 @@
-/* Premium Glassmorphism for Table Container */
 .admin-table-wrap {
   position: relative;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
@@ -8,49 +7,50 @@
   -webkit-backdrop-filter: blur(24px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   overflow: hidden;
-  padding: 1px; /* border gradient illusion */
+  padding: 1px;
 }
 
-/* Row Hover Elevations */
 .admin-table tbody tr {
   transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .admin-table tbody tr:hover {
   background: rgba(255, 255, 255, 0.04);
-  box-shadow: inset 0 0 0 1px rgba(0, 191, 166, 0.2), 0 10px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0 0 0 1px rgba(125, 228, 209, 0.2), 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
 .admin-table tbody tr.row-finished {
   opacity: 0.6;
 }
+
 .admin-table tbody tr.row-finished:hover {
   opacity: 0.9;
 }
 
-/* Income/Expense Highlights */
 .admin-table tbody tr.row-income {
-  background: linear-gradient(90deg, rgba(0, 191, 166, 0.08) 0%, transparent 100%);
+  background: linear-gradient(90deg, rgba(125, 228, 209, 0.08) 0%, transparent 100%);
 }
+
 .admin-table tbody tr.row-income:hover {
-  background: linear-gradient(90deg, rgba(0, 191, 166, 0.12) 0%, rgba(255,255,255,0.02) 100%);
+  background: linear-gradient(90deg, rgba(125, 228, 209, 0.12) 0%, rgba(255, 255, 255, 0.02) 100%);
 }
 
 .admin-table tbody tr.row-expense {
   background: linear-gradient(90deg, rgba(248, 113, 113, 0.08) 0%, transparent 100%);
 }
+
 .admin-table tbody tr.row-expense:hover {
-  background: linear-gradient(90deg, rgba(248, 113, 113, 0.12) 0%, rgba(255,255,255,0.02) 100%);
+  background: linear-gradient(90deg, rgba(248, 113, 113, 0.12) 0%, rgba(255, 255, 255, 0.02) 100%);
 }
 
 .admin-table tbody tr.row-vip {
   background: linear-gradient(90deg, rgba(250, 204, 21, 0.08) 0%, transparent 100%);
 }
+
 .admin-table tbody tr.row-vip:hover {
-  background: linear-gradient(90deg, rgba(250, 204, 21, 0.14) 0%, rgba(255,255,255,0.02) 100%);
+  background: linear-gradient(90deg, rgba(250, 204, 21, 0.14) 0%, rgba(255, 255, 255, 0.02) 100%);
 }
 
-/* Desktop Table Cells */
 .turn-agenda-cell {
   display: flex;
   flex-direction: column;
@@ -102,13 +102,12 @@
   color: var(--color-white);
 }
 
-/* Vehicle Badge Glow */
 .vehicle-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.4rem 0.8rem;
-  border-radius: 12px;
+  padding: 0.45rem 0.8rem;
+  border-radius: 14px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 0.85rem;
@@ -118,18 +117,17 @@
 }
 
 .admin-table tbody tr:hover .vehicle-badge {
-  background: rgba(0, 191, 166, 0.1);
-  border-color: rgba(0, 191, 166, 0.3);
+  background: rgba(125, 228, 209, 0.1);
+  border-color: rgba(125, 228, 209, 0.3);
   color: var(--color-white);
 }
 
-/* Status Selectors */
 .status-selector-wrap {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.4rem 1rem;
-  border-radius: 100px;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -150,6 +148,7 @@
   cursor: pointer;
   appearance: none;
 }
+
 .admin-input-minimal option {
   background: var(--color-bg);
   color: var(--color-white);
@@ -161,7 +160,6 @@
   justify-content: flex-end;
 }
 
-/* Mobile Card Styling - Premium Overhaul */
 .mobile-only-card {
   display: grid;
   gap: 1.5rem;
@@ -184,8 +182,8 @@
 
 .turn-mobile-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(0, 191, 166, 0.3);
-  box-shadow: 0 20px 40px rgba(0, 191, 166, 0.15);
+  border-color: rgba(125, 228, 209, 0.3);
+  box-shadow: 0 20px 40px rgba(125, 228, 209, 0.12);
 }
 
 .turn-mobile-card.row-finished {
@@ -193,11 +191,13 @@
 }
 
 .turn-mobile-card.row-income {
-  background: linear-gradient(180deg, rgba(0, 191, 166, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  background: linear-gradient(180deg, rgba(125, 228, 209, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
 }
+
 .turn-mobile-card.row-expense {
   background: linear-gradient(180deg, rgba(248, 113, 113, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
 }
+
 .turn-mobile-card.row-vip {
   background: linear-gradient(180deg, rgba(250, 204, 21, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
 }
@@ -253,7 +253,7 @@
   justify-content: center;
   font-weight: 800;
   font-size: 1.2rem;
-  box-shadow: 0 5px 15px rgba(0, 191, 166, 0.3);
+  box-shadow: 0 5px 15px rgba(125, 228, 209, 0.3);
 }
 
 .client-info-mini {
@@ -322,7 +322,8 @@
   font-weight: 700;
 }
 
-.btn-ghost-mini, .btn-danger-mini {
+.btn-ghost-mini,
+.btn-danger-mini {
   flex: 1;
   padding: 0.85rem;
   border-radius: 14px;

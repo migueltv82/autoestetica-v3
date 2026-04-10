@@ -1,21 +1,7 @@
 .services-section {
   position: relative;
-  padding: 100px 0;
+  padding: clamp(5rem, 8vw, 7rem) 0;
   overflow: hidden;
-  background: var(--color-bg);
-}
-
-.services-watermark {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 70vw;
-  max-width: 1000px;
-  opacity: 0.035;
-  pointer-events: none;
-  z-index: 0;
-  filter: grayscale(1) brightness(1.2);
 }
 
 .relative-content {
@@ -23,153 +9,196 @@
   z-index: 1;
 }
 
+.section-header-wrapper {
+  max-width: 760px;
+}
+
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2.5rem;
-  margin-top: 4rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.35rem;
+  margin-top: 3rem;
 }
 
-.vanguard-service-card {
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 24px;
-  padding: 2.5rem;
+.premium-service-card {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  position: relative;
-  overflow: hidden;
+  gap: 1.1rem;
+  min-height: 100%;
+  padding: 1.75rem;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015)),
+    rgba(9, 12, 16, 0.86);
+  box-shadow: var(--shadow-soft);
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
-.vanguard-service-card.featured {
-  background: rgba(0, 191, 166, 0.03);
-  border-color: rgba(0, 191, 166, 0.2);
+.premium-service-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(155, 213, 200, 0.16);
+  box-shadow: 0 26px 48px rgba(0, 0, 0, 0.3);
 }
 
-.vanguard-featured-glow {
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(0, 191, 166, 0.05) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: -1;
-}
-
-.vanguard-card-icon {
-  width: 64px;
-  height: 64px;
-  background: rgba(0, 191, 166, 0.1);
-  color: var(--color-primary);
-  border-radius: 18px;
+.card-header {
   display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.card-icon-wrapper {
+  width: 58px;
+  height: 58px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.5rem;
-  border: 1px solid rgba(0, 191, 166, 0.2);
-  box-shadow: 0 8px 16px rgba(0, 191, 166, 0.05);
+  border-radius: 18px;
+  background: rgba(155, 213, 200, 0.08);
+  color: #d2eee8;
+  border: 1px solid rgba(155, 213, 200, 0.14);
 }
 
-.card-click-label {
+.card-action {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--color-text-soft);
+}
+
+.gallery-tooltip {
   position: absolute;
-  top: 2.5rem;
-  right: 2.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.4rem 0.75rem;
-  border-radius: 10px;
+  top: -2rem;
+  right: 0;
+  white-space: nowrap;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(9, 12, 16, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--color-text-soft);
   font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  color: var(--color-primary);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  pointer-events: none;
+}
+
+.premium-service-card:hover .gallery-tooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card-content h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 0.7rem;
+}
+
+.card-content p {
+  color: var(--color-text-soft);
+  line-height: 1.8;
+}
+
+.card-footer {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  border: 1px solid rgba(0, 191, 166, 0.2);
-  opacity: 0.6;
-  transition: all 0.3s ease;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.vanguard-service-card:hover .card-click-label {
-  opacity: 1;
-  background: rgba(0, 191, 166, 0.1);
-  transform: translateX(-5px);
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
-.vanguard-card-title {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--color-white);
-  letter-spacing: -0.02em;
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--color-text-soft);
+  font-size: 0.88rem;
 }
 
-/* Modal Gallery Content */
+.meta-icon {
+  color: #d2eee8;
+}
+
+.card-price {
+  font-family: var(--font-display);
+  font-size: 1.28rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
 .gallery-modal-content {
   display: flex;
   flex-direction: column;
   gap: 2rem;
 }
 
+.gallery-empty-state {
+  display: grid;
+  gap: 0.7rem;
+  padding: 2.3rem 1.5rem;
+  text-align: center;
+  border-radius: 22px;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--color-text-soft);
+}
+
+.gallery-empty-state svg {
+  margin: 0 auto;
+  color: #d2eee8;
+}
+
+.gallery-empty-state p {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
 .gallery-info-text {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 1.5rem;
+  padding-top: 1.4rem;
 }
 
 .gallery-info-text h4 {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: var(--color-white);
   margin-bottom: 0.75rem;
 }
 
 .gallery-info-text p {
-  font-size: 0.95rem;
   color: var(--color-text-soft);
-  line-height: 1.6;
-}
-
-.vanguard-card-desc {
-  font-size: 1rem;
-  line-height: 1.7;
-  color: var(--color-text-soft);
-  flex-grow: 1;
-}
-
-.vanguard-card-footer {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--color-text-soft);
-}
-
-.vanguard-card-duration {
-  color: var(--color-text);
-  font-weight: 700;
+  line-height: 1.8;
 }
 
 @media (max-width: 768px) {
-  .services-section {
-    padding: 60px 0;
-  }
-
-  .vanguard-service-card {
-    padding: 2rem;
-  }
-
   .services-grid {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
   }
 
-  .vanguard-card-title {
-    font-size: 1.3rem;
+  .premium-service-card {
+    padding: 1.5rem;
+  }
+
+  .card-footer {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

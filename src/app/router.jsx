@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Loader from "../components/ui/Loader";
+import ScrollToTop from "../components/ui/ScrollToTop";
 
 // Public pages
 const Home = lazy(() => import("../pages/public/Home"));
@@ -21,6 +22,7 @@ const Settings = lazy(() => import("../pages/admin/Settings"));
 export default function RouterProviderApp() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Suspense fallback={<Loader />}>
         <Routes>
           {/* Public Routes */}
@@ -46,4 +48,4 @@ export default function RouterProviderApp() {
       </Suspense>
     </BrowserRouter>
   );
-}
+}

@@ -1,21 +1,35 @@
 import { useState } from "react";
-import AdminLayout from "../../components/admin/AdminLayout";
-import PageTransition from "../../components/ui/PageTransition";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  Plus, Edit2, Trash2, Clock, Info, Star, Image as ImageIcon,
-  Camera, X, Eye, EyeOff, Check, ChevronDown, ChevronUp
+  Camera,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  Edit2,
+  Eye,
+  EyeOff,
+  Image as ImageIcon,
+  Info,
+  Plus,
+  Star,
+  Trash2,
+  X,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import Modal from "../../components/ui/Modal";
+import AdminLayout from "../../components/admin/AdminLayout";
+import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import Carousel from "../../components/ui/Carousel";
+import Modal from "../../components/ui/Modal";
+import PageTransition from "../../components/ui/PageTransition";
 import { useServices } from "../../hooks/useServices";
-import { getIcon, getAvailableIcons } from "../../utils/iconMapper";
+import { getAvailableIcons, getIcon } from "../../utils/iconMapper";
 import "./AdminServices.css";
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
 };
+
 const cardVariants = {
   hidden: { opacity: 0, y: 24, scale: 0.97 },
   visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: "easeOut" } },
@@ -29,15 +43,29 @@ const emptyForm = {
   duration: "",
   iconName: "Zap",
   featured: false,
-  display: { name: true, description: true, gallery: true, duration: true, price: true },
+  display: {
+    name: true,
+    description: true,
+    gallery: true,
+    duration: true,
+    price: true,
+  },
   gallery: [],
 };
 
 const VISIBILITY_LABELS = {
   name: "Nombre del servicio",
-  description: "Descripción",
-  gallery: "Galería de trabajos",
-  duration: "Duración estimada",
+  description: "Descripcion",
+  gallery: "Galeria de trabajos",
+  duration: "Duracion estimada",
+  price: "Precio",
+};
+
+const VISIBILITY_SHORT_LABELS = {
+  name: "Nombre",
+  description: "Desc.",
+  gallery: "Galeria",
+  duration: "Tiempo",
   price: "Precio",
 };
 
@@ -63,20 +91,38 @@ function ToggleSwitch({ checked, onChange, label }) {
 
 function AdminServices() {
   const {
-    services, addService, updateService, deleteService,
-    toggleFeatured, updateVisibility,
+    services,
+    addService,
+    updateService,
+    deleteService,
+    toggleFeatured,
+    updateVisibility,
   } = useServices();
 
-  const [editingService, setEditingService] = useState(null); // edit modal
-  const [editingGallery, setEditingGallery] = useState(null); // gallery modal
+  const [editingService, setEditingService] = useState(null);
+  const [editingGallery, setEditingGallery] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showVisibility, setShowVisibility] = useState(false);
 
-  const formatMoney = (val) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(val);
+  const formDisplay = { ...emptyForm.display, ...form.display };
+  const isNew = editingService === "new";
+  const currentService = isNew ? null : services.find((service) => service.id === editingService);
 
-  // ----------- Edit / New -------------
+  const formatMoney = (value) =>
+    new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+      minimumFractionDigits: 0,
+    }).format(value);
+
+  const resetEditState = () => {
+    setEditingService(null);
+    setForm(emptyForm);
+    setShowIconPicker(false);
+    setShowVisibility(false);
+  };
+
   const openNew = () => {
     setForm(emptyForm);
     setEditingService("new");
@@ -91,219 +137,237 @@ function AdminServices() {
       price: service.price,
       duration: service.duration,
       iconName: service.iconName,
-      featured: service.featured || false,
-      display: { ...service.display },
-      gallery: [...service.gallery],
+      featured: Boolean(service.featured),
+      display: { ...emptyForm.display, ...service.display },
+      gallery: [...(service.gallery || [])],
     });
     setEditingService(service.id);
     setShowVisibility(false);
     setShowIconPicker(false);
   };
 
-  const closeEdit = () => {
-    setEditingService(null);
-    setForm(emptyForm);
-  };
-
   const handleSave = () => {
-    if (!form.name || !form.duration) return;
+    if (!form.name || !form.duration) {
+      return;
+    }
+
     const payload = {
       ...form,
-      price: parseFloat(form.price) || 0,
+      display: formDisplay,
+      price: Number.parseFloat(form.price) || 0,
     };
+
     if (editingService === "new") {
       addService(payload);
     } else {
       updateService(editingService, payload);
     }
-    closeEdit();
+
+    resetEditState();
   };
 
-  const setDisplayField = (key, val) => {
-    setForm(prev => ({ ...prev, display: { ...prev.display, [key]: val } }));
+  const setDisplayField = (key, value) => {
+    setForm((previous) => ({
+      ...previous,
+      display: { ...previous.display, [key]: value },
+    }));
   };
 
-  // ----------- Gallery ----------------
+  const handleDeleteService = (service) => {
+    if (window.confirm(`Eliminar "${service.name}"?`)) {
+      deleteService(service.id);
+    }
+  };
+
   const openGallery = (service) => setEditingGallery(service);
   const closeGallery = () => setEditingGallery(null);
 
   const addMockImage = () => {
-    if (!editingGallery) return;
+    if (!editingGallery) {
+      return;
+    }
+
     const mockImage = {
       url: "https://images.unsplash.com/photo-1574067332341-35f11e967a5b?q=80&w=1470&auto=format&fit=crop",
-      label: "Nueva Foto",
+      label: "Nueva foto",
     };
-    const updated = { ...editingGallery, gallery: [...editingGallery.gallery, mockImage] };
-    updateService(editingGallery.id, { gallery: updated.gallery });
-    setEditingGallery(updated);
+    const updatedGallery = [...(editingGallery.gallery || []), mockImage];
+    const updatedService = { ...editingGallery, gallery: updatedGallery };
+
+    updateService(editingGallery.id, { gallery: updatedGallery });
+    setEditingGallery(updatedService);
   };
 
   const clearGallery = () => {
-    if (!editingGallery) return;
+    if (!editingGallery) {
+      return;
+    }
+
     updateService(editingGallery.id, { gallery: [] });
     setEditingGallery({ ...editingGallery, gallery: [] });
   };
 
-  const isNew = editingService === "new";
-  const currentService = !isNew && services.find(s => s.id === editingService);
-
   return (
     <PageTransition>
       <AdminLayout
-        title="Gestión de Servicios"
-        subtitle="Administrá tu catálogo, precios, visibilidad y galerías de fotos."
+        title="Gestion de Servicios"
+        subtitle="Administra tu catalogo, precios, visibilidad y galerias de fotos."
       >
         <div className="admin-services-container">
           <div className="admin-services-content">
+            <AdminPageHeader
+              eyebrow="Catalogo"
+              icon={<Star size={18} />}
+              title="Catalogo operativo"
+              subtitle="Cada servicio tiene control individual de visibilidad. Lo que activas aqui se refleja en el sitio publico."
+              actions={
+                <button type="button" className="btn-premium svc-new-btn" onClick={openNew}>
+                  <Plus size={20} />
+                  <span>Nuevo servicio</span>
+                </button>
+              }
+            />
 
-            {/* ---- Header ---- */}
-            <div className="admin-services-header">
-              <div className="admin-services-title-box">
-                <div className="admin-services-title-inner">
-                  <Star size={22} style={{ color: "var(--color-primary)", opacity: 0.85 }} />
-                  <h2>Catálogo Operativo</h2>
-                </div>
-                <p>Cada servicio tiene control individual de visibilidad. Lo que activás aquí se refleja en el sitio público.</p>
-              </div>
-              <button className="btn-premium svc-new-btn" onClick={openNew}>
-                <Plus size={20} /> <span>Nuevo Servicio</span>
-              </button>
-            </div>
-
-            {/* ---- Service Cards Grid ---- */}
             <motion.div
               className="admin-services-grid"
               variants={containerVariants}
               initial="hidden"
               animate="visible"
             >
-              {services.map(service => (
-                <motion.div
-                  key={service.id}
-                  className={`dashboard-panel service-card-premium ${service.featured ? "featured" : ""}`}
-                  variants={cardVariants}
-                  whileHover="hover"
-                >
-                  {service.featured && <div className="featured-ribbon">Popular</div>}
+              {services.map((service) => {
+                const displayConfig = { ...emptyForm.display, ...service.display };
 
-                  {/* Top row */}
-                  <div className="svc-card-top">
-                    <div className="service-icon-box">
-                      {getIcon(service.iconName, { size: 24 })}
-                    </div>
-                    <div className="svc-card-actions">
-                      <button
-                        className="btn-ghost btn-mini-action"
-                        title="Galería de fotos"
-                        onClick={() => openGallery(service)}
-                      >
-                        <ImageIcon size={16} />
-                        {service.gallery?.length > 0 && (
-                          <span className="svc-gallery-count">{service.gallery.length}</span>
-                        )}
-                      </button>
-                      <button
-                        className={`btn-mini-action ${service.featured ? "btn-primary-mini" : "btn-ghost"}`}
-                        title={service.featured ? "Quitar de destacados" : "Marcar como destacado"}
-                        onClick={() => toggleFeatured(service.id)}
-                      >
-                        <Star size={16} fill={service.featured ? "currentColor" : "none"} />
-                      </button>
-                      <button className="btn-ghost btn-mini-action" title="Editar" onClick={() => openEdit(service)}>
-                        <Edit2 size={16} />
-                      </button>
-                      <button
-                        className="btn-danger btn-mini-action"
-                        title="Eliminar"
-                        onClick={() => {
-                          if (window.confirm(`¿Eliminar "${service.name}"?`)) deleteService(service.id);
-                        }}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
+                return (
+                  <motion.div
+                    key={service.id}
+                    className={`dashboard-panel service-card-premium ${service.featured ? "featured" : ""}`}
+                    variants={cardVariants}
+                    whileHover="hover"
+                  >
+                    {service.featured ? <div className="featured-ribbon">Popular</div> : null}
 
-                  {/* Body */}
-                  <div>
-                    <h3 className="service-card-title">{service.name}</h3>
-                    <p className="service-card-desc">{service.description}</p>
-                  </div>
+                    <div className="svc-card-top">
+                      <div className="service-icon-box">
+                        {getIcon(service.iconName, { size: 24 })}
+                      </div>
 
-                  {/* Footer */}
-                  <div className="service-card-footer">
-                    <div>
-                      <span className="service-meta-label">Duración</span>
-                      <div className="service-duration-val">
-                        <Clock size={15} style={{ color: "var(--color-primary)" }} />
-                        {service.duration}
+                      <div className="svc-card-actions">
+                        <button
+                          type="button"
+                          className="btn-ghost btn-mini-action"
+                          title="Galeria de fotos"
+                          onClick={() => openGallery(service)}
+                        >
+                          <ImageIcon size={16} />
+                          {service.gallery?.length ? (
+                            <span className="svc-gallery-count">{service.gallery.length}</span>
+                          ) : null}
+                        </button>
+
+                        <button
+                          type="button"
+                          className={`btn-mini-action ${service.featured ? "btn-primary-mini" : "btn-ghost"}`}
+                          title={service.featured ? "Quitar de destacados" : "Marcar como destacado"}
+                          onClick={() => toggleFeatured(service.id)}
+                        >
+                          <Star size={16} fill={service.featured ? "currentColor" : "none"} />
+                        </button>
+
+                        <button
+                          type="button"
+                          className="btn-ghost btn-mini-action"
+                          title="Editar"
+                          onClick={() => openEdit(service)}
+                        >
+                          <Edit2 size={16} />
+                        </button>
+
+                        <button
+                          type="button"
+                          className="btn-danger btn-mini-action"
+                          title="Eliminar"
+                          onClick={() => handleDeleteService(service)}
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     </div>
-                    <div style={{ textAlign: "right" }}>
-                      <span className="service-meta-label">Precio</span>
-                      <div className="service-price-val">{formatMoney(service.price)}</div>
-                    </div>
-                  </div>
 
-                  {/* Visibility Pills */}
-                  <div className="svc-visibility-pills">
-                    {Object.entries(service.display).map(([key, val]) => (
-                      <button
-                        key={key}
-                        className={`svc-pill ${val ? "pill-on" : "pill-off"}`}
-                        title={`${val ? "Ocultar" : "Mostrar"} ${VISIBILITY_LABELS[key]}`}
-                        onClick={() => updateVisibility(service.id, key, !val)}
-                      >
-                        {val ? <Eye size={11} /> : <EyeOff size={11} />}
-                        {key === "name" ? "Nombre" :
-                          key === "description" ? "Desc." :
-                            key === "gallery" ? "Galería" :
-                              key === "duration" ? "Tiempo" : "Precio"}
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-              ))}
+                    <div>
+                      <h3 className="service-card-title">{service.name}</h3>
+                      <p className="service-card-desc">{service.description}</p>
+                    </div>
+
+                    <div className="service-card-footer">
+                      <div>
+                        <span className="service-meta-label">Duracion</span>
+                        <div className="service-duration-val">
+                          <Clock size={15} className="service-duration-icon" />
+                          {service.duration}
+                        </div>
+                      </div>
+
+                      <div className="service-price-column">
+                        <span className="service-meta-label">Precio</span>
+                        <div className="service-price-val">{formatMoney(service.price)}</div>
+                      </div>
+                    </div>
+
+                    <div className="svc-visibility-pills">
+                      {Object.entries(displayConfig).map(([key, value]) => (
+                        <button
+                          key={key}
+                          type="button"
+                          className={`svc-pill ${value ? "pill-on" : "pill-off"}`}
+                          title={`${value ? "Ocultar" : "Mostrar"} ${VISIBILITY_LABELS[key]}`}
+                          onClick={() => updateVisibility(service.id, key, !value)}
+                        >
+                          {value ? <Eye size={11} /> : <EyeOff size={11} />}
+                          {VISIBILITY_SHORT_LABELS[key]}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                );
+              })}
             </motion.div>
           </div>
         </div>
 
-        {/* ==================== EDIT / NEW MODAL ==================== */}
         <Modal
-          isOpen={!!editingService}
-          onClose={closeEdit}
-          title={isNew ? "Nuevo Servicio" : `Editando: ${currentService?.name || ""}`}
+          isOpen={Boolean(editingService)}
+          onClose={resetEditState}
+          title={isNew ? "Nuevo servicio" : `Editando: ${currentService?.name || ""}`}
           maxWidth="780px"
         >
-          {editingService && (
+          {editingService ? (
             <div className="svc-edit-modal">
-
-              {/* Row 1: Name + Icon */}
               <div className="svc-form-row">
-                <div className="admin-form-group" style={{ flex: 2 }}>
-                  <label>NOMBRE DEL SERVICIO</label>
+                <div className="admin-form-group svc-form-group svc-form-group-wide">
+                  <label>Nombre del servicio</label>
                   <input
                     type="text"
                     className="admin-input"
                     value={form.name}
-                    onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+                    onChange={(event) => setForm((previous) => ({ ...previous, name: event.target.value }))}
                     placeholder="Ej: Lavado Premium"
                   />
                 </div>
-                {/* Icon Picker */}
-                <div className="admin-form-group" style={{ flex: 1 }}>
-                  <label>ÍCONO</label>
+
+                <div className="admin-form-group svc-form-group svc-form-group-icon">
+                  <label>Icono</label>
                   <button
                     type="button"
                     className="admin-input svc-icon-picker-btn"
-                    onClick={() => setShowIconPicker(p => !p)}
+                    onClick={() => setShowIconPicker((previous) => !previous)}
                   >
                     {getIcon(form.iconName, { size: 18 })}
                     <span>{form.iconName}</span>
                     <ChevronDown size={14} />
                   </button>
+
                   <AnimatePresence>
-                    {showIconPicker && (
+                    {showIconPicker ? (
                       <motion.div
                         className="svc-icon-dropdown"
                         initial={{ opacity: 0, y: -8 }}
@@ -311,84 +375,87 @@ function AdminServices() {
                         exit={{ opacity: 0, y: -8 }}
                         transition={{ duration: 0.2 }}
                       >
-                        {getAvailableIcons().map(iconName => (
+                        {getAvailableIcons().map((iconName) => (
                           <button
                             key={iconName}
                             type="button"
                             className={`svc-icon-option ${form.iconName === iconName ? "selected" : ""}`}
-                            onClick={() => { setForm(p => ({ ...p, iconName })); setShowIconPicker(false); }}
+                            onClick={() => {
+                              setForm((previous) => ({ ...previous, iconName }));
+                              setShowIconPicker(false);
+                            }}
                           >
                             {getIcon(iconName, { size: 18 })}
                             <span>{iconName}</span>
-                            {form.iconName === iconName && <Check size={12} />}
+                            {form.iconName === iconName ? <Check size={12} /> : null}
                           </button>
                         ))}
                       </motion.div>
-                    )}
+                    ) : null}
                   </AnimatePresence>
                 </div>
               </div>
 
-              {/* Row 2: Description */}
               <div className="admin-form-group">
-                <label>DESCRIPCIÓN</label>
+                <label>Descripcion</label>
                 <textarea
                   className="admin-input svc-textarea"
                   value={form.description}
-                  onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
+                  onChange={(event) => setForm((previous) => ({ ...previous, description: event.target.value }))}
                   placeholder="Describe el servicio en detalle..."
                   rows={3}
                 />
               </div>
 
-              {/* Row 3: Price + Duration + Featured */}
               <div className="svc-form-row">
-                <div className="admin-form-group" style={{ flex: 1 }}>
-                  <label>PRECIO ($)</label>
+                <div className="admin-form-group svc-form-group">
+                  <label>Precio ($)</label>
                   <input
                     type="number"
                     className="admin-input"
                     value={form.price}
-                    onChange={e => setForm(p => ({ ...p, price: e.target.value }))}
+                    onChange={(event) => setForm((previous) => ({ ...previous, price: event.target.value }))}
                     placeholder="15000"
                   />
                 </div>
-                <div className="admin-form-group" style={{ flex: 1 }}>
-                  <label>DURACIÓN</label>
+
+                <div className="admin-form-group svc-form-group">
+                  <label>Duracion</label>
                   <input
                     type="text"
                     className="admin-input"
                     value={form.duration}
-                    onChange={e => setForm(p => ({ ...p, duration: e.target.value }))}
-                    placeholder="2h / 2 días"
+                    onChange={(event) => setForm((previous) => ({ ...previous, duration: event.target.value }))}
+                    placeholder="2h / 2 dias"
                   />
                 </div>
-                <div className="admin-form-group svc-featured-toggle" style={{ flex: 0, minWidth: 120 }}>
-                  <label>DESTACADO</label>
+
+                <div className="admin-form-group svc-featured-toggle svc-featured-field">
+                  <label>Destacado</label>
                   <button
                     type="button"
                     className={`svc-featured-btn ${form.featured ? "active" : ""}`}
-                    onClick={() => setForm(p => ({ ...p, featured: !p.featured }))}
+                    onClick={() => setForm((previous) => ({ ...previous, featured: !previous.featured }))}
                   >
                     <Star size={16} fill={form.featured ? "currentColor" : "none"} />
-                    {form.featured ? "Sí" : "No"}
+                    {form.featured ? "Si" : "No"}
                   </button>
                 </div>
               </div>
 
-              {/* Row 4: Visibility Panel */}
               <div className="svc-visibility-section">
                 <button
                   type="button"
                   className="svc-visibility-toggle-btn"
-                  onClick={() => setShowVisibility(p => !p)}
+                  onClick={() => setShowVisibility((previous) => !previous)}
                 >
                   <Eye size={16} />
-                  <span>Ajustes de Visibilidad Pública</span>
+                  <span>Ajustes de visibilidad publica</span>
                   {showVisibility ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </button>
+
                 <AnimatePresence>
-                  {showVisibility && (
+                  {showVisibility ? (
                     <motion.div
                       className="svc-visibility-panel"
                       initial={{ opacity: 0, height: 0 }}
@@ -398,25 +465,26 @@ function AdminServices() {
                     >
                       <p className="svc-visibility-hint">
                         <Info size={14} />
-                        Controlá exactamente qué información ven tus clientes en el sitio público.
+                        Controla exactamente que informacion ven tus clientes en el sitio publico.
                       </p>
+
                       {Object.entries(VISIBILITY_LABELS).map(([key, label]) => (
                         <ToggleSwitch
                           key={key}
                           label={label}
-                          checked={form.display[key]}
-                          onChange={val => setDisplayField(key, val)}
+                          checked={formDisplay[key]}
+                          onChange={(value) => setDisplayField(key, value)}
                         />
                       ))}
                     </motion.div>
-                  )}
+                  ) : null}
                 </AnimatePresence>
               </div>
 
-              {/* Actions */}
               <div className="svc-modal-actions">
-                <button type="button" className="btn-ghost" onClick={closeEdit}>
-                  <X size={16} /> Cancelar
+                <button type="button" className="btn-ghost" onClick={resetEditState}>
+                  <X size={16} />
+                  Cancelar
                 </button>
                 <button
                   type="button"
@@ -425,46 +493,54 @@ function AdminServices() {
                   disabled={!form.name || !form.duration}
                 >
                   <Check size={16} />
-                  {isNew ? "Crear Servicio" : "Guardar Cambios"}
+                  {isNew ? "Crear servicio" : "Guardar cambios"}
                 </button>
               </div>
             </div>
-          )}
+          ) : null}
         </Modal>
 
-        {/* ==================== GALLERY MODAL ==================== */}
         <Modal
-          isOpen={!!editingGallery}
+          isOpen={Boolean(editingGallery)}
           onClose={closeGallery}
-          title={`Galería: ${editingGallery?.name}`}
+          title={`Galeria: ${editingGallery?.name}`}
           maxWidth="1000px"
         >
-          {editingGallery && (
+          {editingGallery ? (
             <div className="gallery-manager-grid">
-              <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-                <Carousel images={editingGallery.gallery} />
-                <div style={{ display: "flex", gap: "1rem" }}>
-                  <button className="btn-premium" onClick={addMockImage}>
-                    <Camera size={18} /> <span>Añadir Foto</span>
+              <div className="gallery-manager-main">
+                <Carousel images={editingGallery.gallery || []} />
+
+                <div className="gallery-actions">
+                  <button type="button" className="btn-premium" onClick={addMockImage}>
+                    <Camera size={18} />
+                    <span>Anadir foto</span>
                   </button>
-                  <button className="btn-ghost" style={{ border: "1px solid rgba(255,255,255,0.1)" }} onClick={clearGallery}>
-                    <Trash2 size={16} /> <span>Limpiar Todo</span>
+
+                  <button type="button" className="btn-ghost gallery-clear-btn" onClick={clearGallery}>
+                    <Trash2 size={16} />
+                    <span>Limpiar todo</span>
                   </button>
                 </div>
               </div>
+
               <div className="dashboard-panel gallery-info-panel">
-                <h4><Info size={18} style={{ color: "var(--color-primary)" }} /> Info de Gestión</h4>
+                <h4>
+                  <Info size={18} className="gallery-info-title-icon" />
+                  Info de gestion
+                </h4>
                 <p>
-                  Las fotos que subas aquí serán visibles en el carrusel público cuando un cliente haga clic en el servicio.
-                  <br /><br />
-                  Se recomienda usar imágenes de alta calidad (JPG/PNG) y formato 16:9.
+                  Las fotos que subas aqui seran visibles en el carrusel publico cuando un cliente haga clic en el servicio.
+                  <br />
+                  <br />
+                  Se recomienda usar imagenes de alta calidad (JPG/PNG) y formato 16:9.
                 </p>
                 <div className="gallery-stats-box">
                   <strong>Fotos actuales:</strong> {editingGallery.gallery.length}
                 </div>
               </div>
             </div>
-          )}
+          ) : null}
         </Modal>
       </AdminLayout>
     </PageTransition>

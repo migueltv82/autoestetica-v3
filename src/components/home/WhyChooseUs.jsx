@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Phone, Zap, ShieldCheck, Clock } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import "./WhyChooseUs.css";
 
 const items = [

@@ -15,8 +15,8 @@
   flex-shrink: 0;
   width: 52px;
   height: 52px;
-  background: var(--gradient-glass);
-  border: 1px solid var(--color-border);
+  background: rgba(125, 228, 209, 0.08);
+  border: 1px solid rgba(125, 228, 209, 0.16);
   border-radius: 16px;
   color: var(--color-primary);
   display: flex;
@@ -27,20 +27,22 @@
 
 .settings-icon-box.danger {
   color: #f87171;
-  background: rgba(248, 113, 113, 0.05);
-  box-shadow: 0 0 20px rgba(248, 113, 113, 0.1);
+  background: rgba(248, 113, 113, 0.06);
+  border-color: rgba(248, 113, 113, 0.16);
+  box-shadow: 0 0 20px rgba(248, 113, 113, 0.08);
 }
 
 .settings-title-group h3 {
   font-size: 1.1rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--color-white);
   margin-bottom: 0.15rem;
 }
 
 .settings-title-group p {
-  font-size: 0.8rem;
+  font-size: 0.84rem;
   color: var(--color-text-soft);
+  line-height: 1.6;
 }
 
 .settings-body {
@@ -52,7 +54,7 @@
 .settings-info-text {
   color: var(--color-text-soft);
   font-size: 0.9rem;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 .settings-checkbox-label {
@@ -60,7 +62,7 @@
   align-items: center;
   gap: 1rem;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.03);
   padding: 1.1rem;
   border-radius: 16px;
   border: 1px solid var(--color-border);
@@ -69,7 +71,7 @@
 
 .settings-checkbox-label:hover {
   background: rgba(255, 255, 255, 0.04);
-  border-color: var(--color-primary);
+  border-color: rgba(125, 228, 209, 0.16);
 }
 
 .settings-checkbox {
@@ -85,12 +87,37 @@
   color: var(--color-white);
 }
 
+.settings-save-btn {
+  align-self: flex-start;
+}
+
+.settings-action-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.settings-secondary-btn,
+.settings-danger-btn,
+.settings-history-btn {
+  flex: 1;
+  justify-content: center;
+}
+
+.settings-danger-btn {
+  border: 1px solid rgba(248, 113, 113, 0.18);
+  color: #f87171 !important;
+}
+
+.settings-danger-btn:hover {
+  background: rgba(248, 113, 113, 0.08);
+}
+
 .settings-status-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.25rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.03);
   border-radius: 16px;
   border: 1px solid var(--color-border);
 }
@@ -104,13 +131,23 @@
   font-weight: 700;
   font-size: 0.9rem;
   color: var(--color-white);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.settings-status-icon {
+  color: var(--color-primary);
 }
 
 @media (max-width: 640px) {
-  .settings-header {
+  .settings-header,
+  .settings-action-row {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .settings-save-btn {
+    width: 100%;
   }
 }
-

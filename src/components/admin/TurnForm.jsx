@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Calendar, User, Phone, Wrench, Clock, ClipboardList, Car, CheckCircle2 } from "lucide-react";
+import "./TurnForm.css";
 
 const VEHICLE_OPTIONS = ["Auto", "Camioneta", "SUV", "Moto", "Bicicleta"];
 
@@ -42,68 +43,94 @@ function TurnForm({ onAddTurn }) {
   }
 
   return (
-    <div className="inquiry-form-container" style={{ minHeight: 'auto', padding: '3rem', margin: '0' }}>
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
-         <div>
-           <h3 style={{ fontSize: "1.2rem", fontWeight: 800, marginBottom: "2rem", color: "var(--color-primary)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-             Detalles del Nuevo Turno
-           </h3>
-           
-           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2rem" }}>
-              <div className="inquiry-form-group">
-                <label><User size={14} style={{display:'inline', marginRight: '5px'}}/> Cliente</label>
-                <input type="text" name="client" value={formData.client} onChange={handleChange} placeholder="Nombre completo" required />
-              </div>
-              
-              <div className="inquiry-form-group">
-                <label><Phone size={14} style={{display:'inline', marginRight: '5px'}}/> WhatsApp</label>
-                <input type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="Cod de área + número" required />
-              </div>
+    <section className="admin-form-shell turn-form-shell">
+      <div className="admin-form-header">
+        <div>
+          <span className="admin-form-kicker">
+            <Calendar size={14} /> Agenda manual
+          </span>
+          <h3 className="admin-form-title">Cargar nuevo turno</h3>
+          <p className="admin-form-description">
+            Completa los datos base del cliente y la cita queda registrada al instante.
+          </p>
+        </div>
+        <div className="turn-form-badge">Alta directa</div>
+      </div>
 
-              <div className="inquiry-form-group">
-                <label><Clock size={14} style={{display:'inline', marginRight: '5px'}}/> Horario Sugerido</label>
-                <div style={{ display: "flex", gap: "1rem" }}>
-                  <input type="date" name="date" value={formData.date} onChange={handleChange} required />
-                  <input type="time" name="time" value={formData.time} onChange={handleChange} required />
-                </div>
-              </div>
+      <form className="turn-form" onSubmit={handleSubmit}>
+        <div className="admin-form-grid wide turn-form-grid">
+          <div className="admin-form-group">
+            <label>
+              <User size={14} /> Cliente
+            </label>
+            <input type="text" name="client" value={formData.client} onChange={handleChange} placeholder="Nombre completo" required />
+          </div>
 
-              <div className="inquiry-form-group">
-                <label><Wrench size={14} style={{display:'inline', marginRight: '5px'}}/> Servicio Principal</label>
-                <select name="service" value={formData.service} onChange={handleChange} required>
-                  <option value="">Seleccionar...</option>
-                  {SERVICE_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
+          <div className="admin-form-group">
+            <label>
+              <Phone size={14} /> WhatsApp
+            </label>
+            <input type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="Codigo de area + numero" required />
+          </div>
 
-              <div className="inquiry-form-group">
-                <label><Car size={14} style={{display:'inline', marginRight: '5px'}}/> Vehículo</label>
-                <select name="vehicle" value={formData.vehicle} onChange={handleChange}>
-                  {VEHICLE_OPTIONS.map((v) => <option key={v} value={v}>{v}</option>)}
-                </select>
-              </div>
-           </div>
-         </div>
-         
-         <div className="inquiry-form-group">
-            <label><ClipboardList size={14} style={{display:'inline', marginRight: '5px'}}/> Notas Adicionales</label>
-            <textarea 
-              name="notes" 
-              rows="2" 
-              value={formData.notes} 
-              onChange={handleChange} 
-              placeholder="Especificaciones técnicas o pedidos especiales..." 
-              style={{ resize: "none" }}
+          <div className="admin-form-group turn-form-schedule">
+            <label>
+              <Clock size={14} /> Fecha y horario
+            </label>
+            <div className="turn-form-inline">
+              <input type="date" name="date" value={formData.date} onChange={handleChange} required />
+              <input type="time" name="time" value={formData.time} onChange={handleChange} required />
+            </div>
+          </div>
+
+          <div className="admin-form-group">
+            <label>
+              <Wrench size={14} /> Servicio principal
+            </label>
+            <select name="service" value={formData.service} onChange={handleChange} required>
+              <option value="">Seleccionar...</option>
+              {SERVICE_OPTIONS.map((service) => (
+                <option key={service} value={service}>
+                  {service}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="admin-form-group">
+            <label>
+              <Car size={14} /> Vehiculo
+            </label>
+            <select name="vehicle" value={formData.vehicle} onChange={handleChange}>
+              {VEHICLE_OPTIONS.map((vehicle) => (
+                <option key={vehicle} value={vehicle}>
+                  {vehicle}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="admin-form-group turn-form-notes">
+            <label>
+              <ClipboardList size={14} /> Notas adicionales
+            </label>
+            <textarea
+              name="notes"
+              rows="3"
+              value={formData.notes}
+              onChange={handleChange}
+              placeholder="Especificaciones tecnicas o pedidos especiales..."
             />
-         </div>
+          </div>
+        </div>
 
-         <div style={{ display: "flex", justifyContent: "flex-end", borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "2rem" }}>
-           <button type="submit" className="btn-form-primary" style={{ width: "auto", minWidth: "220px", margin: 0 }}>
-             <CheckCircle2 size={20} /> Agendar Turno
-           </button>
-         </div>
+        <div className="admin-form-actions">
+          <button type="submit" className="btn-form-primary turn-form-submit">
+            <CheckCircle2 size={18} /> Agendar turno
+          </button>
+        </div>
       </form>
-    </div>
+    </section>
   );
 }
 

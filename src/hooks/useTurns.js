@@ -1,29 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
+import { createDemoTurns } from "../data/demoTurns";
 
-const initialTurns = [
-  {
-    id: 1,
-    date: "2026-03-25",
-    time: "10:00",
-    client: "Juan Pérez",
-    phone: "3815550001",
-    vehicle: "Auto",
-    service: "Lavado premium",
-    status: "Pendiente",
-    notes: "",
-  },
-  {
-    id: 2,
-    date: "2026-03-25",
-    time: "12:00",
-    client: "María López",
-    phone: "3815550002",
-    vehicle: "Camioneta",
-    service: "Limpieza de interior",
-    status: "Confirmado",
-    notes: "",
-  },
-];
+const STORAGE_KEY = "turns";
 
 const initialFilters = {
   search: "",
@@ -31,39 +9,46 @@ const initialFilters = {
   status: "",
 };
 
+function loadInitialTurns() {
+  const fallbackTurns = createDemoTurns();
+
+  if (typeof window === "undefined") {
+    return fallbackTurns;
+  }
+
+  try {
+    const savedTurns = localStorage.getItem(STORAGE_KEY);
+    return savedTurns ? JSON.parse(savedTurns) : fallbackTurns;
+  } catch {
+    return fallbackTurns;
+  }
+}
+
 export function useTurns() {
-  const [turns, setTurns] = useState([]);
+  const [turns, setTurns] = useState(loadInitialTurns);
   const [isLoading, setIsLoading] = useState(true);
   const [filters, setFilters] = useState(initialFilters);
 
   useEffect(() => {
-    setIsLoading(true);
-    const savedTurns = localStorage.getItem("turns");
-    const loadedTurns = savedTurns ? JSON.parse(savedTurns) : initialTurns;
-    
-    // Si era la primera vez, guardamos los mocks
-    if (!savedTurns) {
-      localStorage.setItem("turns", JSON.stringify(initialTurns));
-    }
-
     const timer = setTimeout(() => {
-      setTurns(loadedTurns);
       setIsLoading(false);
-    }, 800); // reduced timeout slightly for better UX
+    }, 800);
 
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(turns));
+    } catch {
+      // Keep the UI responsive even if storage is unavailable.
+    }
+  }, [turns]);
+
   function addTurn(newTurn) {
-    setTurns((prev) => {
-      const updated = [newTurn, ...prev].sort((a, b) => {
-        const aDateTime = `${a.date} ${a.time}`;
-        const bDateTime = `${b.date} ${b.time}`;
-        return aDateTime.localeCompare(bDateTime);
-      });
-      localStorage.setItem("turns", JSON.stringify(updated));
-      return updated;
-    });
+    setTurns((prev) =>
+      [newTurn, ...prev].sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))
+    );
   }
 
   function handleFilterChange(event) {
@@ -79,24 +64,16 @@ export function useTurns() {
   }
 
   function updateTurnStatus(turnId, nextStatus) {
-    setTurns((prev) => {
-      const updated = prev.map((turn) =>
-        turn.id === turnId ? { ...turn, status: nextStatus } : turn
-      );
-      localStorage.setItem("turns", JSON.stringify(updated));
-      return updated;
-    });
+    setTurns((prev) => prev.map((turn) => (turn.id === turnId ? { ...turn, status: nextStatus } : turn)));
   }
 
   function deleteTurn(turnId) {
-    const confirmed = window.confirm("¿Querés eliminar este turno?");
-    if (!confirmed) return;
+    const confirmed = window.confirm("Queres eliminar este turno?");
+    if (!confirmed) {
+      return;
+    }
 
-    setTurns((prev) => {
-      const updated = prev.filter((turn) => turn.id !== turnId);
-      localStorage.setItem("turns", JSON.stringify(updated));
-      return updated;
-    });
+    setTurns((prev) => prev.filter((turn) => turn.id !== turnId));
   }
 
   const filteredTurns = useMemo(() => {

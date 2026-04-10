@@ -12,13 +12,14 @@ function ShowcaseGallery() {
     <section className="showcase-section">
       <div className="container">
         <div className="showcase-header">
-          <motion.h2 
+          <span className="section-kicker">Resultados reales</span>
+          <motion.h2
             className="showcase-title section-title"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            Nuestros Resultados
+            Nuestros resultados
           </motion.h2>
           <motion.p
             className="showcase-subtitle"
@@ -27,14 +28,15 @@ function ShowcaseGallery() {
             transition={{ delay: 0.1 }}
             viewport={{ once: true }}
           >
-            Deslizá para descubrir cómo elevamos el estándar de estética vehicular en cada unidad que ingresa a nuestro taller.
+            Deslizá para descubrir cómo elevamos el estándar de estética vehicular en
+            cada unidad que ingresa a nuestro taller.
           </motion.p>
         </div>
 
         <div className="showcase-carousel-wrapper">
           <div className="showcase-carousel">
             {publishedImages.map((item, i) => (
-              <motion.div 
+              <motion.div
                 className="showcase-card"
                 key={item.id}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -61,7 +63,7 @@ function ShowcaseGallery() {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="showcase-card-body">
                   <span className="showcase-category">{item.service}</span>
                   <h3 className="showcase-card-title">{item.title}</h3>
@@ -69,9 +71,9 @@ function ShowcaseGallery() {
               </motion.div>
             ))}
           </div>
-          
+
           <div className="carousel-fade-right">
-             <ChevronRight size={32} />
+            <ChevronRight size={32} />
           </div>
         </div>
       </div>

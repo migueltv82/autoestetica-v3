@@ -13,8 +13,12 @@ function CtaBanner() {
             </h2>
             <p className="cta-banner-text">
               Los turnos se coordinan de forma personalizada para brindar una atención
-              más ordenada y ajustada a cada caso.
+              más ordenada, precisa y ajustada a cada vehículo.
             </p>
+            <div className="cta-banner-notes">
+              <span>Atención personalizada</span>
+              <span>Respuesta directa</span>
+            </div>
           </div>
 
           <div className="cta-banner-actions">

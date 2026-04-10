@@ -17,41 +17,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import "./AdminNavbar.css";
 
 const items = [
-  {
-    to: "/admin/dashboard",
-    label: "Dashboard",
-    icon: <LayoutDashboard size={18} />,
-  },
-  {
-    to: "/admin/turnos",
-    label: "Turnos",
-    icon: <CalendarDays size={18} />,
-  },
-  {
-    to: "/admin/caja",
-    label: "Caja",
-    icon: <Wallet size={18} />,
-  },
-  {
-    to: "/admin/clientes",
-    label: "Clientes",
-    icon: <Users size={18} />,
-  },
-  {
-    to: "/admin/servicios",
-    label: "Servicios",
-    icon: <Wrench size={18} />,
-  },
-  {
-    to: "/admin/galeria",
-    label: "Galería",
-    icon: <ImageIcon size={18} />,
-  },
-  {
-    to: "/admin/configuracion",
-    label: "Configuración",
-    icon: <Settings size={18} />,
-  },
+  { to: "/admin/dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
+  { to: "/admin/turnos", label: "Turnos", icon: <CalendarDays size={18} /> },
+  { to: "/admin/caja", label: "Caja", icon: <Wallet size={18} /> },
+  { to: "/admin/clientes", label: "Clientes", icon: <Users size={18} /> },
+  { to: "/admin/servicios", label: "Servicios", icon: <Wrench size={18} /> },
+  { to: "/admin/galeria", label: "Galeria", icon: <ImageIcon size={18} /> },
+  { to: "/admin/configuracion", label: "Configuracion", icon: <Settings size={18} /> },
 ];
 
 function AdminNavbar() {
@@ -62,24 +34,30 @@ function AdminNavbar() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
+
+    handleScroll();
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  function getAdminLinkClassName({ isActive }) {
+    return `admin-navbar-link${isActive ? " active" : ""}`;
+  }
+
   return (
     <nav className={`admin-navbar ${isScrolled ? "scrolled" : ""}`}>
       <div className="admin-navbar-container">
-        <div className="admin-navbar-brand">
+        <Link to="/admin/dashboard" className="admin-navbar-brand">
           <span className="admin-navbar-dot"></span>
           <div>
-            <strong>Autoestética</strong>
-            <span>Admin</span>
+            <strong>Autoestetica</strong>
+            <span>Control center</span>
           </div>
-        </div>
+        </Link>
 
         <div className="admin-navbar-links desktop-only">
           {items.map((item) => (
-            <NavLink key={item.to} to={item.to} className="admin-navbar-link">
+            <NavLink key={item.to} to={item.to} className={getAdminLinkClassName}>
               <span>{item.icon}</span>
               <span>{item.label}</span>
             </NavLink>
@@ -96,22 +74,31 @@ function AdminNavbar() {
           </NavLink>
         </div>
 
-        <button className="admin-navbar-toggle mobile-only" onClick={() => setIsOpen(!isOpen)}>
+        <button
+          type="button"
+          className="admin-navbar-toggle mobile-only"
+          onClick={() => setIsOpen((current) => !current)}
+          aria-label={isOpen ? "Cerrar menu del panel" : "Abrir menu del panel"}
+        >
           {isOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div 
+          <motion.div
             className="admin-navbar-mobile"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
           >
             {items.map((item) => (
-              <NavLink key={item.to} to={item.to} className="admin-navbar-link" onClick={() => setIsOpen(false)}>
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={getAdminLinkClassName}
+                onClick={() => setIsOpen(false)}
+              >
                 <span>{item.icon}</span>
                 <span>{item.label}</span>
               </NavLink>
@@ -123,7 +110,7 @@ function AdminNavbar() {
             </Link>
             <NavLink to="/admin/login" className="admin-navbar-link" onClick={() => setIsOpen(false)}>
               <LogIn size={18} />
-              <span>Cerrar sesión</span>
+              <span>Cerrar sesion</span>
             </NavLink>
           </motion.div>
         )}
@@ -133,4 +120,3 @@ function AdminNavbar() {
 }
 
 export default AdminNavbar;
-

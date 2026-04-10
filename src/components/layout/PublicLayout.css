@@ -2,9 +2,39 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow: clip;
+}
+
+.public-layout::before,
+.public-layout::after {
+  content: "";
+  position: fixed;
+  inset: auto;
+  width: 28rem;
+  height: 28rem;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  opacity: 0.35;
+  z-index: 0;
+}
+
+.public-layout::before {
+  top: 6rem;
+  right: -10rem;
+  background: rgba(83, 191, 169, 0.16);
+}
+
+.public-layout::after {
+  bottom: 6rem;
+  left: -12rem;
+  background: rgba(98, 118, 255, 0.1);
 }
 
 .public-main {
   flex: 1;
-  padding-top: 96px;
+  padding-top: 110px;
+  position: relative;
+  z-index: 1;
 }

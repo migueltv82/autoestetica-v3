@@ -1,64 +1,53 @@
-.why-choose-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  align-items: start;
+.why-choose-us {
+  position: relative;
 }
 
-.why-grid {
+.why-choose-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: center;
+}
+
+.why-list {
   display: grid;
   gap: 1rem;
 }
 
-.why-card {
-  padding: 2.25rem;
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: default;
-}
-
-.why-card:hover {
-  border-color: rgba(0, 191, 166, 0.25);
-  background: rgba(0, 191, 166, 0.03);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-}
-
-.why-card-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: 16px;
-  background: rgba(0, 191, 166, 0.1);
-  border: 1px solid rgba(0, 191, 166, 0.2);
-  color: var(--color-primary);
+.why-item {
   display: flex;
   align-items: flex-start;
-  gap: 0.85rem;
-  padding: 1rem 1.1rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.02);
-  color: var(--color-text-soft);
+  gap: 0.9rem;
+  padding: 1.1rem 1.2rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+  box-shadow: var(--shadow-soft);
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.why-item:hover {
+  transform: translateY(-3px);
+  border-color: rgba(132, 220, 201, 0.18);
+  background: linear-gradient(180deg, rgba(132, 220, 201, 0.08), rgba(255, 255, 255, 0.02));
 }
 
 .why-item svg {
-  color: #8ef8e7;
+  color: #bdf4e8;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 0.1rem;
 }
 
-@media (max-width: 1100px) {
-  .why-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.why-item span {
+  color: var(--color-text-soft);
+  line-height: 1.7;
 }
 
-@media (max-width: 640px) {
-  .why-grid {
+@media (max-width: 980px) {
+  .why-choose-grid {
     grid-template-columns: 1fr;
   }
 }

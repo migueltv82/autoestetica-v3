@@ -1,65 +1,58 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Clock3 } from "lucide-react";
 import { useServices } from "../../hooks/useServices";
 import { getIcon } from "../../utils/iconMapper";
 import "./ServicesPreview.css";
-
-const featuredServices = [
-  {
-    icon: <Sparkles size={26} />,
-    title: "Lavado premium",
-    text: "Una limpieza exterior cuidada, con terminación prolija y presencia visual.",
-  },
-  {
-    icon: <Droplets size={26} />,
-    title: "Limpieza de interior",
-    text: "Trabajo detallado para renovar la imagen interior y mejorar la experiencia del vehículo.",
-  },
-  {
-    icon: <ShieldCheck size={26} />,
-    title: "Pulido y abrillantado",
-    text: "Tratamientos estéticos para recuperar brillo, profundidad y mejor terminación.",
-  },
-];
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.2,
+      staggerChildren: 0.12,
+      delayChildren: 0.15,
     },
   },
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
 };
+
+const formatMoney = (value) =>
+  new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    minimumFractionDigits: 0,
+  }).format(value);
 
 function ServicesPreview() {
   const { featuredServices, services } = useServices();
-  // Show up to 3: prefer featured, fall back to first 3 if no featured
-  const display = featuredServices.length > 0
+  const displayServices = featuredServices.length > 0
     ? featuredServices.slice(0, 3)
     : services.slice(0, 3);
 
+  if (displayServices.length === 0) {
+    return null;
+  }
+
   return (
-    <section className="section services-preview">
+    <section id="services-preview" className="section services-preview">
       <div className="container">
         <motion.div
           className="section-heading"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.55 }}
         >
           <span className="section-kicker">Servicios</span>
-          <h2 className="section-title">Soluciones pensadas para cada detalle</h2>
+          <h2 className="section-title">Tratamientos pensados para cuidar la imagen de tu vehículo</h2>
           <p className="section-text">
-            Cada servicio es un estándar en sí mismo. Trabajamos con técnicas
-            profesionales y productos de primer nivel para que el resultado supere tus expectativas.
+            Cada servicio combina técnica, criterio estético y una ejecución prolija.
+            Elegimos procesos claros y resultados visibles, sin exageraciones.
           </p>
         </motion.div>
 
@@ -70,17 +63,26 @@ function ServicesPreview() {
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
         >
-          {featuredServices.map((service) => (
-            <motion.article className="service-preview-card" key={service.title} variants={cardVariants}>
-              <div className="service-preview-icon">{service.icon}</div>
-              <h3>{service.title}</h3>
-              <p>{service.text}</p>
+          {displayServices.map((service) => (
+            <motion.article className="service-preview-card" key={service.id} variants={cardVariants}>
+              <div className="service-preview-icon">
+                {getIcon(service.iconName, { size: 24 })}
+              </div>
+              <h3>{service.name}</h3>
+              <p>{service.description}</p>
+              <div className="service-preview-footer">
+                <span className="service-preview-duration">
+                  <Clock3 size={14} />
+                  {service.duration}
+                </span>
+                <strong>{formatMoney(service.price)}</strong>
+              </div>
             </motion.article>
           ))}
         </motion.div>
 
         <div className="services-preview-actions">
-          <Link to="/servicios" className="btn-primary">
+          <Link to="/servicios" className="btn-secondary">
             Ver todos los servicios
           </Link>
         </div>
