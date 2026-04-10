@@ -1,9 +1,30 @@
-import { Sparkles, Droplets, ShieldCheck, Bike, CarFront, Clock, Eye } from "lucide-react";
+<<<<<<< HEAD
 import { useState } from "react";
-import { motion } from "framer-motion";
-import businessLogo from "../../assets/logo.jpg";
+import { motion, AnimatePresence } from "framer-motion";
+import { Clock, ArrowUpRight, ImageOff, Sparkles } from "lucide-react";
 import Modal from "../ui/Modal";
 import Carousel from "../ui/Carousel";
+import { useServices } from "../../hooks/useServices";
+import { getIcon } from "../../utils/iconMapper";
+import "./ServicesGrid.css";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: [0.165, 0.84, 0.44, 1] } },
+};
+
+const formatMoney = (val) =>
+  new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(val);
+=======
+import { Sparkles, Droplets, ShieldCheck, Bike, CarFront } from "lucide-react";
 import "./ServicesGrid.css";
 
 const servicesList = [
@@ -62,25 +83,7 @@ const servicesList = [
     gallery: []
   },
 ];
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2
-    },
-  },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 30, scale: 0.98 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, ease: "easeOut" } }
-};
-
-const formatMoney = (val) =>
-  new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(val);
+>>>>>>> cde7450f2feb3921c869f0d5d95070583627312a
 
 function ServicesGrid() {
   const { services } = useServices();
@@ -95,24 +98,24 @@ function ServicesGrid() {
   const closeGallery = () => setSelectedService(null);
 
   return (
+<<<<<<< HEAD
     <section className="services-section">
-      <div className="services-watermark">
-        <img src={businessLogo} alt="Autoestética Logo Watermark" />
-      </div>
-
-      <div className="container relative-content">
-        <div className="section-heading">
+      <div className="relative-content container">
+        <div className="section-header-wrapper">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.7 }}
           >
-            <span className="section-kicker">Nuestros Servicios</span>
+            <span className="section-kicker">
+              <Sparkles size={14} style={{ display: "inline", marginBottom: "-2px", marginRight: "6px" }} />
+              Nuestros Servicios
+            </span>
             <h1 className="section-title">Estética Vehicular de Vanguardia</h1>
             <p className="section-text">
-              Cada servicio se coordina de manera personalizada para asegurar una
-              atención más precisa y un resultado de concurso. <br />
-              <strong>Hacé clic en cualquier tarjeta para ver resultados reales.</strong>
+              Descubrí nuestro catálogo de tratamientos premium. Cada servicio está diseñado
+              para llevar tu vehículo al siguiente nivel de perfección.{" "}
+              <strong>Haz clic en cualquier tarjeta para ver resultados reales.</strong>
             </p>
           </motion.div>
         </div>
@@ -122,31 +125,87 @@ function ServicesGrid() {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
+          viewport={{ once: true, amount: 0.1 }}
         >
+          {services.map((service) => {
+            const d = service.display || {};
+            const galleryEnabled = d.gallery !== false;
+
+            return (
+              <motion.article
+                key={service.id}
+                className="premium-service-card"
+                variants={cardVariants}
+                onClick={() => openGallery(service)}
+                style={{ cursor: galleryEnabled ? "pointer" : "default" }}
+              >
+                {/* Icon */}
+                <div className="card-icon-wrapper">
+                  {getIcon(service.iconName, { size: 32 })}
+                </div>
+
+                {/* Click action icon */}
+                {galleryEnabled && (
+                  <div className="card-action">
+                    <span className="gallery-tooltip">Ver trabajos</span>
+                    <ArrowUpRight size={22} />
+                  </div>
+                )}
+
+                <div className="card-content">
+                  {d.name !== false && <h3>{service.name}</h3>}
+                  {d.description !== false && <p>{service.description}</p>}
+                </div>
+
+                {/* Footer: Duration + Price */}
+                {(d.duration !== false || d.price !== false) && (
+                  <div className="card-footer">
+                    <div className="card-meta">
+                      {d.duration !== false && (
+                        <div className="meta-item">
+                          <Clock size={16} className="meta-icon" />
+                          <span>{service.duration}</span>
+                        </div>
+                      )}
+                    </div>
+                    {d.price !== false && (
+                      <div className="card-price">
+                        {formatMoney(service.price)}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </motion.article>
+            );
+          })}
+        </motion.div>
+      </div>
+
+      {/* Gallery Modal */}
+      <Modal
+        isOpen={!!selectedService}
+        onClose={closeGallery}
+        title={selectedService?.display?.name !== false ? selectedService?.name : "Galería de trabajos"}
+=======
+    <section className="section">
+      <div className="container">
+        <div className="section-heading">
+          <span className="section-kicker">Catálogo</span>
+          <h1 className="section-title">Servicios disponibles</h1>
+          <p className="section-text">
+            Cada servicio se coordina de manera personalizada para asegurar una
+            atención más precisa y un mejor resultado final.
+          </p>
+        </div>
+
+        <div className="services-grid">
           {servicesList.map((service) => (
-            <motion.article
-              className={`vanguard-service-card ${service.featured ? 'featured' : ''}`}
-              key={service.title}
-              variants={cardVariants}
-              whileHover={{ y: -10, transition: { duration: 0.3 } }}
-              onClick={() => openGallery(service)}
-              style={{ cursor: "pointer" }}
-            >
-              <div className="vanguard-card-icon">
-                {service.icon}
-              </div>
-              <div className="card-click-label">
-                <Eye size={12} /> VER TRABAJOS
-              </div>
-              <h3 className="vanguard-card-title">{service.title}</h3>
-              <p className="vanguard-card-desc">{service.description}</p>
-              <div className="vanguard-card-footer">
-                <Clock size={16} className="text-secondary" />
-                <span className="vanguard-card-duration">{service.duration}</span>
-              </div>
-              {service.featured && <div className="vanguard-featured-glow" />}
-            </motion.article>
+            <article className="service-card" key={service.title}>
+              <div className="service-card-icon">{service.icon}</div>
+              <h3>{service.title}</h3>
+              <p>{service.description}</p>
+              <span className="service-card-duration">{service.duration}</span>
+            </article>
           ))}
         </motion.div>
       </div>
@@ -155,6 +214,7 @@ function ServicesGrid() {
         isOpen={!!selectedService}
         onClose={closeGallery}
         title={selectedService?.title}
+>>>>>>> cde7450f2feb3921c869f0d5d95070583627312a
         maxWidth="900px"
       >
         {selectedService && (
