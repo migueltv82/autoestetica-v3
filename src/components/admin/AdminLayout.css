@@ -1,86 +1,23 @@
 .admin-shell {
+  display: grid;
+  grid-template-columns: 280px 1fr;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background:
-    radial-gradient(circle at 10% 8%, rgba(125, 228, 209, 0.16), transparent 24%),
-    radial-gradient(circle at 88% 10%, rgba(105, 167, 255, 0.16), transparent 22%),
-    linear-gradient(180deg, #04070d 0%, #09111d 54%, #050912 100%);
-  color: var(--color-text);
-  overflow-x: hidden;
-  position: relative;
-}
-
-.admin-content-area {
-  min-width: 0;
-  flex: 1;
-  position: relative;
-  padding-top: 98px;
-  background: transparent;
-}
-
-.admin-content-area::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.012), transparent 32%),
-    url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%237de4d1' fill-opacity='0.028'%3E%3Ccircle cx='8' cy='8' r='2'/%3E%3Ccircle cx='72' cy='72' r='2'/%3E%3Ccircle cx='72' cy='8' r='2'/%3E%3Ccircle cx='8' cy='72' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 0;
+  background-color: var(--color-bg);
 }
 
 .admin-main {
-  position: relative;
-  z-index: 1;
-  width: min(100% - 2rem, var(--container-admin));
-  padding: clamp(1.5rem, 3vw, 2.5rem) 0 clamp(3rem, 6vw, 4.5rem);
+  padding: 2.5rem;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.admin-container {
+  max-width: 1200px;
   margin: 0 auto;
 }
 
-.admin-watermark {
-  position: fixed;
-  right: -6rem;
-  bottom: -5rem;
-  opacity: 0.08;
-  width: min(40vw, 420px);
-  pointer-events: none;
-  z-index: 0;
-  filter: grayscale(1) brightness(1.4) saturate(0);
-  transition: var(--transition-premium);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.admin-watermark img {
-  width: 100%;
-  height: auto;
-  border-radius: 44px;
-  object-fit: cover;
-  aspect-ratio: 1 / 1;
-}
-
 @media (max-width: 1024px) {
-  .admin-main,
-  .admin-topbar {
-    width: min(100% - 1.5rem, var(--container-admin));
-  }
-
-  .admin-watermark {
-    width: min(54vw, 320px);
-    right: -4rem;
-    bottom: -4rem;
-  }
-}
-
-@media (max-width: 720px) {
-  .admin-content-area {
-    padding-top: 84px;
-  }
-
-  .admin-main,
-  .admin-topbar {
-    width: min(100% - 1rem, var(--container-admin));
+  .admin-shell {
+    grid-template-columns: 1fr;
   }
 }

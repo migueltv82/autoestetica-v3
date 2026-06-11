@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Check, MessageCircle, ShieldCheck, Sparkles } from "lucide-react";
+import { AlertTriangle, Check, MessageCircle, ShieldCheck, Sparkles } from "lucide-react";
 import { createDemoTurns } from "../../data/demoTurns";
 import { getTodayString } from "../../utils/date";
 import "./InquiryForm.css";
@@ -15,6 +15,7 @@ function InquiryForm() {
     services: [],
     message: "",
   });
+  const [submitAttempted, setSubmitAttempted] = useState(false);
 
   const availableServices = useMemo(() => {
     if (formData.vehicle === "Moto") return ["Lavado y detallado de motos"];
@@ -64,6 +65,7 @@ function InquiryForm() {
 
   function handleSubmit(event) {
     event.preventDefault();
+    setSubmitAttempted(true);
     if (!formData.name.trim() || !formData.phone.trim() || !formData.vehicle || formData.services.length === 0) {
       return;
     }
@@ -105,7 +107,10 @@ function InquiryForm() {
       <div className="container inquiry-shell">
         <div className="inquiry-intro">
           <span className="section-kicker">Consulta personalizada</span>
-          <h1 className="section-title">Contanos que necesita tu vehiculo.</h1>
+          <h1 className="section-title">
+            Contanos que necesita
+            <span className="inquiry-title-accent"> tu vehiculo</span>.
+          </h1>
           <p className="section-text">
             Completa la consulta con la informacion clave y te abrimos WhatsApp con
             el mensaje listo para responderte de forma directa y con contexto.
@@ -139,8 +144,15 @@ function InquiryForm() {
         </div>
 
         <form className="inquiry-form-panel" onSubmit={handleSubmit}>
+          {submitAttempted &&
+          (!formData.name.trim() || !formData.phone.trim() || !formData.vehicle || formData.services.length === 0) ? (
+            <div className="inquiry-error" role="alert">
+              <AlertTriangle size={16} aria-hidden="true" />
+              Completa nombre, telefono, vehiculo y al menos un servicio para continuar.
+            </div>
+          ) : null}
           <div className="inquiry-form-grid">
-            <div className="inquiry-form-group">
+            <div className={`inquiry-form-group${submitAttempted && !formData.name.trim() ? " has-error" : ""}`}>
               <label>Nombre y apellido</label>
               <input
                 type="text"
@@ -149,23 +161,28 @@ function InquiryForm() {
                 onChange={handleChange}
                 placeholder="Ej: Miguel Torres"
                 required
+                autoComplete="name"
+                aria-invalid={submitAttempted && !formData.name.trim()}
               />
             </div>
 
-            <div className="inquiry-form-group">
+            <div className={`inquiry-form-group${submitAttempted && !formData.phone.trim() ? " has-error" : ""}`}>
               <label>WhatsApp / Telefono</label>
               <input
-                type="text"
+                type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="Codigo de area + numero"
                 required
+                autoComplete="tel"
+                inputMode="tel"
+                aria-invalid={submitAttempted && !formData.phone.trim()}
               />
             </div>
           </div>
 
-          <div className="inquiry-form-group">
+          <div className={`inquiry-form-group${submitAttempted && !formData.vehicle ? " has-error" : ""}`}>
             <label>Vehiculo</label>
             <div className="options-grid">
               {VEHICLE_OPTIONS.map((vehicle) => {
@@ -177,6 +194,7 @@ function InquiryForm() {
                     type="button"
                     className={`option-card ${isSelected ? "selected" : ""}`}
                     onClick={() => selectVehicle(vehicle)}
+                    aria-pressed={isSelected}
                   >
                     <span>{vehicle}</span>
                     {isSelected && <Check size={16} />}
@@ -186,7 +204,7 @@ function InquiryForm() {
             </div>
           </div>
 
-          <div className="inquiry-form-group">
+          <div className={`inquiry-form-group${submitAttempted && formData.services.length === 0 ? " has-error" : ""}`}>
             <label>Servicios que te interesan</label>
             <div className="options-grid options-grid-services">
               {availableServices.map((service) => {
@@ -198,6 +216,7 @@ function InquiryForm() {
                     type="button"
                     className={`option-card option-card-service ${isSelected ? "selected" : ""}`}
                     onClick={() => toggleService(service)}
+                    aria-pressed={isSelected}
                   >
                     <span>{service}</span>
                     {isSelected && <Check size={16} />}

@@ -1,45 +1,45 @@
 :root {
-  --font-main: "Plus Jakarta Sans", sans-serif;
-  --font-display: "Outfit", sans-serif;
+  --font-main: "Inter", system-ui, -apple-system, sans-serif;
+  --font-display: "Outfit", system-ui, sans-serif;
 
-  --color-bg: #050912;
-  --color-bg-soft: #0b1220;
-  --color-surface: #101a2c;
-  --color-surface-soft: #162335;
-  --color-surface-elevated: #203049;
-  --color-text: #f5f7fb;
-  --color-text-soft: #a6b4c8;
-  --color-text-muted: #75849a;
-  --color-primary: #7de4d1;
-  --color-primary-strong: #58ceb9;
-  --color-primary-dark: #329b8b;
-  --color-accent: #69a7ff;
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-strong: rgba(125, 228, 209, 0.2);
+  /* Essential Premium - Deep Dark + Vibrant Accent */
+  --color-bg: #050505;
+  --color-bg-soft: #0a0a0a;
+  --color-surface: #0f0f0f;
+  --color-surface-soft: #141414;
+  --color-surface-elevated: #1a1a1a;
+  
+  --color-text: #ffffff;
+  --color-text-soft: #a0a0a0;
+  --color-text-muted: #606060;
+  
+  --color-primary: #00e1ff; /* Sophisticated Cyan */
+  --color-primary-soft: rgba(0, 225, 255, 0.15);
+  --color-accent: #0070f3;
+  
+  --rgb-primary: 0, 225, 255;
+  --rgb-accent: 0, 112, 243;
+  
+  --color-border: rgba(255, 255, 255, 0.04);
+  --color-border-strong: rgba(var(--rgb-primary), 0.2);
   --color-white: #ffffff;
 
-  --gradient-primary: linear-gradient(135deg, #a6f3e7 0%, #7de4d1 42%, #69a7ff 100%);
-  --gradient-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.018) 100%);
-  --gradient-surface: linear-gradient(180deg, rgba(18, 28, 46, 0.93), rgba(6, 11, 19, 0.98));
-  --gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.018));
+  --gradient-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+  --gradient-overlay: linear-gradient(0deg, var(--color-bg) 0%, rgba(5, 5, 5, 0.4) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--color-primary), var(--color-accent));
 
-  --shadow-premium: 0 28px 80px rgba(0, 0, 0, 0.44);
-  --shadow-soft: 0 18px 44px rgba(0, 0, 0, 0.28);
-  --shadow-glow: 0 20px 55px rgba(88, 206, 185, 0.16);
-  --shadow-accent: 0 18px 48px rgba(105, 167, 255, 0.15);
+  --shadow-premium: 0 30px 60px rgba(0, 0, 0, 0.9);
+  --shadow-soft: 0 20px 40px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 30px rgba(var(--rgb-primary), 0.2);
 
-  --radius-panel: clamp(18px, 2vw, 30px);
-  --radius-input: 16px;
-  --radius-badge: 999px;
-  --radius-md: 18px;
-  --radius-lg: 28px;
+  --radius-panel: 32px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-badge: 100px;
 
   --container: 1440px;
-  --container-admin: 1280px;
+  --spacing-section: clamp(6rem, 10vw, 10rem);
 
-  --spacing-section: clamp(4.5rem, 7vw, 7rem);
-  --admin-padding: clamp(1rem, 3vw, 2.5rem);
-
-  --transition-premium: 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-fast: 0.22s ease;
+  --transition-premium: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: 0.4s ease;
 }

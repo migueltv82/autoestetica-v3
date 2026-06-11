@@ -78,7 +78,6 @@
 .carousel-nav:hover {
   background: var(--color-primary);
   color: black;
-  box-shadow: 0 0 20px var(--color-primary);
 }
 
 .carousel-nav.prev {
@@ -109,7 +108,6 @@
   width: 24px;
   border-radius: 4px;
   background: var(--color-primary);
-  box-shadow: 0 0 10px var(--color-primary);
 }
 
 .carousel-empty {

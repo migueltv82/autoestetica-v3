@@ -1,8 +1,15 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Users, Wallet, Calendar, TrendingUp, CheckCircle2, Clock, Zap, Database } from "lucide-react";
+import { 
+  Plus, 
+  Users, 
+  Wallet, 
+  Calendar, 
+  ArrowRight, 
+  Clock, 
+  TrendingUp 
+} from "lucide-react";
 import AdminLayout from "../../components/admin/AdminLayout";
-import StatCard from "../../components/ui/StatCard";
 import PageTransition from "../../components/ui/PageTransition";
 import TurnsTable from "../../components/admin/TurnsTable";
 import TurnsTableSkeleton from "../../components/admin/TurnsTableSkeleton";
@@ -14,129 +21,107 @@ import "./Dashboard.css";
 
 function Dashboard() {
   const { turns, isLoading, updateTurnStatus, deleteTurn } = useTurns();
-  const { clients } = useClients();
+  const { totalClients } = useClients();
   const { transactions } = useCash();
 
   const today = getTodayString();
-
   const todaysTurns = useMemo(() => turns.filter((turn) => turn.date === today), [turns, today]);
-  const todaysTransactions = useMemo(() => transactions.filter((transaction) => transaction.date === today), [transactions, today]);
-  const confirmedTurns = useMemo(() => todaysTurns.filter((turn) => turn.status === "Confirmado").length, [todaysTurns]);
-  const pendingTurns = useMemo(() => todaysTurns.filter((turn) => turn.status === "Pendiente").length, [todaysTurns]);
-
-  const financialSummary = useMemo(() => {
-    const incomes = transactions.filter((transaction) => transaction.type === "income").reduce((accumulator, current) => accumulator + current.amount, 0);
-    const expenses = transactions.filter((transaction) => transaction.type === "expense").reduce((accumulator, current) => accumulator + current.amount, 0);
-    const todayIncome = todaysTransactions
-      .filter((transaction) => transaction.type === "income")
-      .reduce((accumulator, current) => accumulator + current.amount, 0);
-
+  
+  const stats = useMemo(() => {
+    const todayIncome = transactions
+      .filter(t => t.date === today && t.type === "income")
+      .reduce((acc, curr) => acc + curr.amount, 0);
+      
     return {
-      incomes,
-      expenses,
-      balance: incomes - expenses,
-      todayIncome,
+      todayTurns: todaysTurns.length,
+      clients: totalClients,
+      income: todayIncome
     };
-  }, [transactions, todaysTransactions]);
+  }, [todaysTurns, totalClients, transactions, today]);
 
   const formatMoney = (value) =>
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(value);
 
   return (
     <PageTransition>
-      <AdminLayout
-        title="Panel de Control"
-        subtitle="Resumen operativo del negocio, con foco en agenda, clientes y caja del dia."
-      >
-        <section className="admin-stats-grid">
-          <StatCard label="Turnos de hoy" value={isLoading ? "-" : todaysTurns.length} icon={<Calendar size={20} />} trend="Agenda actual" />
-          <StatCard label="Clientes totales" value={clients.length} icon={<Users size={20} />} trend="Base activa" />
-          <StatCard label="Balance del mes" value={formatMoney(financialSummary.balance)} icon={<Wallet size={20} />} trend="Caja consolidada" />
-          <StatCard label="Ingresos de hoy" value={formatMoney(financialSummary.todayIncome)} icon={<TrendingUp size={20} />} trend="Cobros del dia" />
-        </section>
-
-        <section className="dashboard-panel dashboard-section-spacer">
-          <div className="dashboard-heading">
-            <div className="dashboard-heading-left">
-              <div className="dashboard-heading-icon">
-                <Clock size={22} />
-              </div>
-              <div className="dashboard-heading-info">
-                <h2>Agenda operativa</h2>
-                <p>Vista rapida de los turnos del dia con control directo de estados.</p>
-              </div>
+      <AdminLayout>
+        <div className="dashboard-simple">
+          <header className="dashboard-header">
+            <div>
+              <h1>Panel de Control</h1>
+              <p>Resumen operativo para hoy, {new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })}.</p>
             </div>
-            <Link to="/admin/turnos" className="btn-premium dashboard-link-btn">
-              Ver agenda completa
+            <Link to="/admin/turnos" className="btn-primary-admin">
+              <Plus size={18} /> Nuevo Turno
             </Link>
-          </div>
+          </header>
 
-          {isLoading ? (
-            <TurnsTableSkeleton />
-          ) : todaysTurns.length > 0 ? (
-            <TurnsTable
-              turns={todaysTurns.slice(0, 10)}
-              onStatusChange={updateTurnStatus}
-              onDeleteTurn={deleteTurn}
-            />
-          ) : (
-            <div className="admin-empty-state">
-              <Calendar size={48} />
-              <p>No hay turnos cargados para hoy.</p>
-            </div>
-          )}
-        </section>
-
-        <div className="dashboard-secondary-grid dashboard-section-spacer">
-          <section className="dashboard-panel section-sm">
-            <h3 className="panel-subtitle">
-              <Zap size={16} /> Estado de turnos
-            </h3>
-            <div className="status-summary-cards">
-              <div className="status-mini-card green">
-                <CheckCircle2 size={18} />
-                <span>{confirmedTurns} confirmados</span>
+          <section className="dashboard-stats">
+            <div className="dash-stat-card">
+              <div className="stat-icon blue"><Calendar size={22} /></div>
+              <div className="stat-info">
+                <span className="stat-label">Turnos hoy</span>
+                <span className="stat-value">{isLoading ? "..." : stats.todayTurns}</span>
               </div>
-              <div className="status-mini-card orange">
-                <Clock size={18} />
-                <span>{pendingTurns} pendientes</span>
+            </div>
+            
+            <div className="dash-stat-card">
+              <div className="stat-icon green"><TrendingUp size={22} /></div>
+              <div className="stat-info">
+                <span className="stat-label">Ingresos hoy</span>
+                <span className="stat-value">{formatMoney(stats.income)}</span>
+              </div>
+            </div>
+
+            <div className="dash-stat-card">
+              <div className="stat-icon purple"><Users size={22} /></div>
+              <div className="stat-info">
+                <span className="stat-label">Clientes</span>
+                <span className="stat-value">{stats.clients}</span>
               </div>
             </div>
           </section>
 
-          <section className="dashboard-panel section-sm">
-            <h3 className="panel-subtitle">
-              <Plus size={16} /> Acciones rapidas
-            </h3>
-            <div className="quick-actions-list-horizontal">
-              <Link to="/admin/turnos" className="action-item-compact">
-                <Plus size={20} /> <span>Nuevo turno</span>
-              </Link>
-              <Link to="/admin/clientes" className="action-item-compact">
-                <Users size={20} /> <span>Registrar cliente</span>
-              </Link>
-              <Link to="/admin/caja" className="action-item-compact">
-                <Wallet size={20} /> <span>Nuevo movimiento</span>
-              </Link>
-            </div>
-          </section>
+          <section className="dashboard-main-content">
+            <div className="content-box">
+              <div className="box-header">
+                <div className="box-title">
+                  <Clock size={18} />
+                  <h2>Próximos Turnos</h2>
+                </div>
+                <Link to="/admin/turnos" className="box-link">
+                  Ver agenda completa <ArrowRight size={14} />
+                </Link>
+              </div>
 
-          <section className="dashboard-panel section-sm">
-            <h3 className="panel-subtitle">
-              <Database size={16} /> Infraestructura
-            </h3>
-            <div className="status-indicators">
-              <div className="indicator-item">
-                <span className="dot active"></span>
-                <span>Servidor cloud</span>
-              </div>
-              <div className="indicator-item">
-                <span className="dot warning"></span>
-                <span>Base de datos</span>
-              </div>
-              <div className="indicator-item">
-                <span className="dot active"></span>
-                <span>SSL security</span>
+              {isLoading ? (
+                <TurnsTableSkeleton />
+              ) : todaysTurns.length > 0 ? (
+                <TurnsTable
+                  turns={todaysTurns.slice(0, 5)}
+                  onStatusChange={updateTurnStatus}
+                  onDeleteTurn={deleteTurn}
+                />
+              ) : (
+                <div className="empty-state-simple">
+                  <p>No hay turnos agendados para hoy.</p>
+                </div>
+              )}
+            </div>
+
+            <div className="dashboard-sidebar-content">
+              <div className="content-box">
+                <div className="box-header">
+                  <h2>Acciones Rápidas</h2>
+                </div>
+                <div className="quick-actions-grid">
+                  <Link to="/admin/clientes" className="quick-action-btn">
+                    <Users size={18} /> Registrar Cliente
+                  </Link>
+                  <Link to="/admin/caja" className="quick-action-btn">
+                    <Wallet size={18} /> Nuevo Movimiento
+                  </Link>
+                </div>
               </div>
             </div>
           </section>

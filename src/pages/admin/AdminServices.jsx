@@ -42,6 +42,7 @@ const emptyForm = {
   price: "",
   duration: "",
   iconName: "Zap",
+  coverImageUrl: "",
   featured: false,
   display: {
     name: true,
@@ -137,6 +138,7 @@ function AdminServices() {
       price: service.price,
       duration: service.duration,
       iconName: service.iconName,
+      coverImageUrl: service.coverImageUrl || "",
       featured: Boolean(service.featured),
       display: { ...emptyForm.display, ...service.display },
       gallery: [...(service.gallery || [])],
@@ -240,92 +242,66 @@ function AdminServices() {
                 return (
                   <motion.div
                     key={service.id}
-                    className={`dashboard-panel service-card-premium ${service.featured ? "featured" : ""}`}
+                    className={`service-card-pro ${service.featured ? "is-featured" : ""}`}
                     variants={cardVariants}
                     whileHover="hover"
                   >
-                    {service.featured ? <div className="featured-ribbon">Popular</div> : null}
-
-                    <div className="svc-card-top">
-                      <div className="service-icon-box">
-                        {getIcon(service.iconName, { size: 24 })}
+                    <div className="svc-card-header">
+                      <div className="service-icon-wrapper">
+                        {getIcon(service.iconName, { size: 20 })}
                       </div>
 
-                      <div className="svc-card-actions">
+                      <div className="svc-card-controls">
                         <button
                           type="button"
-                          className="btn-ghost btn-mini-action"
-                          title="Galeria de fotos"
-                          onClick={() => openGallery(service)}
-                        >
-                          <ImageIcon size={16} />
-                          {service.gallery?.length ? (
-                            <span className="svc-gallery-count">{service.gallery.length}</span>
-                          ) : null}
-                        </button>
-
-                        <button
-                          type="button"
-                          className={`btn-mini-action ${service.featured ? "btn-primary-mini" : "btn-ghost"}`}
-                          title={service.featured ? "Quitar de destacados" : "Marcar como destacado"}
+                          className="btn-icon-sm"
+                          title="Cambiar destacados"
                           onClick={() => toggleFeatured(service.id)}
                         >
-                          <Star size={16} fill={service.featured ? "currentColor" : "none"} />
+                          <Star size={14} fill={service.featured ? "currentColor" : "none"} />
                         </button>
-
                         <button
                           type="button"
-                          className="btn-ghost btn-mini-action"
+                          className="btn-icon-sm"
+                          title="Gestionar fotos"
+                          onClick={() => openGallery(service)}
+                        >
+                          <ImageIcon size={14} />
+                          {service.gallery?.length > 0 && (
+                            <span className="svc-dot-indicator" />
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-icon-sm"
                           title="Editar"
                           onClick={() => openEdit(service)}
                         >
-                          <Edit2 size={16} />
+                          <Edit2 size={14} />
                         </button>
-
                         <button
                           type="button"
-                          className="btn-danger btn-mini-action"
+                          className="btn-icon-danger-sm"
                           title="Eliminar"
                           onClick={() => handleDeleteService(service)}
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     </div>
 
-                    <div>
-                      <h3 className="service-card-title">{service.name}</h3>
-                      <p className="service-card-desc">{service.description}</p>
+                    <div className="svc-card-body">
+                      {service.featured && <span className="svc-featured-label">Recomendado</span>}
+                      <h3 className="svc-title">{service.name}</h3>
+                      <p className="svc-desc">{service.description}</p>
                     </div>
 
-                    <div className="service-card-footer">
-                      <div>
-                        <span className="service-meta-label">Duracion</span>
-                        <div className="service-duration-val">
-                          <Clock size={15} className="service-duration-icon" />
-                          {service.duration}
-                        </div>
+                    <div className="svc-card-footer-pro">
+                      <div className="svc-meta-group">
+                        <Clock size={12} />
+                        <span>{service.duration}</span>
                       </div>
-
-                      <div className="service-price-column">
-                        <span className="service-meta-label">Precio</span>
-                        <div className="service-price-val">{formatMoney(service.price)}</div>
-                      </div>
-                    </div>
-
-                    <div className="svc-visibility-pills">
-                      {Object.entries(displayConfig).map(([key, value]) => (
-                        <button
-                          key={key}
-                          type="button"
-                          className={`svc-pill ${value ? "pill-on" : "pill-off"}`}
-                          title={`${value ? "Ocultar" : "Mostrar"} ${VISIBILITY_LABELS[key]}`}
-                          onClick={() => updateVisibility(service.id, key, !value)}
-                        >
-                          {value ? <Eye size={11} /> : <EyeOff size={11} />}
-                          {VISIBILITY_SHORT_LABELS[key]}
-                        </button>
-                      ))}
+                      <div className="svc-price-pro">{formatMoney(service.price)}</div>
                     </div>
                   </motion.div>
                 );
@@ -397,7 +373,7 @@ function AdminServices() {
               </div>
 
               <div className="admin-form-group">
-                <label>Descripcion</label>
+                <label>Descripción</label>
                 <textarea
                   className="admin-input svc-textarea"
                   value={form.description}
@@ -405,6 +381,24 @@ function AdminServices() {
                   placeholder="Describe el servicio en detalle..."
                   rows={3}
                 />
+              </div>
+
+              <div className="svc-form-row">
+                 <div className="admin-form-group svc-form-group-wide">
+                  <label>Imagen de Portada (URL)</label>
+                  <input
+                    type="text"
+                    className="admin-input"
+                    value={form.coverImageUrl}
+                    onChange={(event) => setForm((previous) => ({ ...previous, coverImageUrl: event.target.value }))}
+                    placeholder="https://images.unsplash.com/..."
+                  />
+                </div>
+                {form.coverImageUrl && (
+                  <div className="svc-cover-preview">
+                    <img src={form.coverImageUrl} alt="Vista previa" />
+                  </div>
+                )}
               </div>
 
               <div className="svc-form-row">

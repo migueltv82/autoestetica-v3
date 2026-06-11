@@ -56,7 +56,7 @@
   border-radius: 20px;
   overflow: hidden;
   border: 2px solid var(--color-primary);
-  box-shadow: 0 0 20px rgba(0, 191, 166, 0.3);
+  box-shadow: 0 0 20px rgba(var(--rgb-primary), 0.3);
 }
 
 .login-brand-logo {
@@ -127,7 +127,7 @@
   outline: none;
   background: rgba(255, 255, 255, 0.08);
   border-color: var(--color-primary);
-  box-shadow: 0 10px 25px -5px rgba(0, 191, 166, 0.2);
+  box-shadow: 0 10px 25px -5px rgba(var(--rgb-primary), 0.2);
 }
 
 .login-submit-premium {
@@ -149,7 +149,7 @@
 
 .login-submit-premium:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 30px -10px rgba(0, 191, 166, 0.4);
+  box-shadow: 0 20px 30px -10px rgba(var(--rgb-primary), 0.4);
 }
 
 .btn-icon-move {

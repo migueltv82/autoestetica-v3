@@ -116,9 +116,9 @@
 }
 
 .badge-vip.active {
-  background: rgba(0, 191, 166, 0.1);
+  background: rgba(var(--rgb-primary), 0.1);
   color: var(--color-primary);
-  border-color: rgba(0, 191, 166, 0.2);
+  border-color: rgba(var(--rgb-primary), 0.2);
   opacity: 1;
 }
 
@@ -183,4 +183,3 @@
     width: 100%;
   }
 }
-

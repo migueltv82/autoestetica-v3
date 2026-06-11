@@ -77,11 +77,12 @@ function Hero() {
         >
           <motion.span className="hero-badge" variants={itemVariants}>
             <Sparkles size={14} />
-            Autoestética premium
+            Detailing de alto nivel
           </motion.span>
 
           <motion.h1 className="hero-title" variants={itemVariants}>
-            Presencia impecable, detalle preciso y una experiencia simple.
+            <span className="hero-title-accent">Presencia impecable</span>
+            detalle preciso y una experiencia sin fricción.
           </motion.h1>
 
           <motion.p className="hero-text" variants={itemVariants}>

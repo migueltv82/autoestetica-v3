@@ -9,8 +9,8 @@
   min-height: 42px;
   padding: 0.7rem 1rem;
   border-radius: 999px;
-  border: 1px solid rgba(125, 228, 209, 0.16);
-  background: rgba(125, 228, 209, 0.08);
+  border: 1px solid rgba(var(--rgb-primary), 0.16);
+  background: rgba(var(--rgb-primary), 0.08);
   color: #d7fff8;
   font-size: 0.78rem;
   font-weight: 700;

@@ -6,6 +6,7 @@ import ScrollToTop from "../components/ui/ScrollToTop";
 // Public pages
 const Home = lazy(() => import("../pages/public/Home"));
 const Services = lazy(() => import("../pages/public/Services"));
+const Gallery = lazy(() => import("../pages/public/Gallery"));
 const Contact = lazy(() => import("../pages/public/Contact"));
 const Inquiry = lazy(() => import("../pages/public/Inquiry"));
 
@@ -16,7 +17,7 @@ const Turns = lazy(() => import("../pages/admin/Turns"));
 const Cash = lazy(() => import("../pages/admin/Cash"));
 const Clients = lazy(() => import("../pages/admin/Clients"));
 const AdminServices = lazy(() => import("../pages/admin/AdminServices"));
-const Gallery = lazy(() => import("../pages/admin/Gallery"));
+const GalleryAdmin = lazy(() => import("../pages/admin/Gallery"));
 const Settings = lazy(() => import("../pages/admin/Settings"));
 
 export default function RouterProviderApp() {
@@ -28,6 +29,7 @@ export default function RouterProviderApp() {
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/servicios" element={<Services />} />
+          <Route path="/galeria" element={<Gallery />} />
           <Route path="/consulta" element={<Inquiry />} />
           <Route path="/contacto" element={<Contact />} />
 
@@ -39,7 +41,7 @@ export default function RouterProviderApp() {
           <Route path="/admin/caja" element={<Cash />} />
           <Route path="/admin/clientes" element={<Clients />} />
           <Route path="/admin/servicios" element={<AdminServices />} />
-          <Route path="/admin/galeria" element={<Gallery />} />
+          <Route path="/admin/galeria" element={<GalleryAdmin />} />
           <Route path="/admin/configuracion" element={<Settings />} />
 
           {/* Fallback */}

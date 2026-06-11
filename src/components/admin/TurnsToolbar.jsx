@@ -12,7 +12,7 @@ function TurnsToolbar({ filters, onFilterChange, onClearFilters }) {
           <input
             type="text"
             name="search"
-            className="admin-input-premium"
+            className="admin-input"
             placeholder="Cliente, servicio o patente..."
             value={filters?.search || ""}
             onChange={onFilterChange}
@@ -24,7 +24,7 @@ function TurnsToolbar({ filters, onFilterChange, onClearFilters }) {
           <input
             type="date"
             name="date"
-            className="admin-input-premium"
+            className="admin-input"
             value={filters?.date || ""}
             onChange={onFilterChange}
           />
@@ -34,7 +34,7 @@ function TurnsToolbar({ filters, onFilterChange, onClearFilters }) {
           <label className="toolbar-label"><Filter size={14} /> Filtrar por Estado</label>
           <select
             name="status"
-            className="admin-input-premium"
+            className="admin-input"
             value={filters?.status || ""}
             onChange={onFilterChange}
           >

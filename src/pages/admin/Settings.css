@@ -15,8 +15,8 @@
   flex-shrink: 0;
   width: 52px;
   height: 52px;
-  background: rgba(125, 228, 209, 0.08);
-  border: 1px solid rgba(125, 228, 209, 0.16);
+  background: rgba(var(--rgb-primary), 0.08);
+  border: 1px solid rgba(var(--rgb-primary), 0.16);
   border-radius: 16px;
   color: var(--color-primary);
   display: flex;
@@ -71,7 +71,7 @@
 
 .settings-checkbox-label:hover {
   background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(125, 228, 209, 0.16);
+  border-color: rgba(var(--rgb-primary), 0.16);
 }
 
 .settings-checkbox {
@@ -138,6 +138,19 @@
 
 .settings-status-icon {
   color: var(--color-primary);
+}
+
+.settings-global-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem 0;
+}
+
+.btn-premium.settings-save-btn.success {
+  background-color: #22c55e;
+  border-color: #22c55e;
+  color: #fff;
 }
 
 @media (max-width: 640px) {

@@ -11,7 +11,7 @@
   overflow: hidden;
   padding: clamp(1.4rem, 3vw, 2rem);
   border-radius: calc(var(--radius-panel) + 4px);
-  border: 1px solid rgba(125, 228, 209, 0.15);
+  border: 1px solid rgba(var(--rgb-primary), 0.14);
   background:
     linear-gradient(180deg, rgba(16, 26, 42, 0.86), rgba(9, 15, 25, 0.96)),
     rgba(9, 15, 25, 0.9);
@@ -28,8 +28,8 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(125, 228, 209, 0.45),
-    rgba(105, 167, 255, 0.45),
+    rgba(var(--rgb-primary), 0.38),
+    rgba(var(--rgb-accent), 0.35),
     transparent
   );
 }

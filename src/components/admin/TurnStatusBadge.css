@@ -17,9 +17,9 @@
 }
 
 .turn-status-badge.confirmado {
-  background: rgba(0, 191, 166, 0.12);
-  color: #8ef8e7;
-  border-color: rgba(0, 191, 166, 0.22);
+  background: rgba(var(--rgb-primary), 0.12);
+  color: rgba(222, 255, 249, 0.92);
+  border-color: rgba(var(--rgb-primary), 0.22);
 }
 
 .turn-status-badge.finalizado {

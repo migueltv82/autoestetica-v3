@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 const STORAGE_KEY = 'autoestetica_services';
-const STORAGE_VERSION = 'v2'; // bump when schema changes
+const STORAGE_VERSION = 'v3'; // bump when schema changes
 const STORAGE_VERSION_KEY = 'autoestetica_services_version';
 
 const DEFAULT_DISPLAY = {
@@ -16,6 +16,7 @@ const DEFAULT_DISPLAY = {
 function migrateService(s) {
   return {
     ...s,
+    coverImageUrl: s.coverImageUrl || '',
     iconName: s.iconName || 'Zap',
     gallery: Array.isArray(s.gallery) ? s.gallery : [],
     display: s.display ? { ...DEFAULT_DISPLAY, ...s.display } : { ...DEFAULT_DISPLAY },

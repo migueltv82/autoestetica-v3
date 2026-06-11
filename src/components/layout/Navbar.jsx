@@ -2,11 +2,13 @@ import { NavLink, Link } from "react-router-dom";
 import { Menu, X, Lock } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useSettings } from "../../hooks/useSettings";
 import "./Navbar.css";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { settings } = useSettings();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -40,7 +42,7 @@ function Navbar() {
       <div className="container navbar-shell">
         <Link to="/" className="brand" onClick={closeMenu}>
           <span className="brand-mark"></span>
-          <span className="brand-text">Autoestetica Tucuman</span>
+          <span className="brand-text">{settings.businessName} Tucuman</span>
         </Link>
 
         <nav className="nav-links">
@@ -50,14 +52,11 @@ function Navbar() {
           <NavLink to="/servicios" className={getNavLinkClassName} onClick={closeMenu}>
             Servicios
           </NavLink>
-          <NavLink to="/consulta" className={getNavLinkClassName} onClick={closeMenu}>
-            Consulta
+          <NavLink to="/galeria" className={getNavLinkClassName} onClick={closeMenu}>
+            Galeria
           </NavLink>
-          <NavLink to="/contacto" className={getNavLinkClassName} onClick={closeMenu}>
-            Contacto
-          </NavLink>
-          <Link to="/consulta" className="nav-cta" onClick={closeMenu}>
-            Consultar por WhatsApp
+          <Link to="/consulta" className="btn-minimal" onClick={closeMenu}>
+            Consultar
           </Link>
         </nav>
 
@@ -94,14 +93,11 @@ function Navbar() {
               <NavLink to="/servicios" className={getNavLinkClassName} onClick={closeMenu}>
                 Servicios
               </NavLink>
-              <NavLink to="/consulta" className={getNavLinkClassName} onClick={closeMenu}>
-                Consulta
-              </NavLink>
-              <NavLink to="/contacto" className={getNavLinkClassName} onClick={closeMenu}>
-                Contacto
+              <NavLink to="/galeria" className={getNavLinkClassName} onClick={closeMenu}>
+                Galeria
               </NavLink>
               <Link to="/consulta" className="nav-cta" onClick={closeMenu}>
-                Consultar por WhatsApp
+                Consultar
               </Link>
               <Link to="/admin" className="admin-link-mobile" onClick={closeMenu}>
                 <Lock size={16} /> Panel de Administracion
