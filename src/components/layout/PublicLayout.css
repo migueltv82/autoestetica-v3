@@ -1,25 +1,25 @@
 .public-layout {
-  --font-main: "Instrument Sans", system-ui, -apple-system, Segoe UI, sans-serif;
-  --font-display: "Unbounded", system-ui, -apple-system, Segoe UI, sans-serif;
+  --font-main: "Inter", system-ui, -apple-system, Segoe UI, sans-serif;
+  --font-display: "Outfit", system-ui, -apple-system, Segoe UI, sans-serif;
   --color-bg: #050505;
-  --color-bg-soft: #0a0a09;
-  --color-surface: #10100f;
-  --color-surface-soft: #151513;
-  --color-surface-elevated: #1b1a18;
-  --color-text: #f3f0ea;
-  --color-text-soft: rgba(243, 240, 234, 0.72);
-  --color-text-muted: rgba(243, 240, 234, 0.48);
-  --color-primary: #d9c9aa;
-  --color-primary-soft: rgba(217, 201, 170, 0.1);
-  --color-accent: #b8a681;
-  --rgb-primary: 217, 201, 170;
-  --rgb-accent: 184, 166, 129;
-  --color-border: rgba(231, 224, 211, 0.12);
-  --color-border-strong: rgba(231, 224, 211, 0.22);
-  --color-white: #f3f0ea;
-  --gradient-primary: linear-gradient(180deg, #efe7d6 0%, #d9c9aa 100%);
-  --gradient-accent: linear-gradient(180deg, #efe7d6 0%, #d9c9aa 100%);
-  --gradient-glass: linear-gradient(180deg, rgba(243, 240, 234, 0.045), rgba(243, 240, 234, 0.012));
+  --color-bg-soft: #0a0a0a;
+  --color-surface: #0f0f0f;
+  --color-surface-soft: #151515;
+  --color-surface-elevated: #1c1c1c;
+  --color-text: #f2f0eb;
+  --color-text-soft: rgba(242, 240, 235, 0.72);
+  --color-text-muted: rgba(242, 240, 235, 0.46);
+  --color-primary: #c8c8c8;
+  --color-primary-soft: rgba(200, 200, 200, 0.1);
+  --color-accent: #9f9f9f;
+  --rgb-primary: 200, 200, 200;
+  --rgb-accent: 159, 159, 159;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.18);
+  --color-white: #ffffff;
+  --gradient-primary: linear-gradient(180deg, #f2f0eb 0%, #c8c8c8 100%);
+  --gradient-accent: linear-gradient(180deg, #f2f0eb 0%, #9f9f9f 100%);
+  --gradient-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.012));
   --gradient-overlay: linear-gradient(0deg, #050505 0%, rgba(5, 5, 5, 0.58) 100%);
   --shadow-premium: 0 28px 60px rgba(0, 0, 0, 0.72);
   --shadow-soft: 0 18px 36px rgba(0, 0, 0, 0.42);
@@ -37,28 +37,7 @@
 
 .public-layout::before,
 .public-layout::after {
-  content: "";
-  position: fixed;
-  inset: auto;
-  width: 28rem;
-  height: 28rem;
-  border-radius: 50%;
-  filter: blur(120px);
-  pointer-events: none;
-  opacity: 0.1;
-  z-index: 0;
-}
-
-.public-layout::before {
-  top: -6rem;
-  right: -10rem;
-  background: radial-gradient(circle at 30% 30%, rgba(231, 224, 211, 0.09), transparent 62%);
-}
-
-.public-layout::after {
-  bottom: -8rem;
-  left: -12rem;
-  background: radial-gradient(circle at 30% 30%, rgba(184, 166, 129, 0.07), transparent 58%);
+  display: none;
 }
 
 .public-main {

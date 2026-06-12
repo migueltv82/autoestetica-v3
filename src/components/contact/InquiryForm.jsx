@@ -25,7 +25,7 @@ function InquiryForm() {
       "Lavado premium",
       "Limpieza y detallado interior",
       "Pulido y abrillantado",
-      "Tratamiento acrilico / ceramico",
+      "Tratamiento acrílico / cerámico",
       "Limpieza de motor",
     ];
   }, [formData.vehicle]);
@@ -35,8 +35,8 @@ function InquiryForm() {
       "Hola, quiero hacer una consulta.",
       "",
       `*Nombre:* ${formData.name || "-"}`,
-      `*Telefono:* ${formData.phone || "-"}`,
-      `*Vehiculo:* ${formData.vehicle || "-"}`,
+      `*Teléfono:* ${formData.phone || "-"}`,
+      `*Vehículo:* ${formData.vehicle || "-"}`,
       `*Servicios:* ${formData.services.length > 0 ? formData.services.join(", ") : "-"}`,
       `*Consulta:* ${formData.message || "-"}`,
     ].join("\n");
@@ -88,7 +88,7 @@ function InquiryForm() {
 
       localStorage.setItem("turns", JSON.stringify([newLead, ...initialTurns]));
     } catch (error) {
-      console.error("No se guardo el lead localmente:", error);
+      console.error("No se guardó el lead localmente:", error);
     }
 
     const encodedText = encodeURIComponent(whatsappText);
@@ -108,20 +108,19 @@ function InquiryForm() {
         <div className="inquiry-intro">
           <span className="section-kicker">Consulta personalizada</span>
           <h1 className="section-title">
-            Contanos que necesita
-            <span className="inquiry-title-accent"> tu vehiculo</span>.
+            Contanos qué necesita
+            <span className="inquiry-title-accent"> tu vehículo</span>.
           </h1>
           <p className="section-text">
-            Completa la consulta con la informacion clave y te abrimos WhatsApp con
-            el mensaje listo para responderte de forma directa y con contexto.
+            Completá los datos principales y preparamos tu consulta para responderte con contexto.
           </p>
 
           <div className="inquiry-feature-list">
             <article className="inquiry-feature-card">
               <Sparkles size={18} />
               <div>
-                <strong>Asesoria clara</strong>
-                <span>Te orientamos segun el estado y el uso real del vehiculo.</span>
+                <strong>Asesoría clara</strong>
+                <span>Te orientamos según el estado y el uso real del vehículo.</span>
               </div>
             </article>
 
@@ -129,7 +128,7 @@ function InquiryForm() {
               <MessageCircle size={18} />
               <div>
                 <strong>Respuesta directa</strong>
-                <span>La consulta sale armada y lista para continuar por WhatsApp.</span>
+                <span>La consulta queda lista para continuar por WhatsApp.</span>
               </div>
             </article>
 
@@ -137,7 +136,7 @@ function InquiryForm() {
               <ShieldCheck size={18} />
               <div>
                 <strong>Seguimiento interno</strong>
-                <span>Tambien queda registrada para ordenar el seguimiento desde el panel.</span>
+                <span>También queda registrada para ordenar el seguimiento desde el panel.</span>
               </div>
             </article>
           </div>
@@ -148,9 +147,10 @@ function InquiryForm() {
           (!formData.name.trim() || !formData.phone.trim() || !formData.vehicle || formData.services.length === 0) ? (
             <div className="inquiry-error" role="alert">
               <AlertTriangle size={16} aria-hidden="true" />
-              Completa nombre, telefono, vehiculo y al menos un servicio para continuar.
+              Completá nombre, teléfono, vehículo y al menos un servicio para continuar.
             </div>
           ) : null}
+
           <div className="inquiry-form-grid">
             <div className={`inquiry-form-group${submitAttempted && !formData.name.trim() ? " has-error" : ""}`}>
               <label>Nombre y apellido</label>
@@ -167,13 +167,13 @@ function InquiryForm() {
             </div>
 
             <div className={`inquiry-form-group${submitAttempted && !formData.phone.trim() ? " has-error" : ""}`}>
-              <label>WhatsApp / Telefono</label>
+              <label>WhatsApp / Teléfono</label>
               <input
                 type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder="Codigo de area + numero"
+                placeholder="Código de área + número"
                 required
                 autoComplete="tel"
                 inputMode="tel"
@@ -183,7 +183,7 @@ function InquiryForm() {
           </div>
 
           <div className={`inquiry-form-group${submitAttempted && !formData.vehicle ? " has-error" : ""}`}>
-            <label>Vehiculo</label>
+            <label>Vehículo</label>
             <div className="options-grid">
               {VEHICLE_OPTIONS.map((vehicle) => {
                 const isSelected = formData.vehicle === vehicle;
@@ -233,13 +233,13 @@ function InquiryForm() {
               rows="5"
               value={formData.message}
               onChange={handleChange}
-              placeholder="Podes contarnos el estado general del vehiculo, que resultado buscas o cualquier detalle importante."
+              placeholder="Podés contarnos el estado general del vehículo, qué resultado buscás o cualquier detalle importante."
             />
           </div>
 
           <div className="inquiry-submit-row">
             <p className="inquiry-submit-note">
-              Al enviar, abrimos WhatsApp con tu consulta ya preparada para continuar la conversacion.
+              Al enviar, abrimos WhatsApp con tu consulta preparada para continuar la conversación.
             </p>
             <button type="submit" className="btn-primary inquiry-submit">
               <MessageCircle size={18} />

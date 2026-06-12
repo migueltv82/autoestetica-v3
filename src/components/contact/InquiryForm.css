@@ -4,15 +4,7 @@
 }
 
 .inquiry-page::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 18% 8%, rgba(var(--rgb-primary), 0.07), transparent 54%),
-    radial-gradient(circle at 96% 12%, rgba(var(--rgb-accent), 0.05), transparent 58%);
-  opacity: 0.65;
+  display: none;
 }
 
 .inquiry-shell {
@@ -58,12 +50,12 @@
 
 .inquiry-feature-card:hover {
   transform: translateY(-1px);
-  border-color: rgba(var(--rgb-primary), 0.22);
+  border-color: var(--color-border-strong);
   box-shadow: var(--shadow-soft);
 }
 
 .inquiry-feature-card svg {
-  color: rgba(var(--rgb-primary), 0.92);
+  color: var(--color-primary);
   flex-shrink: 0;
   margin-top: 0.15rem;
 }
@@ -98,9 +90,9 @@
   margin-bottom: 1.1rem;
   padding: 0.9rem 1rem;
   border-radius: 18px;
-  border: 1px solid rgba(255, 140, 140, 0.24);
-  background: linear-gradient(180deg, rgba(255, 120, 120, 0.09), rgba(255, 120, 120, 0.03));
-  color: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--color-border-strong);
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--color-text);
   font-weight: 600;
   line-height: 1.45;
 }
@@ -108,7 +100,7 @@
 .inquiry-error svg {
   flex-shrink: 0;
   margin-top: 0.1rem;
-  color: rgba(255, 170, 170, 0.92);
+  color: var(--color-text-soft);
 }
 
 .inquiry-form-grid {
@@ -146,21 +138,21 @@
 
 .inquiry-form-group input:focus,
 .inquiry-form-group textarea:focus {
-  border-color: rgba(var(--rgb-primary), 0.32);
+  border-color: var(--color-border-strong);
   background: rgba(255, 255, 255, 0.045);
-  box-shadow: 0 0 0 4px rgba(var(--rgb-primary), 0.09);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.055);
 }
 
 .inquiry-form-group.has-error input,
 .inquiry-form-group.has-error textarea {
-  border-color: rgba(255, 140, 140, 0.32);
-  box-shadow: 0 0 0 4px rgba(255, 140, 140, 0.08);
+  border-color: var(--color-border-strong);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.055);
 }
 
 .inquiry-form-group input:focus-visible,
 .inquiry-form-group textarea:focus-visible,
 .option-card:focus-visible {
-  outline: 2px solid rgba(var(--rgb-primary), 0.32);
+  outline: 2px solid rgba(255, 255, 255, 0.24);
   outline-offset: 3px;
 }
 
@@ -202,14 +194,14 @@
 
 .option-card:hover {
   transform: translateY(-1px);
-  border-color: rgba(var(--rgb-primary), 0.18);
+  border-color: var(--color-border-strong);
   background: rgba(255, 255, 255, 0.045);
   box-shadow: 0 16px 44px rgba(0, 0, 0, 0.22);
 }
 
 .option-card.selected {
-  border-color: rgba(var(--rgb-primary), 0.32);
-  background: rgba(var(--rgb-primary), 0.08);
+  border-color: var(--color-border-strong);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--color-white);
   box-shadow: none;
 }

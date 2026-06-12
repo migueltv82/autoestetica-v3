@@ -2,35 +2,36 @@
   --font-main: "Inter", system-ui, -apple-system, sans-serif;
   --font-display: "Outfit", system-ui, sans-serif;
 
-  /* Essential Premium - Deep Dark + Vibrant Accent */
+  /* Premium detailing - deep neutral palette */
   --color-bg: #050505;
   --color-bg-soft: #0a0a0a;
   --color-surface: #0f0f0f;
-  --color-surface-soft: #141414;
-  --color-surface-elevated: #1a1a1a;
+  --color-surface-soft: #151515;
+  --color-surface-elevated: #1c1c1c;
   
-  --color-text: #ffffff;
-  --color-text-soft: #a0a0a0;
-  --color-text-muted: #606060;
+  --color-text: #f2f0eb;
+  --color-text-soft: rgba(242, 240, 235, 0.72);
+  --color-text-muted: rgba(242, 240, 235, 0.46);
   
-  --color-primary: #00e1ff; /* Sophisticated Cyan */
-  --color-primary-soft: rgba(0, 225, 255, 0.15);
-  --color-accent: #0070f3;
+  --color-primary: #c8c8c8;
+  --color-primary-soft: rgba(200, 200, 200, 0.1);
+  --color-accent: #9f9f9f;
   
-  --rgb-primary: 0, 225, 255;
-  --rgb-accent: 0, 112, 243;
+  --rgb-primary: 200, 200, 200;
+  --rgb-accent: 159, 159, 159;
   
-  --color-border: rgba(255, 255, 255, 0.04);
-  --color-border-strong: rgba(var(--rgb-primary), 0.2);
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.18);
   --color-white: #ffffff;
 
-  --gradient-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+  --gradient-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.012) 100%);
   --gradient-overlay: linear-gradient(0deg, var(--color-bg) 0%, rgba(5, 5, 5, 0.4) 100%);
-  --gradient-accent: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  --gradient-primary: linear-gradient(180deg, #f2f0eb 0%, #c8c8c8 100%);
+  --gradient-accent: linear-gradient(180deg, #f2f0eb 0%, #9f9f9f 100%);
 
   --shadow-premium: 0 30px 60px rgba(0, 0, 0, 0.9);
   --shadow-soft: 0 20px 40px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 30px rgba(var(--rgb-primary), 0.2);
+  --shadow-glow: 0 18px 42px rgba(0, 0, 0, 0.38);
 
   --radius-panel: 32px;
   --radius-md: 16px;

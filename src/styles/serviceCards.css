@@ -18,7 +18,7 @@
 }
 
 .svc-poster:focus-visible {
-  outline: 3px solid rgba(var(--rgb-primary), 0.35);
+  outline: 3px solid rgba(255, 255, 255, 0.22);
   outline-offset: 4px;
 }
 
@@ -40,9 +40,7 @@
   align-items: center;
   justify-content: center;
   background:
-    radial-gradient(circle at 30% 20%, rgba(var(--rgb-primary), 0.18), transparent 55%),
-    radial-gradient(circle at 80% 0%, rgba(var(--rgb-accent), 0.14), transparent 50%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(5, 9, 16, 0.92));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(5, 5, 5, 0.92));
 }
 
 .svc-poster-fallback-icon {
@@ -52,10 +50,10 @@
   align-items: center;
   justify-content: center;
   border-radius: 16px;
-  border: 1px solid rgba(var(--rgb-primary), 0.22);
-  background: rgba(var(--rgb-primary), 0.1);
-  color: rgba(222, 255, 249, 0.92);
-  box-shadow: 0 24px 55px rgba(var(--rgb-primary), 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-soft);
+  box-shadow: 0 22px 42px rgba(0, 0, 0, 0.28);
 }
 
 .svc-poster-img {
@@ -125,9 +123,9 @@
 }
 
 .svc-poster-chip-featured {
-  background: rgba(var(--rgb-primary), 0.9);
-  color: #07110f;
-  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text);
+  border-color: rgba(255, 255, 255, 0.18);
 }
 
 .svc-poster-bottom {
@@ -178,7 +176,7 @@
   font-size: 0.98rem;
   font-weight: 700;
   letter-spacing: -0.03em;
-  color: rgba(222, 255, 249, 0.95);
+  color: var(--color-text);
 }
 
 .svc-poster-price.muted {
@@ -219,8 +217,8 @@
 .gallery-placeholder-note {
   padding: 0.9rem 1.05rem;
   border-radius: 18px;
-  border: 1px solid rgba(var(--rgb-primary), 0.16);
-  background: rgba(var(--rgb-primary), 0.06);
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.035);
   color: var(--color-text-soft);
   line-height: 1.7;
   font-size: 0.92rem;
@@ -239,7 +237,7 @@
 
 .gallery-empty-state svg {
   margin: 0 auto;
-  color: rgba(222, 255, 249, 0.92);
+  color: var(--color-text-soft);
 }
 
 .gallery-empty-state p {

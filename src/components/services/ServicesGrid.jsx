@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Clock, ArrowRight, Zap } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Modal from "../ui/Modal";
 import Carousel from "../ui/Carousel";
 import { useServices } from "../../hooks/useServices";
@@ -15,10 +15,10 @@ const formatMoney = (value) =>
   }).format(value);
 
 const FADE_UP = {
-  initial: { opacity: 0, y: 30 },
+  initial: { opacity: 0, y: 20 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+  viewport: { once: true, margin: "-50px" },
+  transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
 };
 
 function ServicesGrid() {
@@ -34,71 +34,79 @@ function ServicesGrid() {
     <div className="services-catalog-modern">
       <header className="catalog-header">
         <div className="container">
-          <motion.span className="catalog-kicker" {...FADE_UP}>Portfolio de Excelencia</motion.span>
-          <motion.h1 {...FADE_UP} transition={{ delay: 0.1 }}>Servicios Signature</motion.h1>
-          <motion.p {...FADE_UP} transition={{ delay: 0.2 }}>
-            Cada tratamiento es una obra de ingeniería estética dedicada a preservar y realzar el valor de su vehículo.
+          <motion.span className="catalog-kicker" {...FADE_UP}>Servicios</motion.span>
+          <motion.h1 {...FADE_UP} transition={{ delay: 0.08 }}>
+            Tratamientos profesionales
+          </motion.h1>
+          <motion.p {...FADE_UP} transition={{ delay: 0.16 }}>
+            Soluciones de estética automotriz pensadas para proteger, realzar y mantener cada detalle de tu vehículo.
           </motion.p>
         </div>
       </header>
 
       <section className="container catalog-grid">
         {orderedServices.map((service, idx) => (
-          <motion.div 
-            key={service.id} 
-            {...FADE_UP} 
-            transition={{ delay: idx * 0.1 }}
-            className={`service-card-modern ${service.featured ? 'featured' : ''}`}
+          <motion.article
+            key={service.id}
+            {...FADE_UP}
+            transition={{ delay: idx * 0.06 }}
+            className="service-card-modern"
           >
             <div className="card-media">
-              <img src={getServiceCoverUrl(service)} alt={service.name} />
-              {service.featured && (
-                <div className="featured-badge">
-                  <Zap size={12} /> Destacado
-                </div>
-              )}
-              <div className="card-overlay">
-                <button className="btn-view-gallery" onClick={() => setSelectedService(service)}>
-                  Ver Resultados
-                </button>
-              </div>
+              <img
+                src={getServiceCoverUrl(service)}
+                alt={`Tratamiento ${service.name}`}
+                loading="lazy"
+                decoding="async"
+              />
             </div>
-            
+
             <div className="card-body">
               <div className="card-meta">
-                <span className="category">{service.category || "Detailing"}</span>
-                <span className="duration"><Clock size={12} /> {service.duration}</span>
+                <span className="category">{service.category || "Detailing técnico"}</span>
+                {service.duration && <span className="duration">{service.duration}</span>}
               </div>
+
               <h3>{service.name}</h3>
               <p>{service.description}</p>
-              
+
               <div className="card-footer">
-                <div className="price-label">Desde</div>
-                <div className="price-value">{formatMoney(service.price)}</div>
-                <button 
-                  className="btn-info-link" 
-                   onClick={() => setSelectedService(service)}
+                {service.price ? (
+                  <div className="price-summary">
+                    <span>Desde</span>
+                    <strong>{formatMoney(service.price)}</strong>
+                  </div>
+                ) : (
+                  <span aria-hidden="true" />
+                )}
+                <button
+                  type="button"
+                  className="btn-info-link"
+                  onClick={() => setSelectedService(service)}
+                  aria-label={`Ver detalle de ${service.name}`}
                 >
-                  <ArrowRight size={18} />
+                  Ver detalle <ArrowRight size={14} />
                 </button>
               </div>
             </div>
-          </motion.div>
+          </motion.article>
         ))}
       </section>
 
       <Modal
         isOpen={Boolean(selectedService)}
         onClose={() => setSelectedService(null)}
-        title={selectedService?.name || "Detalles del Servicio"}
+        title="Resultados del tratamiento"
         maxWidth="1000px"
       >
         {selectedService && (
           <div className="gallery-modal-premium">
             <Carousel images={getServicePreviewGallery(selectedService)} />
             <div className="gallery-modal-info">
-              <h3>El Estándar Autoestética</h3>
-              <p>Muestras de trabajos reales realizados bajo protocolos de estricta calidad. El resultado final puede variar según el estado base del vehículo.</p>
+              <h3>{selectedService.name}</h3>
+              <p>
+                Trabajos realizados bajo procesos técnicos y terminaciones cuidadas. El resultado final puede variar según el estado inicial del vehículo.
+              </p>
             </div>
           </div>
         )}

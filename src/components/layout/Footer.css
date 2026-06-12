@@ -14,7 +14,7 @@
   width: min(680px, 90vw);
   height: 1px;
   transform: translateX(-50%);
-  background: linear-gradient(90deg, transparent, rgba(231, 224, 211, 0.24), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
   pointer-events: none;
 }
 
@@ -128,25 +128,21 @@
   width: fit-content;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.72rem 1.05rem;
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  background: rgba(243, 240, 234, 0.035);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--color-text-soft);
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 500;
   transition:
-    background 0.25s ease,
-    border-color 0.25s ease,
     color 0.25s ease,
-    transform 0.25s ease;
+    opacity 0.25s ease;
 }
 
 .footer-wa-btn:hover {
-  border-color: var(--color-border-strong);
-  background: rgba(243, 240, 234, 0.07);
   color: var(--color-primary);
-  transform: translateY(-1px);
+  opacity: 0.9;
 }
 
 .footer-detail {

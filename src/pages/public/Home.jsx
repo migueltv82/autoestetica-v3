@@ -3,17 +3,16 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import PublicLayout from "../../components/layout/PublicLayout";
 import PageTransition from "../../components/ui/PageTransition";
-import { useSettings } from "../../hooks/useSettings";
 import { useServices } from "../../hooks/useServices";
 import { getServiceCoverUrl } from "../../utils/serviceMedia";
 import heroImg from "../../assets/hero-premium.png";
 import "./Home.css";
 
 const FADE_UP = {
-  initial: { opacity: 0, y: 16 },
+  initial: { opacity: 0, y: 14 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-70px" },
-  transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+  viewport: { once: true, margin: "-60px" },
+  transition: { duration: 0.48, ease: [0.16, 1, 0.3, 1] },
 };
 
 const TRUST_ITEMS = [
@@ -23,7 +22,7 @@ const TRUST_ITEMS = [
   },
   {
     title: "Productos profesionales",
-    description: "Procesos y materiales adecuados para cada superficie.",
+    description: "Procesos adecuados para cada superficie.",
   },
   {
     title: "Terminación premium",
@@ -33,7 +32,6 @@ const TRUST_ITEMS = [
 
 function Home() {
   const { services } = useServices();
-  const { getWaLink } = useSettings();
   const featuredServices = Array.isArray(services) ? services.slice(0, 3) : [];
 
   return (
@@ -41,51 +39,53 @@ function Home() {
       <PublicLayout className="home-public-layout">
         <div className="home-premium">
           <section className="home-hero" aria-labelledby="home-hero-title">
-            <div className="home-hero-media">
-              <img src={heroImg} alt="Vehículo con terminación premium en estudio oscuro" />
+            <div className="home-hero-media" aria-hidden="true">
+              <img src={heroImg} alt="" />
               <div className="home-hero-overlay" />
             </div>
 
-            <div className="container home-hero-content">
-              <motion.span
-                className="home-kicker"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45 }}
-              >
-                Detailing premium en Tucumán
-              </motion.span>
+            <div className="container home-hero-shell">
+              <div className="home-hero-content">
+                <motion.span
+                  className="home-kicker"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.42 }}
+                >
+                  Detailing premium en Tucumán
+                </motion.span>
 
-              <motion.h1
-                id="home-hero-title"
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.08 }}
-              >
-                Estética automotriz de alto nivel
-              </motion.h1>
+                <motion.h1
+                  id="home-hero-title"
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.56, delay: 0.08 }}
+                >
+                  Estética automotriz de alto nivel
+                </motion.h1>
 
-              <motion.p
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.16 }}
-              >
-                Tratamientos profesionales para proteger, realzar y mantener cada detalle de tu vehículo.
-              </motion.p>
+                <motion.p
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.56, delay: 0.16 }}
+                >
+                  Cuidamos cada detalle de tu vehículo con tratamientos profesionales, terminaciones limpias y protección duradera.
+                </motion.p>
 
-              <motion.div
-                className="home-hero-actions"
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.24 }}
-              >
-                <Link to="/consulta" className="home-btn home-btn-primary">
-                  Solicitar diagnóstico <ArrowRight size={17} />
-                </Link>
-                <Link to="/servicios" className="home-btn home-btn-secondary">
-                  Ver servicios
-                </Link>
-              </motion.div>
+                <motion.div
+                  className="home-hero-actions"
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.56, delay: 0.24 }}
+                >
+                  <Link to="/consulta" className="home-btn home-btn-primary">
+                    Solicitar diagnóstico <ArrowRight size={17} />
+                  </Link>
+                  <Link to="/servicios" className="home-btn home-btn-secondary">
+                    Ver servicios
+                  </Link>
+                </motion.div>
+              </div>
             </div>
           </section>
 
@@ -101,7 +101,7 @@ function Home() {
                   <motion.article
                     key={service.id}
                     {...FADE_UP}
-                    transition={{ ...FADE_UP.transition, delay: index * 0.07 }}
+                    transition={{ ...FADE_UP.transition, delay: index * 0.06 }}
                     className="home-service-card"
                   >
                     <div className="home-service-image">
@@ -125,7 +125,7 @@ function Home() {
               <motion.article
                 key={item.title}
                 {...FADE_UP}
-                transition={{ ...FADE_UP.transition, delay: index * 0.07 }}
+                transition={{ ...FADE_UP.transition, delay: index * 0.06 }}
                 className="home-trust-item"
               >
                 <span>0{index + 1}</span>
@@ -133,15 +133,6 @@ function Home() {
                 <p>{item.description}</p>
               </motion.article>
             ))}
-          </section>
-
-          <section className="home-final-cta">
-            <motion.div {...FADE_UP} className="container home-final-cta-content">
-              <h2>Tu vehículo merece un cuidado a medida.</h2>
-              <a href={getWaLink()} target="_blank" rel="noreferrer" className="home-btn home-btn-primary">
-                Consultar por WhatsApp
-              </a>
-            </motion.div>
           </section>
         </div>
       </PublicLayout>

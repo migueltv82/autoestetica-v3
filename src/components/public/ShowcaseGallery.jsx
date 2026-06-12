@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { ArrowUpRight, Images } from "lucide-react";
 import { useGallery } from "../../hooks/useGallery";
 import Modal from "../ui/Modal";
@@ -118,7 +118,7 @@ function ShowcaseGallery() {
               <h4>Detalles que se notan</h4>
               <p>
                 Cada resultado refleja un proceso prolijo: limpieza, corrección, protección y terminación
-                cuidada. Consultá por WhatsApp y te recomendamos el tratamiento ideal.
+                cuidada, con criterio técnico según el estado inicial del vehículo.
               </p>
             </div>
           </div>

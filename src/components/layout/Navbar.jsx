@@ -1,7 +1,7 @@
-import { NavLink, Link } from "react-router-dom";
-import { Menu, X, Lock } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { Lock, Menu, X } from "lucide-react";
 import { useSettings } from "../../hooks/useSettings";
 import "./Navbar.css";
 
@@ -41,11 +41,11 @@ function Navbar() {
     <header className={`site-header ${isScrolled ? "scrolled" : ""}`}>
       <div className="container navbar-shell">
         <Link to="/" className="brand" onClick={closeMenu}>
-          <span className="brand-mark"></span>
-          <span className="brand-text">{settings.businessName} Tucuman</span>
+          <span className="brand-mark" />
+          <span className="brand-text">{settings.businessName} Tucumán</span>
         </Link>
 
-        <nav className="nav-links">
+        <nav className="nav-links" aria-label="Navegación principal">
           <NavLink to="/" className={getNavLinkClassName} onClick={closeMenu}>
             Inicio
           </NavLink>
@@ -53,14 +53,14 @@ function Navbar() {
             Servicios
           </NavLink>
           <NavLink to="/galeria" className={getNavLinkClassName} onClick={closeMenu}>
-            Galeria
+            Galería
           </NavLink>
           <Link to="/consulta" className="btn-minimal" onClick={closeMenu}>
             Consultar
           </Link>
         </nav>
 
-        <Link to="/admin" className="admin-link" aria-label="Panel de administrador">
+        <Link to="/admin" className="admin-link" aria-label="Panel de Administración">
           <Lock size={16} />
         </Link>
 
@@ -68,7 +68,7 @@ function Navbar() {
           type="button"
           className="menu-toggle"
           onClick={toggleMenu}
-          aria-label={menuOpen ? "Cerrar menu" : "Abrir menu"}
+          aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
           aria-expanded={menuOpen}
           aria-controls="mobile-nav"
         >
@@ -86,7 +86,7 @@ function Navbar() {
             exit={{ opacity: 0, y: -14 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
           >
-            <nav className="mobile-nav-links">
+            <nav className="mobile-nav-links" aria-label="Navegación móvil">
               <NavLink to="/" className={getNavLinkClassName} onClick={closeMenu}>
                 Inicio
               </NavLink>
@@ -94,13 +94,13 @@ function Navbar() {
                 Servicios
               </NavLink>
               <NavLink to="/galeria" className={getNavLinkClassName} onClick={closeMenu}>
-                Galeria
+                Galería
               </NavLink>
               <Link to="/consulta" className="nav-cta" onClick={closeMenu}>
                 Consultar
               </Link>
               <Link to="/admin" className="admin-link-mobile" onClick={closeMenu}>
-                <Lock size={16} /> Panel de Administracion
+                <Lock size={16} /> Panel de Administración
               </Link>
             </nav>
           </motion.div>
