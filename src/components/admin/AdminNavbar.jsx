@@ -1,4 +1,4 @@
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   CalendarDays,
@@ -11,9 +11,10 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import "./AdminNavbar.css";
+import { useAuth } from "../../hooks/useAuth";
 
 const items = [
-  { to: "/admin/dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
+  { to: "/admin/dashboard", label: "Inicio", icon: <LayoutDashboard size={20} /> },
   { to: "/admin/turnos", label: "Agenda", icon: <CalendarDays size={20} /> },
   { to: "/admin/caja", label: "Caja", icon: <Wallet size={20} /> },
   { to: "/admin/clientes", label: "Clientes", icon: <Users size={20} /> },
@@ -23,8 +24,16 @@ const items = [
 ];
 
 function AdminNavbar() {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
   function getLinkClassName({ isActive }) {
     return `admin-sidebar-link${isActive ? " active" : ""}`;
+  }
+
+  async function handleSignOut() {
+    await signOut();
+    navigate("/admin/login", { replace: true });
   }
 
   return (
@@ -47,14 +56,15 @@ function AdminNavbar() {
       </nav>
 
       <div className="sidebar-footer">
+        {user?.email ? <span className="sidebar-user" title={user.email}>{user.email}</span> : null}
         <Link to="/" className="admin-sidebar-link">
           <span className="link-icon"><Globe size={20} /></span>
           <span className="link-label">Ver sitio público</span>
         </Link>
-        <Link to="/admin/login" className="admin-sidebar-link logout">
+        <button type="button" className="admin-sidebar-link logout sidebar-logout" onClick={handleSignOut}>
           <span className="link-icon"><LogIn size={20} /></span>
           <span className="link-label">Cerrar sesión</span>
-        </Link>
+        </button>
       </div>
     </aside>
   );

@@ -9,13 +9,15 @@ import {
   Bike, 
   Truck, 
   Box, 
-  User 
+  User,
+  ReceiptText,
+  Pencil
 } from "lucide-react";
 import "./TurnsTable.css";
 
-const STATUS_OPTIONS = ["Pendiente", "Confirmado", "Finalizado", "Cancelado"];
+const STATUS_OPTIONS = ["Consulta", "Pendiente", "Seña pendiente", "Confirmado", "En proceso", "Listo", "Finalizado", "Cancelado", "No asistió"];
 
-function TurnsTable({ turns, onStatusChange, onDeleteTurn }) {
+function TurnsTable({ turns, onStatusChange, onDeleteTurn, onGenerateReceipt, onEditTurn }) {
   if (!turns.length) {
     return (
       <EmptyState
@@ -37,9 +39,14 @@ function TurnsTable({ turns, onStatusChange, onDeleteTurn }) {
   const getStatusClass = (status) => {
     switch (status) {
       case "Confirmado": return "status-confirmed";
+      case "En proceso": return "status-progress";
+      case "Listo": return "status-ready";
       case "Pendiente": return "status-pending";
+      case "Consulta": return "status-pending";
+      case "Seña pendiente": return "status-pending";
       case "Finalizado": return "status-finished";
       case "Cancelado": return "status-cancelled";
+      case "No asistió": return "status-cancelled";
       default: return "";
     }
   };
@@ -95,6 +102,16 @@ function TurnsTable({ turns, onStatusChange, onDeleteTurn }) {
                 </select>
               </td>
               <td style={{ textAlign: "right" }}>
+                {onEditTurn ? <button className="btn-ghost btn-mini-action" onClick={() => onEditTurn(turn)} title="Editar turno"><Pencil size={16} /></button> : null}
+                {onGenerateReceipt ? (
+                  <button
+                    className="btn-action-receipt"
+                    onClick={() => onGenerateReceipt(turn)}
+                    title="Generar recibo"
+                  >
+                    <ReceiptText size={16} />
+                  </button>
+                ) : null}
                 <button 
                   className="btn-action-danger" 
                   onClick={() => onDeleteTurn(turn.id)}

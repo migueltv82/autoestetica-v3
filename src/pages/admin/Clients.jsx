@@ -3,7 +3,7 @@ import AdminLayout from "../../components/admin/AdminLayout";
 import PageTransition from "../../components/ui/PageTransition";
 import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import StatCard from "../../components/ui/StatCard";
-import { Search, Plus, Users, Star, TrendingUp, Edit2, Trash2, X, Phone, Car } from "lucide-react";
+import { Search, Plus, Users, Star, UserPlus, Edit2, Trash2, X, Phone, Car } from "lucide-react";
 import { useClients } from "../../hooks/useClients";
 import "../../components/admin/TurnsTable.css";
 
@@ -17,6 +17,13 @@ function Clients() {
     () => clients.filter((client) => Number.parseInt(client.visits, 10) >= 3).length,
     [clients]
   );
+  const newThisMonth = useMemo(() => {
+    const now = new Date();
+    return clients.filter((client) => {
+      const created = new Date(client.createdAt);
+      return created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear();
+    }).length;
+  }, [clients]);
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -57,14 +64,14 @@ function Clients() {
         <section className="admin-stats-grid">
           <StatCard label="Total clientes" value={totalClients} icon={<Users size={24} />} color="var(--color-primary)" trend="Base activa" />
           <StatCard label="Clientes VIP" value={vipClients} icon={<Star size={24} />} trend="Alta recurrencia" color="#facc15" />
-          <StatCard label="Eficiencia" value="94%" icon={<TrendingUp size={24} />} trend="Retencion estimada" color="#38bdf8" />
+          <StatCard label="Nuevos este mes" value={newThisMonth} icon={<UserPlus size={24} />} trend="Altas registradas" color="#38bdf8" />
         </section>
 
         <AdminPageHeader
-          eyebrow="CRM"
+          eyebrow="Clientes"
           icon={<Users size={18} />}
           title="Base de clientes"
-          subtitle="Busca, edita y registra perfiles sin salir de la misma grilla."
+          subtitle="Encontrá rápido sus datos, vehículos y trabajos realizados."
           actions={
             <button
               className={showForm ? "btn-ghost" : "btn-premium"}

@@ -5,6 +5,7 @@ import Modal from "../ui/Modal";
 import Carousel from "../ui/Carousel";
 import { useServices } from "../../hooks/useServices";
 import { getServiceCoverUrl, getServicePreviewGallery } from "../../utils/serviceMedia";
+import { isTwoWheelService } from "../../utils/servicePricing";
 import "./ServicesGrid.css";
 
 const formatMoney = (value) =>
@@ -71,11 +72,17 @@ function ServicesGrid() {
               <p>{service.description}</p>
 
               <div className="card-footer">
-                {service.price ? (
-                  <div className="price-summary">
-                    <span>Desde</span>
-                    <strong>{formatMoney(service.price)}</strong>
-                  </div>
+                {service.priceOnRequest ? (
+                  <div className="price-summary price-consult"><span>Precio</span><strong>Consultar</strong></div>
+                ) : service.carPrice || service.truckPrice ? (
+                  isTwoWheelService(service) ? (
+                    <div className="price-summary"><span>Precio</span><strong>{formatMoney(service.carPrice)}</strong></div>
+                  ) : (
+                    <div className="price-summary">
+                      <span>Auto {formatMoney(service.carPrice)}</span>
+                      <strong>Camioneta {formatMoney(service.truckPrice)}</strong>
+                    </div>
+                  )
                 ) : (
                   <span aria-hidden="true" />
                 )}
@@ -104,6 +111,7 @@ function ServicesGrid() {
             <Carousel images={getServicePreviewGallery(selectedService)} />
             <div className="gallery-modal-info">
               <h3>{selectedService.name}</h3>
+              {selectedService.priceOnRequest ? <div className="service-modal-prices"><strong>Precio a consultar</strong><span>El valor se define despues de evaluar el estado del vehiculo.</span></div> : isTwoWheelService(selectedService) ? <div className="service-modal-prices"><span>Precio: <strong>{formatMoney(selectedService.carPrice)}</strong></span></div> : <div className="service-modal-prices"><span>Auto: <strong>{formatMoney(selectedService.carPrice)}</strong></span><span>Camioneta: <strong>{formatMoney(selectedService.truckPrice)}</strong></span></div>}
               <p>
                 Trabajos realizados bajo procesos técnicos y terminaciones cuidadas. El resultado final puede variar según el estado inicial del vehículo.
               </p>

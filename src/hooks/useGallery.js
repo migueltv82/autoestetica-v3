@@ -1,116 +1,79 @@
-import { useState } from "react";
-import { getTodayString, shiftDateByDays } from "../utils/date";
+import { useCallback, useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
+import { getPublicOrganizationId } from "../lib/organization";
+import { useAuth } from "./useAuth";
 
-const STORAGE_KEY = "autoestetica_gallery";
-
-function createDefaultImages() {
-  return [
-    {
-      id: 1,
-      title: "Restauración de BMW M3",
-      service: "Tratamiento Cerámico",
-      beforeUrl: "https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?q=80&w=800",
-      afterUrl: "https://images.unsplash.com/photo-1583121274602-3e2820c69888?q=80&w=800",
-      date: shiftDateByDays(-15),
-      status: "published",
-    },
-    {
-      id: 2,
-      title: "Limpieza Profunda de Interiores",
-      service: "Detallado Interior",
-      beforeUrl: "https://images.unsplash.com/photo-1549317661-bc32c5ce24af?q=80&w=800",
-      afterUrl: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=800",
-      date: shiftDateByDays(-5),
-      status: "published",
-    },
-    {
-      id: 3,
-      title: "Corrección de Pintura & Brillo",
-      service: "Pulido 3 Pasos",
-      beforeUrl: "https://images.unsplash.com/photo-1601362840469-51e4d8d59085?q=80&w=800",
-      afterUrl: "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?q=80&w=800",
-      date: getTodayString(),
-      status: "published",
-    },
-    {
-      id: 4,
-      title: "Detallado Técnico de Motor",
-      service: "Limpieza a Vapor",
-      beforeUrl: "https://images.unsplash.com/photo-1621905252507-b354bc2a196c?q=80&w=800",
-      afterUrl: "https://images.unsplash.com/photo-1599256621730-535171e28e50?q=80&w=800",
-      date: getTodayString(),
-      status: "published",
-    },
-  ];
+function publicUrl(path) {
+  if (!path) return null;
+  return supabase.storage.from("portfolio").getPublicUrl(path).data.publicUrl;
 }
-
-function loadInitialGallery() {
-  const defaultImages = createDefaultImages();
-
-  if (typeof window === "undefined") {
-    return defaultImages;
-  }
-
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      return JSON.parse(saved);
-    }
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultImages));
-  } catch {
-    return defaultImages;
-  }
-
-  return defaultImages;
+function mapItem(item) {
+  return { id: item.id, title: item.title, service: item.service_name, beforeUrl: publicUrl(item.before_path), afterUrl: publicUrl(item.after_path), beforePath: item.before_path, afterPath: item.after_path, date: item.created_at?.slice(0, 10), status: item.status };
+}
+function dataUrlToBlob(dataUrl) {
+  const [header, content] = dataUrl.split(",");
+  const mime = header.match(/:(.*?);/)?.[1] || "image/jpeg";
+  const bytes = Uint8Array.from(atob(content), (character) => character.charCodeAt(0));
+  return new Blob([bytes], { type: mime });
 }
 
 export function useGallery() {
-  const [images, setImages] = useState(loadInitialGallery);
+  const { organizationId } = useAuth();
+  const [images, setImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const saveToLocal = (newImages) => {
-    setImages(newImages);
-
+  const refresh = useCallback(async () => {
+    setIsLoading(true);
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newImages));
-    } catch {
-      console.warn("Storage quota exceeded or error saving to localStorage.");
-      alert("La memoria del navegador esta llena. Borra algunas fotos pesadas para continuar.");
-    }
-  };
+      const targetId = organizationId || await getPublicOrganizationId();
+      let query = supabase.from("portfolio_items").select("*").eq("organization_id", targetId).is("deleted_at", null);
+      if (!organizationId) query = query.eq("status", "published").eq("publication_consent", true);
+      const { data, error: queryError } = await query.order("created_at", { ascending: false });
+      if (queryError) throw queryError;
+      setImages((data || []).map(mapItem)); setError("");
+    } catch (queryError) { setError(queryError.message); }
+    setIsLoading(false);
+  }, [organizationId]);
 
-  const addImage = (imgData) => {
-    const newDoc = {
-      id: Date.now(),
-      status: "published",
-      date: getTodayString(),
-      ...imgData,
-    };
+  useEffect(() => { const timer = setTimeout(() => refresh(), 0); return () => clearTimeout(timer); }, [refresh]);
 
-    saveToLocal([newDoc, ...images]);
-  };
+  async function uploadImage(dataUrl, label) {
+    if (!dataUrl) return null;
+    const blob = dataUrlToBlob(dataUrl);
+    const extension = blob.type.split("/")[1]?.replace("jpeg", "jpg") || "jpg";
+    const path = `${organizationId}/${crypto.randomUUID()}-${label}.${extension}`;
+    const { error: uploadError } = await supabase.storage.from("portfolio").upload(path, blob, { contentType: blob.type, upsert: false });
+    if (uploadError) throw uploadError;
+    return path;
+  }
 
-  const deleteImage = (id) => {
-    saveToLocal(images.filter((img) => img.id !== id));
-  };
-
-  const toggleStatus = (id) => {
-    const nextImages = images.map((img) => {
-      if (img.id === id) {
-        return { ...img, status: img.status === "published" ? "draft" : "published" };
-      }
-
-      return img;
+  async function addImage(image) {
+    const beforePath = await uploadImage(image.beforeUrl, "antes");
+    const afterPath = await uploadImage(image.afterUrl, "despues");
+    const { error: insertError } = await supabase.from("portfolio_items").insert({
+      organization_id: organizationId, title: image.title.trim(), service_name: image.service.trim(),
+      before_path: beforePath, after_path: afterPath, status: "published", publication_consent: true,
     });
+    if (insertError) throw insertError;
+    await refresh();
+  }
+  async function deleteImage(id) {
+    const item = images.find((image) => image.id === id);
+    const paths = [item?.beforePath, item?.afterPath].filter(Boolean);
+    const { error: deleteError } = await supabase.from("portfolio_items").update({ deleted_at: new Date().toISOString() })
+      .eq("id", id).eq("organization_id", organizationId);
+    if (deleteError) throw deleteError;
+    if (paths.length) await supabase.storage.from("portfolio").remove(paths);
+    await refresh();
+  }
+  async function toggleStatus(id) {
+    const item = images.find((image) => image.id === id);
+    const { error: updateError } = await supabase.from("portfolio_items").update({ status: item.status === "published" ? "draft" : "published" })
+      .eq("id", id).eq("organization_id", organizationId);
+    if (updateError) throw updateError;
+    await refresh();
+  }
 
-    saveToLocal(nextImages);
-  };
-
-  return {
-    images,
-    publishedImages: images.filter((image) => image.status === "published"),
-    addImage,
-    deleteImage,
-    toggleStatus,
-  };
+  return { images, publishedImages: images.filter((image) => image.status === "published"), isLoading, error, refresh, addImage, deleteImage, toggleStatus };
 }

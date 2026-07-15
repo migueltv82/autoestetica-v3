@@ -2,6 +2,7 @@ import { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Loader from "../components/ui/Loader";
 import ScrollToTop from "../components/ui/ScrollToTop";
+import ProtectedRoute from "../components/admin/ProtectedRoute";
 
 // Public pages
 const Home = lazy(() => import("../pages/public/Home"));
@@ -21,6 +22,7 @@ const GalleryAdmin = lazy(() => import("../pages/admin/Gallery"));
 const Settings = lazy(() => import("../pages/admin/Settings"));
 
 export default function RouterProviderApp() {
+  const protect = (element) => <ProtectedRoute>{element}</ProtectedRoute>;
   return (
     <BrowserRouter>
       <ScrollToTop />
@@ -36,13 +38,13 @@ export default function RouterProviderApp() {
           {/* Admin Routes */}
           <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
           <Route path="/admin/login" element={<Login />} />
-          <Route path="/admin/dashboard" element={<Dashboard />} />
-          <Route path="/admin/turnos" element={<Turns />} />
-          <Route path="/admin/caja" element={<Cash />} />
-          <Route path="/admin/clientes" element={<Clients />} />
-          <Route path="/admin/servicios" element={<AdminServices />} />
-          <Route path="/admin/galeria" element={<GalleryAdmin />} />
-          <Route path="/admin/configuracion" element={<Settings />} />
+          <Route path="/admin/dashboard" element={protect(<Dashboard />)} />
+          <Route path="/admin/turnos" element={protect(<Turns />)} />
+          <Route path="/admin/caja" element={protect(<Cash />)} />
+          <Route path="/admin/clientes" element={protect(<Clients />)} />
+          <Route path="/admin/servicios" element={protect(<AdminServices />)} />
+          <Route path="/admin/galeria" element={protect(<GalleryAdmin />)} />
+          <Route path="/admin/configuracion" element={protect(<Settings />)} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -19,6 +19,7 @@
   gap: 1.5rem;
   transition: all var(--transition-smooth);
 }
+.svc-card-cover{height:170px;margin:-1.75rem -1.75rem 0;overflow:hidden;border-radius:var(--radius-lg) var(--radius-lg) 0 0;background:var(--color-surface-elevated)}.svc-card-cover img{width:100%;height:100%;object-fit:cover;transition:transform .35s ease}.service-card-pro:hover .svc-card-cover img{transform:scale(1.035)}
 
 .service-card-pro:hover {
   border-color: var(--color-border-strong);
@@ -162,6 +163,8 @@
   color: var(--color-primary);
   font-family: var(--font-display);
 }
+.svc-price-pro{display:flex;flex-direction:column;align-items:flex-end;gap:.2rem;font-size:1rem}.svc-price-pro small{font-size:.72rem;font-weight:700;white-space:nowrap}.svc-price-mode{padding:1rem;border:1px solid var(--color-border);border-radius:12px;background:rgba(255,255,255,.02)}.svc-consult-toggle{display:flex;align-items:center;gap:.75rem;cursor:pointer}.svc-consult-toggle input{width:18px;height:18px;accent-color:var(--color-primary)}.svc-consult-toggle span{display:flex;flex-direction:column;gap:.2rem}.svc-consult-toggle small,.svc-consult-note{color:var(--color-text-muted);font-size:.75rem}.svc-vehicle-prices{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}.svc-consult-note{margin-top:.8rem;padding:.7rem;border-radius:8px;background:rgba(255,255,255,.03)}
+.svc-vehicle-prices.single{grid-template-columns:1fr}
 
 /* MODAL & FORM */
 .svc-edit-modal {
@@ -308,9 +311,11 @@
   gap: 1rem;
   margin-top: 1rem;
 }
+.svc-save-error{flex:1;margin:0;color:#fb7185;font-size:.76rem;line-height:1.4}
 
 @media (max-width: 768px) {
   .svc-form-row {
     grid-template-columns: 1fr;
   }
+  .svc-vehicle-prices{grid-template-columns:1fr}
 }

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Clock, MapPin } from "lucide-react";
+import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { useSettings } from "../../hooks/useSettings";
 import { InstagramIcon, FacebookIcon, TikTokIcon, WhatsAppIcon } from "../ui/SocialIcons";
 import "./Footer.css";
@@ -7,10 +7,16 @@ import "./Footer.css";
 function Footer() {
   const { settings, getWaLink } = useSettings();
 
+  const normalizeUrl = (value, baseUrl) => {
+    const clean = String(value || "").trim();
+    if (!clean) return "";
+    if (/^https?:\/\//i.test(clean)) return clean;
+    return `${baseUrl}${clean.replace(/^@/, "").replace(/^\//, "")}`;
+  };
   const socialLinks = [
-    { key: "instagram", href: settings.instagram, Icon: InstagramIcon, label: "Instagram" },
-    { key: "facebook", href: settings.facebook, Icon: FacebookIcon, label: "Facebook" },
-    { key: "tiktok", href: settings.tiktok, Icon: TikTokIcon, label: "TikTok" },
+    { key: "instagram", href: normalizeUrl(settings.instagram, "https://instagram.com/"), Icon: InstagramIcon, label: "Instagram" },
+    { key: "facebook", href: normalizeUrl(settings.facebook, "https://facebook.com/"), Icon: FacebookIcon, label: "Facebook" },
+    { key: "tiktok", href: normalizeUrl(settings.tiktok, "https://tiktok.com/@"), Icon: TikTokIcon, label: "TikTok" },
   ].filter((s) => s.href);
 
   return (
@@ -50,16 +56,18 @@ function Footer() {
 
           <div className="footer-info">
             <span className="footer-nav-title">Contacto</span>
-            <a href={getWaLink()} target="_blank" rel="noopener noreferrer" className="footer-wa-btn">
+            {settings.whatsapp ? <a href={getWaLink()} target="_blank" rel="noopener noreferrer" className="footer-wa-btn">
               <WhatsAppIcon size={16} />
               <span>{settings.whatsapp}</span>
-            </a>
-            <p className="footer-detail">
+            </a> : null}
+            {settings.phone ? <a className="footer-detail" href={`tel:${settings.phone.replace(/[^\d+]/g, "")}`}><Phone size={13} /> {settings.phone}</a> : null}
+            {settings.email ? <a className="footer-detail" href={`mailto:${settings.email}`}><Mail size={13} /> {settings.email}</a> : null}
+            {settings.openingHours ? <p className="footer-detail">
               <Clock size={13} /> {settings.openingHours}
-            </p>
-            <p className="footer-detail">
+            </p> : null}
+            {settings.address ? <p className="footer-detail">
               <MapPin size={13} /> {settings.address}
-            </p>
+            </p> : null}
           </div>
         </div>
 

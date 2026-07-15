@@ -1,23 +1,4 @@
-.admin-shell {
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  min-height: 100vh;
-  background-color: var(--color-bg);
-}
-
-.admin-main {
-  padding: 2.5rem;
-  overflow-y: auto;
-  height: 100vh;
-}
-
-.admin-container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-@media (max-width: 1024px) {
-  .admin-shell {
-    grid-template-columns: 1fr;
-  }
-}
+.admin-shell { --color-bg:#0b0f15;--color-bg-soft:#101620;--color-surface:#151c27;--color-surface-soft:#1a2230;--color-surface-elevated:#202a39;--color-text:#f5f7fa;--color-white:#fff;--color-text-soft:#aab4c3;--color-text-muted:#748094;--color-primary:#d9e2ec;--rgb-primary:217,226,236;--color-border:rgba(255,255,255,.075);--color-border-strong:rgba(255,255,255,.15);--radius-panel:18px;--radius-md:12px;--gradient-glass:#151c27;--gradient-surface:#151c27;--shadow-premium:0 14px 34px rgba(0,0,0,.2);display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh;background:var(--color-bg);color:var(--color-text) }
+.admin-main { min-width:0;min-height:100vh;padding:clamp(1.25rem,3vw,2.5rem);background:radial-gradient(circle at 80% 0,rgba(80,110,150,.06),transparent 32%),var(--color-bg) }
+.admin-container { width:100%;max-width:1440px;margin:0 auto }
+@media(max-width:1024px){.admin-shell{display:block;padding-bottom:76px}.admin-main{padding:1.25rem 1rem 2rem}}

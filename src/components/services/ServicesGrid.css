@@ -172,6 +172,7 @@
   font-weight: 600;
   line-height: 1;
 }
+.price-summary.price-consult strong{color:var(--color-primary)}.service-modal-prices{display:flex;flex-wrap:wrap;gap:.6rem 1.25rem;margin:.75rem 0;padding:.8rem;border:1px solid var(--color-border);border-radius:10px;color:var(--color-text-soft)}.service-modal-prices span{font-size:.8rem}
 
 .btn-info-link {
   display: inline-flex;

@@ -1,5 +1,6 @@
 import AdminNavbar from "./AdminNavbar";
 import "./AdminLayout.css";
+import "./AdminButtons.css";
 
 function AdminLayout({ children }) {
   return (

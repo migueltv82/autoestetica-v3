@@ -1,0 +1,172 @@
+/* Button system scoped to the administrator area. */
+.admin-shell button,
+.admin-shell a[class*="btn-"] {
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.admin-shell :is(
+  .btn-primary-admin,
+  .btn-premium,
+  .btn-form-primary,
+  .btn-form-secondary,
+  .btn-ghost,
+  .btn-danger
+) {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.68rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 0.76rem;
+  font-weight: 750;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: none;
+  transform: none;
+  transition: background-color 160ms ease, border-color 160ms ease,
+    color 160ms ease, box-shadow 160ms ease;
+}
+
+.admin-shell :is(.btn-primary-admin, .btn-premium, .btn-form-primary) {
+  border-color: #e8edf4;
+  background: #e8edf4;
+  color: #0c1118;
+}
+
+.admin-shell :is(.btn-primary-admin, .btn-premium, .btn-form-primary):hover:not(:disabled) {
+  border-color: #fff;
+  background: #fff;
+  color: #070a0f;
+  box-shadow: 0 7px 20px rgba(0, 0, 0, 0.24);
+}
+
+.admin-shell :is(.btn-ghost, .btn-form-secondary) {
+  border-color: #344152;
+  background: #1a2330;
+  color: #dbe3ed;
+}
+
+.admin-shell :is(.btn-ghost, .btn-form-secondary):hover:not(:disabled) {
+  border-color: #526177;
+  background: #232e3d;
+  color: #fff;
+}
+
+.admin-shell .btn-danger {
+  border-color: rgba(251, 113, 133, 0.3);
+  background: rgba(244, 63, 94, 0.09);
+  color: #fb7185;
+}
+
+.admin-shell .btn-danger:hover:not(:disabled) {
+  border-color: rgba(251, 113, 133, 0.55);
+  background: rgba(244, 63, 94, 0.17);
+  color: #fda4af;
+}
+
+.admin-shell :is(button, a):focus-visible {
+  outline: 3px solid rgba(147, 197, 253, 0.35);
+  outline-offset: 2px;
+}
+
+.admin-shell button:disabled,
+.admin-shell [aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.admin-shell :is(.btn-primary-admin, .btn-premium, .btn-form-primary, .btn-form-secondary, .btn-ghost, .btn-danger) svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+}
+
+/* Compact icon actions in tables, cards and mobile lists. */
+.admin-shell :is(
+  .btn-mini-action,
+  .btn-ghost-mini,
+  .btn-danger-mini,
+  .btn-icon-sm,
+  .btn-icon-danger-sm,
+  .btn-action-receipt,
+  .btn-action-danger
+) {
+  display: inline-flex;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 9px;
+}
+
+.admin-shell .btn-action-receipt {
+  border: 1px solid rgba(74, 222, 128, 0.28);
+  background: rgba(34, 197, 94, 0.09);
+  color: #4ade80;
+}
+
+.admin-shell .btn-action-receipt:hover {
+  border-color: rgba(74, 222, 128, 0.5);
+  background: rgba(34, 197, 94, 0.17);
+  color: #86efac;
+}
+
+.admin-shell :is(.btn-icon-sm, .btn-icon-danger-sm) {
+  border: 1px solid #303b4b;
+  background: #18212c;
+}
+
+.admin-shell .btn-icon-sm:hover {
+  border-color: #4b5a6e;
+  background: #232e3b;
+  color: #fff;
+}
+
+.admin-shell .btn-icon-danger-sm:hover {
+  border-color: rgba(251, 113, 133, 0.45);
+  background: rgba(244, 63, 94, 0.14);
+  color: #fb7185;
+}
+
+/* Agenda controls keep their compact size but share the same interaction states. */
+.admin-shell .week-controls button,
+.admin-shell .board-card button {
+  border-color: #344152;
+  background: #1a2330;
+  color: #dbe3ed;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.admin-shell .week-controls button:hover:not(:disabled),
+.admin-shell .board-card button:hover:not(:disabled) {
+  border-color: #526177;
+  background: #263242;
+  color: #fff;
+}
+
+.admin-shell .board-card button {
+  min-height: 36px;
+  font-size: 0.7rem;
+}
+
+@media (max-width: 640px) {
+  .admin-shell :is(.btn-primary-admin, .btn-premium, .btn-form-primary, .btn-form-secondary, .btn-ghost, .btn-danger) {
+    min-height: 44px;
+  }
+
+  .admin-shell .admin-page-header-actions > :is(button, a) {
+    width: 100%;
+  }
+}

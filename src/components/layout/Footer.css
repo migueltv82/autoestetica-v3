@@ -161,6 +161,15 @@
   opacity: 0.72;
 }
 
+a.footer-detail {
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a.footer-detail:hover {
+  color: var(--color-white);
+}
+
 .footer-bottom {
   display: flex;
   align-items: center;

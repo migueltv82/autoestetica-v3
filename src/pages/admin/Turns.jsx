@@ -1,15 +1,16 @@
 import AdminLayout from "../../components/admin/AdminLayout";
 import PageTransition from "../../components/ui/PageTransition";
 import TurnsToolbar from "../../components/admin/TurnsToolbar";
-import TurnsTable from "../../components/admin/TurnsTable";
 import TurnsTableSkeleton from "../../components/admin/TurnsTableSkeleton";
 import TurnForm from "../../components/admin/TurnForm";
+import ReceiptModal from "../../components/admin/ReceiptModal";
 import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import { useTurns } from "../../hooks/useTurns";
-import { useClients } from "../../hooks/useClients";
-import { useCash } from "../../hooks/useCash";
-import { Calendar, Plus, X } from "lucide-react";
+import { useServices } from "../../hooks/useServices";
+import { useSettings } from "../../hooks/useSettings";
+import { Calendar, CalendarRange, Columns3, ListChecks, Plus, X } from "lucide-react";
 import { useState } from "react";
+import { BoardAgenda, TodayAgenda, WeekAgenda } from "../../components/admin/AgendaViews";
 
 function Turns() {
   const {
@@ -17,44 +18,49 @@ function Turns() {
     filters,
     isLoading,
     addTurn,
+    updateTurn,
     handleFilterChange,
     clearFilters,
     updateTurnStatus,
     deleteTurn,
   } = useTurns();
 
-  const { clients, addClient } = useClients();
-  const { addTransaction } = useCash();
+  const { services } = useServices();
+  const { settings } = useSettings();
 
   const [showForm, setShowForm] = useState(false);
+  const [editingTurn, setEditingTurn] = useState(null);
+  const [receiptTurn, setReceiptTurn] = useState(null);
+  const [agendaView, setAgendaView] = useState("today");
+  const [weekOffset, setWeekOffset] = useState(0);
 
-  const handleCreateTurn = (formData) => {
-    const turnId = Date.now();
-    
-    // 1. Guardar Turno
-    addTurn({ id: turnId, ...formData });
-
-    // 2. Guardar Cliente (si no existe)
-    const existingClient = clients.find(c => c.phone === formData.phone);
-    if (!existingClient) {
-      addClient({
-        name: formData.client,
-        phone: formData.phone,
-        vehicle: formData.vehicle
-      });
+  const handleCreateTurn = async (formData) => {
+    try {
+      await addTurn(formData);
+      setShowForm(false);
+    } catch (error) {
+      console.error(error);
+      alert("No se pudo guardar la orden. Revisá los datos e intentá nuevamente.");
+      throw error;
     }
+  };
 
-    // 3. Registrar en Caja
-    if (formData.amount && Number(formData.amount) > 0) {
-      addTransaction({
-        description: `Reserva: ${formData.client} - ${formData.service}`,
-        type: "income",
-        amount: Number(formData.amount),
-        method: "Efectivo",
-      });
+  const handleUpdateTurn = async (formData) => {
+    try {
+      await updateTurn(editingTurn.id, formData);
+      setEditingTurn(null);
+      setShowForm(false);
+    } catch (error) {
+      console.error(error);
+      alert("No se pudieron guardar los cambios del turno.");
+      throw error;
     }
+  };
 
-    setShowForm(false);
+  const openEdit = (turn) => {
+    setEditingTurn(turn);
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -63,10 +69,10 @@ function Turns() {
         <AdminPageHeader
           eyebrow="Agenda"
           icon={<Calendar size={18} />}
-          title="Programacion operativa"
-          subtitle="Filtra, actualiza estados y carga nuevos turnos con sincronización total."
+          title="Agenda de turnos"
+          subtitle="Organizá los trabajos del día y mantené cada cliente al tanto."
           actions={
-            <button className={showForm ? "btn-form-primary" : "btn-primary-admin"} onClick={() => setShowForm((current) => !current)}>
+            <button className={showForm ? "btn-form-primary" : "btn-primary-admin"} onClick={() => { setEditingTurn(null); setShowForm((current) => !current); }}>
               {showForm ? <X size={18} /> : <Plus size={18} />}
               <span>{showForm ? "Cerrar" : "Nuevo Turno"}</span>
             </button>
@@ -74,10 +80,16 @@ function Turns() {
         />
 
         {showForm ? (
-          <TurnForm onAddTurn={handleCreateTurn} />
+          <TurnForm key={editingTurn?.id || "new"} initialData={editingTurn} onAddTurn={editingTurn ? handleUpdateTurn : handleCreateTurn} />
         ) : null}
 
-        <div className="admin-stack" style={{ marginTop: "2rem" }}>
+        <div className="agenda-view-tabs" role="tablist" aria-label="Vista de agenda">
+          <button type="button" className={agendaView === "today" ? "active" : ""} onClick={() => setAgendaView("today")}><ListChecks size={17} /><span>Hoy</span></button>
+          <button type="button" className={agendaView === "week" ? "active" : ""} onClick={() => setAgendaView("week")}><CalendarRange size={17} /><span>Semana</span></button>
+          <button type="button" className={agendaView === "board" ? "active" : ""} onClick={() => setAgendaView("board")}><Columns3 size={17} /><span>En proceso</span></button>
+        </div>
+
+        <div className="admin-stack agenda-workspace">
           <TurnsToolbar
             filters={filters}
             onFilterChange={handleFilterChange}
@@ -86,14 +98,25 @@ function Turns() {
 
           {isLoading ? (
             <TurnsTableSkeleton />
-          ) : (
-            <TurnsTable
-              turns={filteredTurns}
+          ) : agendaView === "today" ? (
+            <TodayAgenda turns={filteredTurns}
               onStatusChange={updateTurnStatus}
               onDeleteTurn={deleteTurn}
+              onGenerateReceipt={setReceiptTurn}
+              onEditTurn={openEdit}
             />
-          )}
+          ) : agendaView === "week" ? (
+            <WeekAgenda turns={filteredTurns} weekOffset={weekOffset} onWeekChange={setWeekOffset} onStatusChange={updateTurnStatus} onEditTurn={openEdit} onDeleteTurn={deleteTurn} />
+          ) : <BoardAgenda turns={filteredTurns} onStatusChange={updateTurnStatus} />}
         </div>
+        {receiptTurn ? (
+          <ReceiptModal
+            turn={receiptTurn}
+            services={services}
+            settings={settings}
+            onClose={() => setReceiptTurn(null)}
+          />
+        ) : null}
       </AdminLayout>
     </PageTransition>
   );

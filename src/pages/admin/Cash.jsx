@@ -20,17 +20,17 @@ function Cash() {
   const formatMoney = (value) =>
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(value);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     if (!formData.description || !formData.amount) {
       return;
     }
 
     if (editingId) {
-      updateTransaction(editingId, formData);
+      await updateTransaction(editingId, formData);
       setEditingId(null);
     } else {
-      addTransaction(formData);
+      await addTransaction(formData);
     }
 
     setFormData({ description: "", amount: "", type: "income", method: "Efectivo" });
@@ -49,9 +49,9 @@ function Cash() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function handleDelete(id) {
+  async function handleDelete(id) {
     if (window.confirm("Queres borrar este movimiento?")) {
-      deleteTransaction(id);
+      await deleteTransaction(id);
     }
   }
 
@@ -83,8 +83,8 @@ function Cash() {
         <AdminPageHeader
           eyebrow="Caja"
           icon={<Wallet size={18} />}
-          title="Libro mayor"
-          subtitle="Carga nuevos movimientos y revisa la caja en formato operativo."
+          title="Movimientos de caja"
+          subtitle="Registrá lo que entra y sale para conocer el resultado real del negocio."
           actions={
             <button
               className={showForm ? "btn-ghost" : "btn-premium"}

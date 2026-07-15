@@ -1,77 +1,94 @@
-import { Link, useNavigate } from "react-router-dom";
-import { ShieldCheck, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
+import { useState } from "react";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Lock, Mail, ArrowRight, ArrowLeft } from "lucide-react";
 import PageTransition from "../../components/ui/PageTransition";
+import { useAuth } from "../../hooks/useAuth";
 import loginBg from "../../assets/login_bg.png";
 import businessLogo from "../../assets/logo.jpg";
 import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user, profile, isLoading, signIn, signOut, resetPassword } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(() => location.state?.authError || "");
+  const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    navigate("/admin/dashboard");
+    setError("");
+    setMessage("");
+    setIsSubmitting(true);
+    const { error: authError } = await signIn(email.trim(), password);
+    setIsSubmitting(false);
+    if (authError) {
+      setError(authError.message === "Invalid login credentials" ? "Email o contraseña incorrectos." : "No pudimos iniciar sesión. Intentá nuevamente.");
+      return;
+    }
+    // ProtectedRoute will verify the organization profile after Auth updates.
+    navigate(location.state?.from || "/admin/dashboard", { replace: true });
   }
+
+  async function handleResetPassword() {
+    if (!email.trim()) {
+      setError("Ingresá tu email para recuperar la contraseña.");
+      return;
+    }
+    setError("");
+    const { error: resetError } = await resetPassword(email.trim());
+    if (resetError) setError("No pudimos enviar el correo de recuperación.");
+    else setMessage("Te enviamos un enlace de recuperación a tu email.");
+  }
+
+  if (!isLoading && user && profile) return <Navigate to="/admin/dashboard" replace />;
 
   return (
     <PageTransition>
       <main className="super-premium-login">
         <div className="login-background-overlay">
-          <img src={loginBg} alt="Cinematic Detailing Background" className="login-bg-img" />
+          <img src={loginBg} alt="Auto en proceso de detailing" className="login-bg-img" />
           <div className="login-glass-blur" />
         </div>
-
         <div className="login-content-wrapper">
           <div className="admin-login-card-v3 glass-panel-premium">
             <div className="login-brand-header">
-               <div className="brand-logo-container">
-                 <img src={businessLogo} alt="Autoestética Logo" className="login-brand-logo" />
-               </div>
-               <div className="login-title-group">
-                 <span className="premium-badge">Acceso Reservado</span>
-                 <h1 className="login-main-title">Sistema de Gestión</h1>
-                 <p className="login-sub-text">Iniciá sesión para administrar la estética de vanguardia.</p>
-               </div>
+              <div className="brand-logo-container"><img src={businessLogo} alt="Autoestética Tucumán" className="login-brand-logo" /></div>
+              <div className="login-title-group">
+                <span className="premium-badge">Acceso seguro</span>
+                <h1 className="login-main-title">Sistema de gestión</h1>
+                <p className="login-sub-text">Iniciá sesión con tu cuenta autorizada para administrar el negocio.</p>
+              </div>
             </div>
-
             <form onSubmit={handleSubmit} className="premium-login-form">
               <div className="premium-input-group">
-                <label className="premium-input-label"><User size={14} /> Identificador de Usuario</label>
+                <label className="premium-input-label"><Mail size={14} /> Email</label>
                 <div className="premium-input-wrapper">
-                  <input
-                    className="admin-input-premium-v2"
-                    type="text"
-                    placeholder="Tu usuario"
-                    required
-                  />
-                  <div className="input-focus-glow" />
+                  <input className="admin-input-premium-v2" type="email" placeholder="tu@email.com" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required />
                 </div>
               </div>
-
               <div className="premium-input-group">
-                <label className="premium-input-label"><Lock size={14} /> Código de Seguridad</label>
+                <label className="premium-input-label"><Lock size={14} /> Contraseña</label>
                 <div className="premium-input-wrapper">
-                  <input
-                    className="admin-input-premium-v2"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                  />
-                  <div className="input-focus-glow" />
+                  <input className="admin-input-premium-v2" type="password" placeholder="••••••••" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" required />
                 </div>
               </div>
-
-              <button type="submit" className="login-submit-premium">
-                <span>Ingresar al Panel</span>
-                <ArrowRight size={20} className="btn-icon-move" />
+              {error ? <div className="login-feedback error" role="alert">{error}</div> : null}
+              {message ? <div className="login-feedback success" role="status">{message}</div> : null}
+              {!isLoading && user && !profile ? (
+                <div className="login-feedback error" role="alert">
+                  La cuenta existe pero no está vinculada al negocio.
+                  <button type="button" className="login-inline-action" onClick={signOut}>Cerrar esta sesión</button>
+                </div>
+              ) : null}
+              <button type="button" className="login-forgot" onClick={handleResetPassword}>Olvidé mi contraseña</button>
+              <button type="submit" className="login-submit-premium" disabled={isSubmitting}>
+                <span>{isSubmitting ? "Verificando…" : "Ingresar al panel"}</span><ArrowRight size={20} className="btn-icon-move" />
               </button>
             </form>
-
-            <footer className="login-footer-minimal">
-              <Link to="/" className="back-link-v3">
-                <ArrowLeft size={16} /> <span>Volver al centro de servicios</span>
-              </Link>
-            </footer>
+            <footer className="login-footer-minimal"><Link to="/" className="back-link-v3"><ArrowLeft size={16} /><span>Volver al sitio</span></Link></footer>
           </div>
         </div>
       </main>

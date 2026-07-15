@@ -79,8 +79,8 @@ function AdminGallery() {
         <AdminPageHeader
           eyebrow="Portfolio"
           icon={<ImageIcon size={18} />}
-          title="Fotos y evidencia"
-          subtitle="Carga nuevos trabajos, publica resultados y gestiona el material visual del sitio."
+          title="Galería de trabajos"
+          subtitle="Subí resultados y elegí cuáles querés mostrar en el sitio."
           actions={
             <button className={showForm ? "btn-ghost" : "btn-premium"} onClick={() => setShowForm((current) => !current)}>
               {showForm ? <X size={18} /> : <Plus size={18} />}

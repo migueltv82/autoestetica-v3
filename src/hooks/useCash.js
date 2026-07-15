@@ -1,74 +1,77 @@
-import { useEffect, useState } from "react";
-import { getTodayString, shiftDateByDays } from "../utils/date";
+import { useCallback, useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
+import { useAuth } from "./useAuth";
 
-const STORAGE_KEY = "autoestetica_cash";
-
-function createInitialTransactions() {
-  const today = getTodayString();
-  const yesterday = shiftDateByDays(-1);
-
-  return [
-    { id: 1, date: today, description: "Lavado premium Juan Perez", type: "income", amount: 15000, method: "Transferencia" },
-    { id: 2, date: today, description: "Compra de microfibras y shampoo", type: "expense", amount: 4500, method: "Efectivo" },
-    { id: 3, date: yesterday, description: "Lavado completo Moto", type: "income", amount: 8000, method: "Efectivo" },
-    { id: 4, date: yesterday, description: "Tratamiento acrilico SUV", type: "income", amount: 45000, method: "Transferencia" },
-  ];
-}
-
-function loadInitialTransactions() {
-  const fallbackTransactions = createInitialTransactions();
-
-  if (typeof window === "undefined") {
-    return fallbackTransactions;
-  }
-
-  try {
-    const savedTransactions = localStorage.getItem(STORAGE_KEY);
-    return savedTransactions ? JSON.parse(savedTransactions) : fallbackTransactions;
-  } catch {
-    return fallbackTransactions;
-  }
+function mapMovement(movement) {
+  return {
+    id: movement.id,
+    date: new Date(movement.occurred_at).toLocaleDateString("en-CA", { timeZone: "America/Argentina/Tucuman" }),
+    description: movement.description,
+    type: movement.type,
+    amount: Number(movement.amount),
+    method: movement.method,
+    category: movement.category,
+    workOrderId: movement.work_order_id,
+  };
 }
 
 export function useCash() {
-  const [transactions, setTransactions] = useState(loadInitialTransactions);
+  const { organizationId, user } = useAuth();
+  const [transactions, setTransactions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const refresh = useCallback(async () => {
+    if (!organizationId) return;
+    setIsLoading(true);
+    const { data, error: queryError } = await supabase.from("cash_movements")
+      .select("id,occurred_at,description,type,amount,method,category,work_order_id")
+      .eq("organization_id", organizationId).is("voided_at", null)
+      .order("occurred_at", { ascending: false });
+    if (queryError) setError(queryError.message);
+    else { setTransactions((data || []).map(mapMovement)); setError(""); }
+    setIsLoading(false);
+  }, [organizationId]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
-    } catch {
-      // Ignore storage failures and keep the UI working.
-    }
-  }, [transactions]);
+    const timer = setTimeout(() => refresh(), 0);
+    return () => clearTimeout(timer);
+  }, [refresh]);
 
-  function addTransaction(tx) {
-    setTransactions((prev) => [
-      {
-        ...tx,
-        id: Date.now(),
-        date: getTodayString(),
-        amount: Number(tx.amount),
-      },
-      ...prev,
-    ]);
+  async function addTransaction(transaction) {
+    const { error: insertError } = await supabase.from("cash_movements").insert({
+      organization_id: organizationId,
+      type: transaction.type,
+      category: transaction.category || (transaction.type === "income" ? "Servicios" : "Gastos operativos"),
+      description: transaction.description.trim(),
+      amount: Number(transaction.amount),
+      method: transaction.method,
+      work_order_id: transaction.workOrderId || null,
+      created_by: user.id,
+    });
+    if (insertError) throw insertError;
+    await refresh();
   }
 
-  function updateTransaction(id, updatedTx) {
-    setTransactions((prev) =>
-      prev.map((transaction) =>
-        transaction.id === id ? { ...transaction, ...updatedTx, amount: Number(updatedTx.amount) } : transaction
-      )
-    );
+  async function updateTransaction(id, transaction) {
+    const { error: updateError } = await supabase.from("cash_movements").update({
+      type: transaction.type,
+      category: transaction.category || (transaction.type === "income" ? "Servicios" : "Gastos operativos"),
+      description: transaction.description.trim(),
+      amount: Number(transaction.amount),
+      method: transaction.method,
+    }).eq("id", id).eq("organization_id", organizationId).is("voided_at", null);
+    if (updateError) throw updateError;
+    await refresh();
   }
 
-  function deleteTransaction(id) {
-    setTransactions((prev) => prev.filter((transaction) => transaction.id !== id));
+  async function deleteTransaction(id) {
+    const { error: voidError } = await supabase.from("cash_movements").update({
+      voided_at: new Date().toISOString(), void_reason: "Anulado desde el panel",
+    }).eq("id", id).eq("organization_id", organizationId);
+    if (voidError) throw voidError;
+    await refresh();
   }
 
-  return {
-    transactions,
-    addTransaction,
-    updateTransaction,
-    deleteTransaction,
-  };
+  return { transactions, isLoading, error, refresh, addTransaction, updateTransaction, deleteTransaction };
 }

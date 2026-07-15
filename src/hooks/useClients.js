@@ -1,77 +1,107 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { supabase } from "../lib/supabase";
+import { useAuth } from "./useAuth";
 
-const STORAGE_KEY = "autoestetica_clients";
+const formatMoney = (value) => new Intl.NumberFormat("es-AR", {
+  style: "currency", currency: "ARS", maximumFractionDigits: 0,
+}).format(value || 0);
 
-const initialClients = [
-  { id: 1, name: "Miguel Torres", phone: "3814400001", visits: 3, vehicle: "Auto", amount: "$ 45.000" },
-  { id: 2, name: "Juan Perez", phone: "3814400002", visits: 1, vehicle: "Camioneta", amount: "$ 20.000" },
-  { id: 3, name: "Sofia Gomez", phone: "3814400003", visits: 5, vehicle: "Moto", amount: "$ 120.000" },
-  { id: 4, name: "Lucas Alderete", phone: "3814400004", visits: 2, vehicle: "SUV", amount: "$ 35.000" },
-];
-
-function loadInitialClients() {
-  if (typeof window === "undefined") {
-    return initialClients;
-  }
-
-  try {
-    const savedClients = localStorage.getItem(STORAGE_KEY);
-    return savedClients ? JSON.parse(savedClients) : initialClients;
-  } catch {
-    return initialClients;
-  }
+function mapClient(client) {
+  const activeOrders = (client.work_orders || []).filter((order) => order.status !== "cancelled");
+  return {
+    id: client.id,
+    name: client.name,
+    phone: client.phone,
+    email: client.email || "",
+    notes: client.notes || "",
+    tags: client.tags || [],
+    visits: activeOrders.filter((order) => order.status === "delivered").length,
+    vehicle: client.vehicles?.[0]?.type || "Sin vehículo",
+    vehicleId: client.vehicles?.[0]?.id || null,
+    vehicles: client.vehicles || [],
+    amount: formatMoney(activeOrders.reduce((sum, order) => sum + Number(order.total || 0), 0)),
+    createdAt: client.created_at,
+  };
 }
 
 export function useClients() {
-  const [clients, setClients] = useState(loadInitialClients);
+  const { organizationId } = useAuth();
+  const [allClients, setAllClients] = useState([]);
   const [search, setSearch] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const refresh = useCallback(async () => {
+    if (!organizationId) return;
+    setIsLoading(true);
+    const { data, error: queryError } = await supabase
+      .from("clients")
+      .select("id,name,phone,email,notes,tags,created_at,vehicles(id,type,brand,model,license_plate,color),work_orders(id,total,status)")
+      .eq("organization_id", organizationId)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false });
+    if (queryError) setError(queryError.message);
+    else {
+      setAllClients((data || []).map(mapClient));
+      setError("");
+    }
+    setIsLoading(false);
+  }, [organizationId]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
-    } catch {
-      // Ignore storage failures and keep the UI working.
+    const timer = setTimeout(() => refresh(), 0);
+    return () => clearTimeout(timer);
+  }, [refresh]);
+
+  async function addClient(newClient) {
+    const { data: client, error: clientError } = await supabase.from("clients").insert({
+      organization_id: organizationId,
+      name: newClient.name.trim(),
+      phone: newClient.phone.replace(/\s/g, ""),
+      email: newClient.email || null,
+      notes: newClient.notes || null,
+    }).select().single();
+    if (clientError) throw clientError;
+    if (newClient.vehicle) {
+      const { error: vehicleError } = await supabase.from("vehicles").insert({
+        organization_id: organizationId, client_id: client.id, type: newClient.vehicle,
+      });
+      if (vehicleError) throw vehicleError;
     }
-  }, [clients]);
-
-  function addClient(newClient) {
-    const formatMoney = (value) =>
-      new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(value);
-
-    setClients((prev) => [
-      ...prev,
-      {
-        ...newClient,
-        id: Date.now(),
-        visits: 0,
-        amount: formatMoney(0),
-      },
-    ]);
+    await refresh();
+    return client;
   }
 
-  function updateClient(id, updatedData) {
-    setClients((prev) => prev.map((client) => (client.id === id ? { ...client, ...updatedData } : client)));
+  async function updateClient(id, updatedData) {
+    const { error: clientError } = await supabase.from("clients").update({
+      name: updatedData.name.trim(), phone: updatedData.phone.replace(/\s/g, ""),
+    }).eq("id", id).eq("organization_id", organizationId);
+    if (clientError) throw clientError;
+    const existing = allClients.find((client) => client.id === id);
+    if (existing?.vehicleId) {
+      const { error: vehicleError } = await supabase.from("vehicles").update({ type: updatedData.vehicle })
+        .eq("id", existing.vehicleId).eq("organization_id", organizationId);
+      if (vehicleError) throw vehicleError;
+    } else if (updatedData.vehicle) {
+      const { error: vehicleError } = await supabase.from("vehicles").insert({
+        organization_id: organizationId, client_id: id, type: updatedData.vehicle,
+      });
+      if (vehicleError) throw vehicleError;
+    }
+    await refresh();
   }
 
-  function deleteClient(id) {
-    setClients((prev) => prev.filter((client) => client.id !== id));
+  async function deleteClient(id) {
+    const { error: deleteError } = await supabase.from("clients")
+      .update({ deleted_at: new Date().toISOString() }).eq("id", id).eq("organization_id", organizationId);
+    if (deleteError) throw deleteError;
+    await refresh();
   }
 
-  const filteredClients = useMemo(() => {
-    const query = search.toLowerCase();
+  const clients = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return query ? allClients.filter((client) => client.name.toLowerCase().includes(query) || client.phone.includes(query)) : allClients;
+  }, [allClients, search]);
 
-    return clients.filter(
-      (client) => client.name.toLowerCase().includes(query) || client.phone.includes(search)
-    );
-  }, [clients, search]);
-
-  return {
-    clients: filteredClients,
-    totalClients: clients.length,
-    search,
-    setSearch,
-    addClient,
-    updateClient,
-    deleteClient,
-  };
+  return { clients, totalClients: allClients.length, search, setSearch, isLoading, error, refresh, addClient, updateClient, deleteClient };
 }

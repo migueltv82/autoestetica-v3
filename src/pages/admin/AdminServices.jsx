@@ -23,6 +23,8 @@ import Modal from "../../components/ui/Modal";
 import PageTransition from "../../components/ui/PageTransition";
 import { useServices } from "../../hooks/useServices";
 import { getAvailableIcons, getIcon } from "../../utils/iconMapper";
+import { isTwoWheelService } from "../../utils/servicePricing";
+import { getServiceCoverUrl } from "../../utils/serviceMedia";
 import "./AdminServices.css";
 
 const containerVariants = {
@@ -40,6 +42,9 @@ const emptyForm = {
   name: "",
   description: "",
   price: "",
+  carPrice: "",
+  truckPrice: "",
+  priceOnRequest: false,
   duration: "",
   iconName: "Zap",
   coverImageUrl: "",
@@ -105,10 +110,13 @@ function AdminServices() {
   const [form, setForm] = useState(emptyForm);
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showVisibility, setShowVisibility] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   const formDisplay = { ...emptyForm.display, ...form.display };
   const isNew = editingService === "new";
   const currentService = isNew ? null : services.find((service) => service.id === editingService);
+  const usesSinglePrice = isTwoWheelService(form.name);
 
   const formatMoney = (value) =>
     new Intl.NumberFormat("es-AR", {
@@ -122,6 +130,7 @@ function AdminServices() {
     setForm(emptyForm);
     setShowIconPicker(false);
     setShowVisibility(false);
+    setSaveError("");
   };
 
   const openNew = () => {
@@ -129,6 +138,7 @@ function AdminServices() {
     setEditingService("new");
     setShowVisibility(false);
     setShowIconPicker(false);
+    setSaveError("");
   };
 
   const openEdit = (service) => {
@@ -136,6 +146,9 @@ function AdminServices() {
       name: service.name,
       description: service.description,
       price: service.price,
+      carPrice: service.carPrice,
+      truckPrice: service.truckPrice,
+      priceOnRequest: service.priceOnRequest,
       duration: service.duration,
       iconName: service.iconName,
       coverImageUrl: service.coverImageUrl || "",
@@ -146,9 +159,10 @@ function AdminServices() {
     setEditingService(service.id);
     setShowVisibility(false);
     setShowIconPicker(false);
+    setSaveError("");
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name || !form.duration) {
       return;
     }
@@ -157,15 +171,22 @@ function AdminServices() {
       ...form,
       display: formDisplay,
       price: Number.parseFloat(form.price) || 0,
+      carPrice: Number.parseFloat(form.carPrice) || 0,
+      truckPrice: usesSinglePrice ? Number.parseFloat(form.carPrice) || 0 : Number.parseFloat(form.truckPrice) || 0,
     };
 
-    if (editingService === "new") {
-      addService(payload);
-    } else {
-      updateService(editingService, payload);
+    setIsSaving(true);
+    setSaveError("");
+    try {
+      if (editingService === "new") await addService(payload);
+      else await updateService(editingService, payload);
+      resetEditState();
+    } catch (error) {
+      console.error(error);
+      setSaveError(error?.message || "No se pudieron guardar los cambios.");
+    } finally {
+      setIsSaving(false);
     }
-
-    resetEditState();
   };
 
   const setDisplayField = (key, value) => {
@@ -220,8 +241,8 @@ function AdminServices() {
             <AdminPageHeader
               eyebrow="Catalogo"
               icon={<Star size={18} />}
-              title="Catalogo operativo"
-              subtitle="Cada servicio tiene control individual de visibilidad. Lo que activas aqui se refleja en el sitio publico."
+              title="Servicios y precios"
+              subtitle="Actualizá lo que ofrecés; los cambios se reflejan también en el sitio público."
               actions={
                 <button type="button" className="btn-premium svc-new-btn" onClick={openNew}>
                   <Plus size={20} />
@@ -246,6 +267,7 @@ function AdminServices() {
                     variants={cardVariants}
                     whileHover="hover"
                   >
+                    <div className="svc-card-cover"><img src={getServiceCoverUrl(service)} alt={service.name} loading="lazy" /></div>
                     <div className="svc-card-header">
                       <div className="service-icon-wrapper">
                         {getIcon(service.iconName, { size: 20 })}
@@ -301,7 +323,7 @@ function AdminServices() {
                         <Clock size={12} />
                         <span>{service.duration}</span>
                       </div>
-                      <div className="svc-price-pro">{formatMoney(service.price)}</div>
+                      <div className="svc-price-pro">{service.priceOnRequest ? "Consultar" : isTwoWheelService(service) ? <small>Precio {formatMoney(service.carPrice)}</small> : <><small>Auto {formatMoney(service.carPrice)}</small><small>Camioneta {formatMoney(service.truckPrice)}</small></>}</div>
                     </div>
                   </motion.div>
                 );
@@ -401,17 +423,18 @@ function AdminServices() {
                 )}
               </div>
 
+              <div className="svc-price-mode">
+                <label className="svc-consult-toggle">
+                  <input type="checkbox" checked={form.priceOnRequest} onChange={(event) => setForm((previous) => ({ ...previous, priceOnRequest: event.target.checked }))} />
+                  <span><strong>Precio a consultar</strong><small>Usalo cuando el valor dependa del estado del vehiculo.</small></span>
+                </label>
+                {!form.priceOnRequest ? <div className={`svc-vehicle-prices ${usesSinglePrice ? "single" : ""}`}>
+                  <div className="admin-form-group"><label>{usesSinglePrice ? "Precio del servicio ($)" : "Precio Auto ($)"}</label><input type="number" min="0" className="admin-input" value={form.carPrice} onChange={(event) => setForm((previous) => ({ ...previous, carPrice: event.target.value }))} placeholder="15000" /></div>
+                  {!usesSinglePrice ? <div className="admin-form-group"><label>Precio Camioneta ($)</label><input type="number" min="0" className="admin-input" value={form.truckPrice} onChange={(event) => setForm((previous) => ({ ...previous, truckPrice: event.target.value }))} placeholder="20000" /></div> : null}
+                </div> : <div className="svc-consult-note">La tarjeta publica mostrara “Consultar” en lugar de un valor fijo.</div>}
+              </div>
+
               <div className="svc-form-row">
-                <div className="admin-form-group svc-form-group">
-                  <label>Precio ($)</label>
-                  <input
-                    type="number"
-                    className="admin-input"
-                    value={form.price}
-                    onChange={(event) => setForm((previous) => ({ ...previous, price: event.target.value }))}
-                    placeholder="15000"
-                  />
-                </div>
 
                 <div className="admin-form-group svc-form-group">
                   <label>Duracion</label>
@@ -476,6 +499,7 @@ function AdminServices() {
               </div>
 
               <div className="svc-modal-actions">
+                {saveError ? <p className="svc-save-error" role="alert">{saveError}</p> : null}
                 <button type="button" className="btn-ghost" onClick={resetEditState}>
                   <X size={16} />
                   Cancelar
@@ -484,10 +508,10 @@ function AdminServices() {
                   type="button"
                   className="btn-premium"
                   onClick={handleSave}
-                  disabled={!form.name || !form.duration}
+                  disabled={!form.name || !form.duration || isSaving}
                 >
                   <Check size={16} />
-                  {isNew ? "Crear servicio" : "Guardar cambios"}
+                  {isSaving ? "Guardando..." : isNew ? "Crear servicio" : "Guardar cambios"}
                 </button>
               </div>
             </div>

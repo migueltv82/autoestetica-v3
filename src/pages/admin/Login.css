@@ -151,6 +151,13 @@
   transform: translateY(-4px);
   box-shadow: 0 20px 30px -10px rgba(var(--rgb-primary), 0.4);
 }
+.login-submit-premium:disabled { opacity: .65; cursor: wait; transform: none; }
+.login-forgot { align-self: flex-end; margin-top: -1rem; padding: 0; border: 0; background: transparent; color: var(--color-text-soft); font-size: .76rem; cursor: pointer; }
+.login-forgot:hover { color: var(--color-white); }
+.login-feedback { padding: .8rem 1rem; margin-top: -.5rem; border-radius: 12px; font-size: .78rem; line-height: 1.4; }
+.login-feedback.error { color: #fda4af; background: rgba(244,63,94,.09); border: 1px solid rgba(244,63,94,.18); }
+.login-feedback.success { color: #86efac; background: rgba(34,197,94,.09); border: 1px solid rgba(34,197,94,.18); }
+.login-inline-action { display: block; margin-top: .5rem; padding: 0; border: 0; background: transparent; color: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; }
 
 .btn-icon-move {
   transition: transform 0.3s ease;
