@@ -94,7 +94,7 @@
   }
 
   .modal-container {
-    max-height: 90vh;
+    max-height: calc(100dvh - env(safe-area-inset-top));
     border-radius: 32px 32px 0 0;
   }
 
@@ -103,6 +103,6 @@
   }
 
   .modal-body {
-    padding: 1.5rem;
+    padding: 1.25rem 1rem calc(1.25rem + env(safe-area-inset-bottom));
   }
 }

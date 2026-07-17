@@ -1,0 +1,12 @@
+{
+  "name": "Autoestética Tucumán",
+  "short_name": "Autoestética",
+  "description": "Detailing automotriz y gestión del taller",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090d13",
+  "theme_color": "#0f766e",
+  "lang": "es-AR",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
+

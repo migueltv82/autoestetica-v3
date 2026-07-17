@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { getPublicOrganizationId } from "../lib/organization";
 import { useAuth } from "./useAuth";
+import { compressImageFile } from "../utils/imageUpload";
 
 const DEFAULT_DISPLAY = { name: true, description: true, gallery: true, duration: true, price: true };
 const INITIAL_CATALOG = [
@@ -18,9 +19,12 @@ const mapService = (service) => ({
   truckPrice: Number(service.display?.truckPrice ?? service.truck_price ?? service.base_price ?? 0),
   priceOnRequest: Boolean(service.display?.priceOnRequest ?? service.price_on_request),
   duration: service.duration_label || (service.estimated_minutes ? `${service.estimated_minutes} min` : "A consultar"),
+  durationMinutes: Number(service.estimated_minutes || 120),
+  category: service.category || "",
   iconName: service.icon_name || "Zap", coverImageUrl: service.cover_image_url || "",
   featured: Boolean(service.featured), display: { ...DEFAULT_DISPLAY, ...(service.display || {}) },
-  gallery: Array.isArray(service.gallery) ? service.gallery : [], active: service.active,
+  gallery: Array.isArray(service.gallery) ? service.gallery : [], active: service.active !== false,
+  publicVisible: service.public_visible !== false,
 });
 
 export function useServices() {
@@ -60,9 +64,11 @@ export function useServices() {
 
   const payload = (service) => ({
     organization_id: organizationId, name: service.name.trim(), description: service.description || null,
+    category: service.category?.trim() || null,
     base_price: Number(service.carPrice ?? service.price) || 0, duration_label: service.duration || null,
+    estimated_minutes: Math.max(15, Number(service.durationMinutes) || 120),
     icon_name: service.iconName || "Zap", cover_image_url: service.coverImageUrl || null,
-    featured: Boolean(service.featured), display: {
+    featured: Boolean(service.featured), active: service.active !== false, public_visible: service.publicVisible !== false, display: {
       ...DEFAULT_DISPLAY, ...service.display,
       carPrice: Number(service.carPrice) || 0,
       truckPrice: Number(service.truckPrice) || 0,
@@ -83,16 +89,75 @@ export function useServices() {
     await refresh();
   }
   async function deleteService(id) {
+    const service = services.find((item) => item.id === id);
+    const mediaPaths = (service?.gallery || []).map((image) => image.storagePath).filter(Boolean);
     const { error: deleteError } = await supabase.from("services").update({ deleted_at: new Date().toISOString(), active: false })
       .eq("id", id).eq("organization_id", organizationId);
     if (deleteError) throw deleteError;
+    if (mediaPaths.length) {
+      const { error: storageError } = await supabase.storage.from("portfolio").remove(mediaPaths);
+      if (storageError) throw storageError;
+    }
     await refresh();
   }
   const toggleFeatured = (id) => updateService(id, { featured: !services.find((service) => service.id === id)?.featured });
+  const togglePublished = (id) => {
+    const service = services.find((item) => item.id === id);
+    const next = !(service.active && service.publicVisible);
+    return updateService(id, { active: next, publicVisible: next });
+  };
   const updateVisibility = (id, key, value) => {
     const service = services.find((item) => item.id === id);
     return updateService(id, { display: { ...service.display, [key]: value } });
   };
 
-  return { services, featuredServices: services.filter((service) => service.featured), isLoading, error, refresh, addService, updateService, deleteService, toggleFeatured, updateVisibility };
+  async function uploadServiceImage(serviceId, file, currentMedia = {}) {
+    const service = services.find((item) => item.id === serviceId);
+    if (!service) throw new Error("Servicio no encontrado.");
+    const blob = await compressImageFile(file);
+    const storagePath = `${organizationId}/services/${serviceId}/${crypto.randomUUID()}.webp`;
+    const { error: uploadError } = await supabase.storage.from("portfolio").upload(storagePath, blob, { contentType: "image/webp", upsert: false });
+    if (uploadError) throw uploadError;
+    const url = supabase.storage.from("portfolio").getPublicUrl(storagePath).data.publicUrl;
+    const image = { url, storagePath, label: service.name };
+    const gallery = [...(currentMedia.gallery || service.gallery || []), image];
+    try {
+      await updateService(serviceId, { gallery, coverImageUrl: currentMedia.coverImageUrl || service.coverImageUrl || url });
+    } catch (error) {
+      await supabase.storage.from("portfolio").remove([storagePath]);
+      throw error;
+    }
+    return image;
+  }
+
+  async function setServiceCover(serviceId, image) {
+    await updateService(serviceId, { coverImageUrl: image.url });
+  }
+
+  async function reorderServiceImages(serviceId, gallery) {
+    await updateService(serviceId, { gallery });
+  }
+
+  async function deleteServiceImage(serviceId, image) {
+    const service = services.find((item) => item.id === serviceId);
+    const gallery = (service.gallery || []).filter((item) => item.url !== image.url);
+    const coverImageUrl = service.coverImageUrl === image.url ? gallery[0]?.url || "" : service.coverImageUrl;
+    await updateService(serviceId, { gallery, coverImageUrl });
+    if (image.storagePath) {
+      const { error: storageError } = await supabase.storage.from("portfolio").remove([image.storagePath]);
+      if (storageError) throw storageError;
+    }
+  }
+
+  async function clearServiceImages(serviceId) {
+    const service = services.find((item) => item.id === serviceId);
+    const paths = (service.gallery || []).map((image) => image.storagePath).filter(Boolean);
+    await updateService(serviceId, { gallery: [], coverImageUrl: "" });
+    if (paths.length) {
+      const { error: storageError } = await supabase.storage.from("portfolio").remove(paths);
+      if (storageError) throw storageError;
+    }
+  }
+
+  return { services, featuredServices: services.filter((service) => service.featured), isLoading, error, refresh, addService, updateService, deleteService, toggleFeatured, togglePublished, updateVisibility, uploadServiceImage, setServiceCover, reorderServiceImages, deleteServiceImage, clearServiceImages };
 }

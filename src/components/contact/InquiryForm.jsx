@@ -4,6 +4,7 @@ import { useServices } from "../../hooks/useServices";
 import { useSettings } from "../../hooks/useSettings";
 import { supabase } from "../../lib/supabase";
 import { ORGANIZATION_SLUG } from "../../lib/organization";
+import { Link } from "react-router-dom";
 import "./InquiryForm.css";
 
 const VEHICLE_OPTIONS = ["Auto", "Camioneta", "SUV", "Moto", "Bicicleta"];
@@ -11,7 +12,7 @@ const VEHICLE_OPTIONS = ["Auto", "Camioneta", "SUV", "Moto", "Bicicleta"];
 function InquiryForm() {
   const { services, isLoading: servicesLoading } = useServices();
   const { settings } = useSettings();
-  const [formData, setFormData] = useState({ name: "", phone: "", vehicle: "", services: [], message: "" });
+  const [formData, setFormData] = useState({ name: "", phone: "", vehicle: "", services: [], message: "", acceptedLegal: false });
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -34,7 +35,7 @@ function InquiryForm() {
   async function handleSubmit(event) {
     event.preventDefault();
     setSubmitAttempted(true);
-    if (!formData.name.trim() || !formData.phone.trim() || !formData.vehicle || !formData.services.length) return;
+    if (!formData.name.trim() || !formData.phone.trim() || !formData.vehicle || !formData.services.length || !formData.acceptedLegal) return;
     setIsSubmitting(true);
     setSubmitError("");
     const { error } = await supabase.rpc("submit_inquiry", {
@@ -43,7 +44,7 @@ function InquiryForm() {
       client_phone: formData.phone,
       vehicle_type: formData.vehicle,
       requested_services: formData.services,
-      inquiry_notes: formData.message || "Consulta ingresada desde la web.",
+      inquiry_notes: `${formData.message || "Consulta ingresada desde la web."}\nAceptó Política de Privacidad y Condiciones del Servicio (versión 2026-07-16).`,
     });
     setIsSubmitting(false);
     if (error) {
@@ -53,11 +54,11 @@ function InquiryForm() {
     }
     const whatsapp = (settings.whatsapp || "5493815448147").replace(/\D/g, "");
     window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(whatsappText)}`, "_blank", "noopener,noreferrer");
-    setFormData({ name: "", phone: "", vehicle: "", services: [], message: "" });
+    setFormData({ name: "", phone: "", vehicle: "", services: [], message: "", acceptedLegal: false });
     setSubmitAttempted(false);
   }
 
-  const invalid = submitAttempted && (!formData.name.trim() || !formData.phone.trim() || !formData.vehicle || !formData.services.length);
+  const invalid = submitAttempted && (!formData.name.trim() || !formData.phone.trim() || !formData.vehicle || !formData.services.length || !formData.acceptedLegal);
   return (
     <section className="section inquiry-page">
       <div className="container inquiry-shell">
@@ -68,32 +69,34 @@ function InquiryForm() {
           <div className="inquiry-feature-list">
             <article className="inquiry-feature-card"><Sparkles size={18} /><div><strong>Asesoría clara</strong><span>Te orientamos según el estado y el uso real del vehículo.</span></div></article>
             <article className="inquiry-feature-card"><MessageCircle size={18} /><div><strong>Respuesta directa</strong><span>La consulta queda lista para continuar por WhatsApp.</span></div></article>
-            <article className="inquiry-feature-card"><ShieldCheck size={18} /><div><strong>Seguimiento interno</strong><span>También queda registrada en el panel administrativo.</span></div></article>
+            <article className="inquiry-feature-card"><ShieldCheck size={18} /><div><strong>Datos protegidos</strong><span>Usamos tus datos únicamente para responder y coordinar el servicio.</span></div></article>
           </div>
         </div>
 
-        <form className="inquiry-form-panel" onSubmit={handleSubmit}>
-          {invalid ? <div className="inquiry-error" role="alert"><AlertTriangle size={16} />Completá nombre, teléfono, vehículo y al menos un servicio.</div> : null}
+        <form className="inquiry-form-panel" onSubmit={handleSubmit} noValidate>
+          <div className="inquiry-form-heading"><span>Consulta rápida</span><strong>Completá los datos principales</strong><p>Los campos marcados son necesarios para poder asesorarte.</p></div>
+          {invalid ? <div className="inquiry-error" role="alert"><AlertTriangle size={16} />Completá los datos requeridos y aceptá la Política de Privacidad y las Condiciones del Servicio.</div> : null}
           {submitError ? <div className="inquiry-error" role="alert"><AlertTriangle size={16} />{submitError}</div> : null}
           <div className="inquiry-form-grid">
             <div className={`inquiry-form-group${submitAttempted && !formData.name.trim() ? " has-error" : ""}`}>
-              <label>Nombre y apellido</label><input type="text" value={formData.name} onChange={(event) => setFormData({ ...formData, name: event.target.value })} placeholder="Ej: Miguel Torres" autoComplete="name" />
+              <label>Nombre y apellido *</label><input type="text" value={formData.name} onChange={(event) => setFormData({ ...formData, name: event.target.value })} placeholder="Ej: Miguel Torres" autoComplete="name" aria-invalid={submitAttempted && !formData.name.trim()} />
             </div>
             <div className={`inquiry-form-group${submitAttempted && !formData.phone.trim() ? " has-error" : ""}`}>
-              <label>WhatsApp / Teléfono</label><input type="tel" value={formData.phone} onChange={(event) => setFormData({ ...formData, phone: event.target.value })} placeholder="Código de área + número" autoComplete="tel" />
+              <label>WhatsApp / Teléfono *</label><input type="tel" inputMode="tel" value={formData.phone} onChange={(event) => setFormData({ ...formData, phone: event.target.value })} placeholder="Código de área + número" autoComplete="tel" aria-invalid={submitAttempted && !formData.phone.trim()} />
             </div>
           </div>
           <div className={`inquiry-form-group${submitAttempted && !formData.vehicle ? " has-error" : ""}`}>
-            <label>Vehículo</label><div className="options-grid">{VEHICLE_OPTIONS.map((vehicle) => <button key={vehicle} type="button" className={`option-card ${formData.vehicle === vehicle ? "selected" : ""}`} onClick={() => selectVehicle(vehicle)}><span>{vehicle}</span>{formData.vehicle === vehicle ? <Check size={16} /> : null}</button>)}</div>
+            <label>Vehículo *</label><div className="options-grid">{VEHICLE_OPTIONS.map((vehicle) => <button key={vehicle} type="button" className={`option-card ${formData.vehicle === vehicle ? "selected" : ""}`} onClick={() => selectVehicle(vehicle)} aria-pressed={formData.vehicle === vehicle}><span>{vehicle}</span>{formData.vehicle === vehicle ? <Check size={16} /> : null}</button>)}</div>
           </div>
           <div className={`inquiry-form-group${submitAttempted && !formData.services.length ? " has-error" : ""}`}>
-            <label>Servicios que te interesan</label>
+            <label>Servicios que te interesan *</label>
             <div className="options-grid options-grid-services">
-              {servicesLoading ? <span>Cargando servicios…</span> : availableServices.map((service) => <button key={service} type="button" className={`option-card option-card-service ${formData.services.includes(service) ? "selected" : ""}`} onClick={() => toggleService(service)}><span>{service}</span>{formData.services.includes(service) ? <Check size={16} /> : null}</button>)}
+              {servicesLoading ? <span>Cargando servicios…</span> : availableServices.map((service) => <button key={service} type="button" className={`option-card option-card-service ${formData.services.includes(service) ? "selected" : ""}`} onClick={() => toggleService(service)} aria-pressed={formData.services.includes(service)}><span>{service}</span>{formData.services.includes(service) ? <Check size={16} /> : null}</button>)}
             </div>
           </div>
           <div className="inquiry-form-group"><label>Detalle adicional</label><textarea rows="5" value={formData.message} onChange={(event) => setFormData({ ...formData, message: event.target.value })} placeholder="Contanos el estado del vehículo o el resultado que buscás." /></div>
-          <div className="inquiry-submit-row"><p className="inquiry-submit-note">La consulta se guarda en el panel y luego abrimos WhatsApp.</p><button type="submit" className="btn-primary inquiry-submit" disabled={isSubmitting || servicesLoading}><MessageCircle size={18} />{isSubmitting ? "Registrando…" : "Enviar consulta"}</button></div>
+          <label className={`inquiry-legal-consent${submitAttempted && !formData.acceptedLegal ? " has-error" : ""}`}><input type="checkbox" checked={formData.acceptedLegal} onChange={(event) => setFormData({ ...formData, acceptedLegal: event.target.checked })} /><span>Acepto la <Link to="/privacidad" target="_blank">Política de Privacidad</Link> y las <Link to="/terminos" target="_blank">Condiciones del Servicio</Link>.</span></label>
+          <div className="inquiry-submit-row"><p className="inquiry-submit-note">Al enviar, registramos la consulta y abrimos WhatsApp con el resumen listo.</p><button type="submit" className="btn-primary inquiry-submit" disabled={isSubmitting || servicesLoading}><MessageCircle size={18} />{isSubmitting ? "Registrando…" : "Continuar por WhatsApp"}</button></div>
         </form>
       </div>
     </section>

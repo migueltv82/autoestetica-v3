@@ -3,22 +3,22 @@
   --font-display: "Outfit", system-ui, sans-serif;
 
   /* Premium detailing - deep neutral palette */
-  --color-bg: #050505;
-  --color-bg-soft: #0a0a0a;
-  --color-surface: #0f0f0f;
-  --color-surface-soft: #151515;
-  --color-surface-elevated: #1c1c1c;
+  --color-bg: #05070a;
+  --color-bg-soft: #080d13;
+  --color-surface: #0c121a;
+  --color-surface-soft: #111a25;
+  --color-surface-elevated: #182432;
   
   --color-text: #f2f0eb;
   --color-text-soft: rgba(242, 240, 235, 0.72);
   --color-text-muted: rgba(242, 240, 235, 0.46);
   
-  --color-primary: #c8c8c8;
-  --color-primary-soft: rgba(200, 200, 200, 0.1);
-  --color-accent: #9f9f9f;
+  --color-primary: #57c7ff;
+  --color-primary-soft: rgba(87, 199, 255, 0.11);
+  --color-accent: #b9e8ff;
   
-  --rgb-primary: 200, 200, 200;
-  --rgb-accent: 159, 159, 159;
+  --rgb-primary: 87, 199, 255;
+  --rgb-accent: 185, 232, 255;
   
   --color-border: rgba(255, 255, 255, 0.08);
   --color-border-strong: rgba(255, 255, 255, 0.18);
@@ -26,8 +26,8 @@
 
   --gradient-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.012) 100%);
   --gradient-overlay: linear-gradient(0deg, var(--color-bg) 0%, rgba(5, 5, 5, 0.4) 100%);
-  --gradient-primary: linear-gradient(180deg, #f2f0eb 0%, #c8c8c8 100%);
-  --gradient-accent: linear-gradient(180deg, #f2f0eb 0%, #9f9f9f 100%);
+  --gradient-primary: linear-gradient(135deg, #dff6ff 0%, #57c7ff 48%, #249fe5 100%);
+  --gradient-accent: linear-gradient(135deg, #ffffff 0%, #a8def7 100%);
 
   --shadow-premium: 0 30px 60px rgba(0, 0, 0, 0.9);
   --shadow-soft: 0 20px 40px rgba(0, 0, 0, 0.5);

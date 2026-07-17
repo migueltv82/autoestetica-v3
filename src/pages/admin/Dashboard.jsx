@@ -4,6 +4,7 @@ import {
   ArrowDownRight,
   ArrowRight,
   ArrowUpRight,
+  Banknote,
   CalendarDays,
   CheckCircle2,
   CircleAlert,
@@ -21,6 +22,7 @@ import TurnsTableSkeleton from "../../components/admin/TurnsTableSkeleton";
 import { useTurns } from "../../hooks/useTurns";
 import { useClients } from "../../hooks/useClients";
 import { useCash } from "../../hooks/useCash";
+import { useSettings } from "../../hooks/useSettings";
 import { getTodayString, shiftDateByDays } from "../../utils/date";
 import "./Dashboard.css";
 
@@ -31,9 +33,10 @@ const moneyFormatter = new Intl.NumberFormat("es-AR", {
 });
 
 function Dashboard() {
-  const { turns, isLoading, updateTurnStatus, deleteTurn } = useTurns();
-  const { totalClients } = useClients();
-  const { transactions } = useCash();
+  const { turns, isLoading, error: turnsError, updateTurnStatus, deleteTurn } = useTurns();
+  const { totalClients, error: clientsError } = useClients();
+  const { transactions, receivables, error: cashError } = useCash();
+  const { settings } = useSettings();
   const today = getTodayString();
   const yesterday = shiftDateByDays(-1);
 
@@ -58,6 +61,7 @@ function Dashboard() {
     const confirmed = todaysTurns.filter((turn) => turn.status === "Confirmado").length;
     const completed = todaysTurns.filter((turn) => turn.status === "Finalizado").length;
     const activeTurns = todaysTurns.filter((turn) => turn.status !== "Cancelado").length;
+    const outstanding = receivables.reduce((total, order) => total + Number(order.balance || 0), 0);
 
     return {
       todaysTurns,
@@ -71,8 +75,10 @@ function Dashboard() {
       confirmed,
       completed,
       activeTurns,
+      outstanding,
+      pendingPayments: receivables.length,
     };
-  }, [turns, transactions, today, yesterday]);
+  }, [turns, transactions, receivables, today, yesterday]);
 
   const incomeVariation = summary.yesterdayIncome
     ? Math.round(((summary.income - summary.yesterdayIncome) / summary.yesterdayIncome) * 100)
@@ -80,6 +86,9 @@ function Dashboard() {
   const completionRate = summary.activeTurns
     ? Math.round((summary.completed / summary.activeTurns) * 100)
     : 0;
+  const currentHour = Number(new Intl.DateTimeFormat("es-AR", { hour: "2-digit", hour12: false, timeZone: "America/Argentina/Tucuman" }).format(new Date()));
+  const greeting = currentHour < 12 ? "Buen día" : currentHour < 19 ? "Buenas tardes" : "Buenas noches";
+  const dataError = turnsError || clientsError || cashError;
 
   return (
     <PageTransition>
@@ -88,7 +97,7 @@ function Dashboard() {
           <header className="dashboard-header">
             <div>
               <span className="dashboard-eyebrow">Resumen del negocio</span>
-              <h1>Buen día, Autoestética Tucumán</h1>
+              <h1>{greeting}, {settings.businessName || "Autoestética Tucumán"}</h1>
               <p>
                 {new Date().toLocaleDateString("es-AR", {
                   weekday: "long",
@@ -102,6 +111,8 @@ function Dashboard() {
               <Plus size={18} /> Agendar turno
             </Link>
           </header>
+
+          {dataError ? <div className="dashboard-data-alert" role="alert"><CircleAlert size={17} /><span>No pudimos actualizar una parte del resumen. Revisá tu conexión y volvé a intentar.</span></div> : null}
 
           <section className="dashboard-kpis" aria-label="Indicadores principales">
             <article className="dashboard-kpi kpi-agenda">
@@ -125,6 +136,11 @@ function Dashboard() {
               <div className="kpi-topline"><span>Clientes registrados</span><Users size={19} /></div>
               <strong>{totalClients}</strong>
               <p>Base total de clientes</p>
+            </article>
+            <article className="dashboard-kpi kpi-receivable">
+              <div className="kpi-topline"><span>Saldo por cobrar</span><Banknote size={19} /></div>
+              <strong>{moneyFormatter.format(summary.outstanding)}</strong>
+              <p>{summary.pendingPayments} {summary.pendingPayments === 1 ? "orden pendiente" : "órdenes pendientes"}</p>
             </article>
           </section>
 
@@ -172,6 +188,11 @@ function Dashboard() {
                     <span><strong>{summary.recentTransactions.length ? `${summary.recentTransactions.length} movimientos hoy` : "Caja sin movimientos"}</strong><small>Ingresos y egresos registrados</small></span>
                     <ArrowRight size={15} />
                   </Link>
+                  {summary.pendingPayments ? <Link to="/admin/caja" className="priority-item warning">
+                    <span className="priority-icon"><Banknote size={18} /></span>
+                    <span><strong>{moneyFormatter.format(summary.outstanding)} por cobrar</strong><small>{summary.pendingPayments} {summary.pendingPayments === 1 ? "trabajo con saldo" : "trabajos con saldo"}</small></span>
+                    <ArrowRight size={15} />
+                  </Link> : null}
                 </div>
               </div>
 
@@ -181,6 +202,7 @@ function Dashboard() {
                   <Link to="/admin/turnos"><CalendarDays size={18} /><span>Nuevo turno</span></Link>
                   <Link to="/admin/clientes"><UserPlus size={18} /><span>Nuevo cliente</span></Link>
                   <Link to="/admin/caja"><Wallet size={18} /><span>Registrar movimiento</span></Link>
+                  <Link to="/admin/servicios"><Plus size={18} /><span>Gestionar servicios</span></Link>
                 </div>
               </div>
             </aside>

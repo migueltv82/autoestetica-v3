@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
 import { Download, FileText, MessageCircle, Plus, Trash2 } from "lucide-react";
 import Modal from "../ui/Modal";
-import logoUrl from "../../assets/logo.jpg";
+import defaultLogoUrl from "../../assets/logo.jpg";
 import "./ReceiptModal.css";
+import { useFeedback } from "../../hooks/useFeedback";
+import { normalizeArgentinaPhone } from "../../utils/whatsapp";
 
 const money = new Intl.NumberFormat("es-AR", {
   style: "currency",
@@ -10,17 +12,10 @@ const money = new Intl.NumberFormat("es-AR", {
   maximumFractionDigits: 0,
 });
 
-function normalizePhone(phone) {
-  const digits = String(phone || "").replace(/\D/g, "");
-  if (!digits) return "";
-  if (digits.startsWith("54")) return digits;
-  const local = digits.replace(/^0/, "").replace(/^15/, "");
-  return `549${local}`;
-}
-
 function loadImage(src) {
   return new Promise((resolve, reject) => {
     const image = new Image();
+    image.crossOrigin = "anonymous";
     image.onload = () => resolve(image);
     image.onerror = reject;
     image.src = src;
@@ -46,16 +41,12 @@ function wrapText(context, text, x, y, maxWidth, lineHeight) {
 }
 
 function ReceiptModal({ turn, services, settings, onClose }) {
+  const { notify } = useFeedback();
   const matchedService = services.find(
     (service) => service.name.toLowerCase() === (turn?.service || "").toLowerCase()
   );
-  const [items, setItems] = useState(() => [{
-    id: Date.now(),
-    description: turn.service || "Servicio de detailing",
-    quantity: 1,
-    price: Number(turn.amount) || Number(matchedService?.price) || 0,
-  }]);
-  const [receiptNumber, setReceiptNumber] = useState(() => `R-${String(turn.id).slice(-6)}`);
+  const [items, setItems] = useState(() => turn.services?.length ? turn.services.map((item, index) => ({ id: item.id || `${Date.now()}-${index}`, description: item.description, quantity: Number(item.quantity || 1), price: Number(item.unit_price || 0) })) : [{ id: Date.now(), description: turn.service || "Servicio de detailing", quantity: 1, price: Number(turn.amount) || Number(matchedService?.price) || 0 }]);
+  const [receiptNumber, setReceiptNumber] = useState(() => turn.receiptNumber ? `R-${String(turn.receiptNumber).padStart(6, "0")}` : `R-${String(turn.id).slice(-6)}`);
   const [isWorking, setIsWorking] = useState(false);
 
   const total = useMemo(
@@ -88,7 +79,7 @@ function ReceiptModal({ turn, services, settings, onClose }) {
     ctx.fillRect(0, 205, width, 5);
 
     try {
-      const logo = await loadImage(logoUrl);
+      const logo = await loadImage(settings.logoUrl || defaultLogoUrl);
       ctx.save();
       ctx.beginPath();
       ctx.arc(105, 105, 66, 0, Math.PI * 2);
@@ -177,7 +168,7 @@ function ReceiptModal({ turn, services, settings, onClose }) {
     ctx.textAlign = "center";
     ctx.fillStyle = "#666660";
     ctx.font = "20px Arial";
-    ctx.fillText("Gracias por confiar en nuestro trabajo.", width / 2, height - 85);
+    ctx.fillText(settings.receiptFooter || "Gracias por confiar en nuestro trabajo.", width / 2, height - 85);
     ctx.font = "18px Arial";
     ctx.fillText(settings.whatsapp || "Autoestética Tucumán", width / 2, height - 50);
 
@@ -210,11 +201,11 @@ function ReceiptModal({ turn, services, settings, onClose }) {
         await navigator.share({ title: `Recibo ${receiptNumber}`, text, files: [file] });
       } else {
         downloadFile(file);
-        const phone = normalizePhone(turn.phone);
+        const phone = normalizeArgentinaPhone(turn.phone);
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(`${text}\n\nEl recibo fue descargado para adjuntarlo en este chat.`)}`, "_blank", "noopener,noreferrer");
       }
     } catch (error) {
-      if (error?.name !== "AbortError") alert("No se pudo generar el recibo. Intentá nuevamente.");
+      if (error?.name !== "AbortError") notify("No se pudo generar el recibo. Intenta nuevamente.", "error");
     } finally { setIsWorking(false); }
   }
 
@@ -222,7 +213,7 @@ function ReceiptModal({ turn, services, settings, onClose }) {
     <Modal isOpen={Boolean(turn)} onClose={onClose} title="Generar recibo" maxWidth="900px">
       <div className="receipt-editor">
         <div className="receipt-summary">
-          <div className="receipt-brand"><img src={logoUrl} alt="Logo" /><span><strong>{settings.businessName || "Autoestética Tucumán"}</strong><small>Recibo de servicios</small></span></div>
+          <div className="receipt-brand"><img src={settings.logoUrl || defaultLogoUrl} alt="Logo" /><span><strong>{settings.businessName || "Autoestética Tucumán"}</strong><small>Recibo de servicios</small></span></div>
           <label>N.º de recibo<input value={receiptNumber} onChange={(event) => setReceiptNumber(event.target.value)} /></label>
         </div>
         <div className="receipt-client-grid">

@@ -11,8 +11,10 @@ import {
   Box, 
   User,
   ReceiptText,
-  Pencil
+  Pencil,
+  MessageCircle
 } from "lucide-react";
+import { appointmentWhatsAppLink } from "../../utils/whatsapp";
 import "./TurnsTable.css";
 
 const STATUS_OPTIONS = ["Consulta", "Pendiente", "Seña pendiente", "Confirmado", "En proceso", "Listo", "Finalizado", "Cancelado", "No asistió"];
@@ -102,6 +104,7 @@ function TurnsTable({ turns, onStatusChange, onDeleteTurn, onGenerateReceipt, on
                 </select>
               </td>
               <td style={{ textAlign: "right" }}>
+                {turn.phone && !["Cancelado", "Finalizado"].includes(turn.status) ? <a className="btn-action-confirm" href={appointmentWhatsAppLink(turn)} target="_blank" rel="noreferrer" title={turn.status === "Listo" ? "Avisar por WhatsApp" : "Enviar confirmación por WhatsApp"}><MessageCircle size={16} /><span>{turn.status === "Listo" ? "Avisar listo" : "Confirmar turno"}</span></a> : null}
                 {onEditTurn ? <button className="btn-ghost btn-mini-action" onClick={() => onEditTurn(turn)} title="Editar turno"><Pencil size={16} /></button> : null}
                 {onGenerateReceipt ? (
                   <button

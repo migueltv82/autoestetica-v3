@@ -1,0 +1,50 @@
+-- Ejecutar después de crear y editar un turno de prueba desde la aplicación.
+-- Todos los valores de "problemas" deben ser 0.
+
+with active_orders as (
+  select wo.id, wo.organization_id, wo.total
+  from public.work_orders wo
+  where wo.deleted_at is null
+),
+item_totals as (
+  select work_order_id, coalesce(sum(total), 0) as total
+  from public.work_order_items
+  group by work_order_id
+),
+receipt_totals as (
+  select r.work_order_id, r.total,
+    coalesce(sum(ri.total), 0) as items_total
+  from public.receipts r
+  left join public.receipt_items ri on ri.receipt_id = r.id
+  where r.status <> 'voided'
+  group by r.id, r.work_order_id, r.total
+)
+select 'total del turno distinto a sus servicios' as control, count(*) as problemas
+from active_orders wo
+left join item_totals items on items.work_order_id = wo.id
+where wo.total <> coalesce(items.total, 0)
+union all
+select 'total del recibo distinto al turno', count(*)
+from receipt_totals receipt
+join active_orders wo on wo.id = receipt.work_order_id
+where receipt.total <> wo.total
+union all
+select 'detalle del recibo distinto a su total', count(*)
+from receipt_totals receipt
+where receipt.total <> receipt.items_total
+union all
+select 'pagos activos sin turno', count(*)
+from public.payments payment
+left join public.work_orders wo on wo.id = payment.work_order_id
+where payment.voided_at is null and payment.work_order_id is not null and wo.id is null
+union all
+select 'movimientos activos sin turno', count(*)
+from public.cash_movements movement
+left join public.work_orders wo on wo.id = movement.work_order_id
+where movement.voided_at is null and movement.work_order_id is not null and wo.id is null
+union all
+select 'recibos activos sin turno', count(*)
+from public.receipts receipt
+left join public.work_orders wo on wo.id = receipt.work_order_id
+where receipt.status <> 'voided' and receipt.work_order_id is not null and wo.id is null;
+

@@ -7,6 +7,8 @@ const DEFAULT_SETTINGS = {
   businessName: "Autoestética Tucumán", address: "Tucumán, Argentina", phone: "",
   whatsapp: "+54 9 381 5448147", email: "", instagram: "", facebook: "", tiktok: "",
   openingHours: "Lunes a viernes de 9:00 a 18:00", logoUrl: "", receiptFooter: "Gracias por confiar en nuestro trabajo.",
+  confirmationMessageTemplate: "Hola {cliente} 👋 Te escribimos de {negocio} para confirmar tu turno del {fecha} a las {hora}, para tu {vehiculo}. Servicios: {servicios}. ¿Podés confirmarnos tu asistencia?",
+  readyMessageTemplate: "Hola {cliente}, queremos informarte que tu {vehiculo} ya está listo para retirar. Por favor, recordá que nuestro horario de atención es {horario}. Ante cualquier inconveniente, comunicate con nosotros.",
 };
 const SETTINGS_UPDATED_EVENT = "autoestetica:settings-updated";
 
@@ -18,6 +20,8 @@ function mapSettings(data) {
     email: data.email || "", instagram: data.instagram || "", facebook: data.facebook || "",
     tiktok: data.tiktok || "", openingHours: data.opening_hours || "", logoUrl: data.logo_url || "",
     receiptFooter: data.receipt_footer || DEFAULT_SETTINGS.receiptFooter,
+    confirmationMessageTemplate: data.confirmation_message_template || DEFAULT_SETTINGS.confirmationMessageTemplate,
+    readyMessageTemplate: data.ready_message_template || DEFAULT_SETTINGS.readyMessageTemplate,
   };
 }
 
@@ -54,6 +58,8 @@ export function useSettings() {
       phone: next.phone || null, whatsapp: next.whatsapp || null, email: next.email || null,
       instagram: next.instagram || null, facebook: next.facebook || null, tiktok: next.tiktok || null,
       opening_hours: next.openingHours || null, logo_url: next.logoUrl || null, receipt_footer: next.receiptFooter || null,
+      confirmation_message_template: next.confirmationMessageTemplate || DEFAULT_SETTINGS.confirmationMessageTemplate,
+      ready_message_template: next.readyMessageTemplate || DEFAULT_SETTINGS.readyMessageTemplate,
     };
     const { error: updateError } = await supabase.from("business_settings").upsert(payload, { onConflict: "organization_id" });
     if (updateError) throw updateError;

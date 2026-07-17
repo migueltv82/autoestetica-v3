@@ -7,9 +7,11 @@ La aplicación usa una sola fuente de verdad en Supabase. `localStorage` será r
 1. Crear un proyecto nuevo en Supabase y esperar a que figure `Healthy`.
 2. Copiar `Project URL` y la clave pública en `.env.local`.
 3. Si el proyecto contiene tablas descartables, ejecutar `RESET_DATABASE.sql` en SQL Editor.
-4. Ejecutar `migrations/202607140001_foundation.sql`.
+4. Ejecutar todos los archivos de `migrations/` en orden por nombre.
 5. Crear el usuario propietario en Authentication > Users.
 6. Ejecutar el bloque de vinculación incluido abajo.
+7. Ejecutar `VERIFY_DATABASE.sql`: todos los controles de integridad deben devolver `0`.
+8. Aplicar el procedimiento de respaldo documentado en `BACKUP_AND_RECOVERY.md`.
 
 ## Vincular el propietario
 

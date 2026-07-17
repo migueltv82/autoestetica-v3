@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Calendar, Car, Check, CheckCircle2, ClipboardList, Clock, CreditCard, Phone, User, Wallet, Wrench } from "lucide-react";
 import { useServices } from "../../hooks/useServices";
 import { getServicePriceForVehicle } from "../../utils/servicePricing";
+import { useFeedback } from "../../hooks/useFeedback";
 import "./TurnForm.css";
 
 const VEHICLE_OPTIONS = ["Auto", "Camioneta", "SUV", "Moto", "Bicicleta"];
@@ -10,9 +11,11 @@ const initialForm = { date: "", time: "", client: "", phone: "", vehicle: "Auto"
 
 function TurnForm({ onAddTurn, initialData = null }) {
   const { services, isLoading } = useServices();
-  const [formData, setFormData] = useState(() => initialData ? { date: initialData.date || "", time: initialData.time || "", client: initialData.client || "", phone: initialData.phone || "", vehicle: initialData.vehicle || "Auto", services: (initialData.services || []).map((service) => ({ serviceId: service.service_id, name: service.description, price: Number(service.unit_price || 0) })), status: initialData.status || "Confirmado", notes: initialData.notes || "", paymentMethod: "Efectivo", registerPayment: false } : initialForm);
+  const { notify } = useFeedback();
+  const [formData, setFormData] = useState(() => initialData ? { date: initialData.date || "", time: initialData.time || "", client: initialData.client || "", phone: initialData.phone || "", vehicle: initialData.vehicle || "Auto", services: (initialData.services || []).map((service) => ({ serviceId: service.service_id, name: service.description, price: Number(service.unit_price || 0), durationMinutes: Number(service.services?.estimated_minutes || 0) })), status: initialData.status || "Confirmado", notes: initialData.notes || "", paymentMethod: "Efectivo", registerPayment: false } : initialForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const total = useMemo(() => formData.services.reduce((sum, service) => sum + Number(service.price || 0), 0), [formData.services]);
+  const durationMinutes = useMemo(() => formData.services.reduce((sum, service) => sum + Number(service.durationMinutes || 0), 0) || initialData?.durationMinutes || 120, [formData.services, initialData]);
   const isEditing = Boolean(initialData);
 
   function handleChange(event) {
@@ -30,7 +33,7 @@ function TurnForm({ onAddTurn, initialData = null }) {
     setFormData((current) => {
       const selected = current.services.some((item) => item.serviceId === service.id);
       const vehiclePrice = getServicePriceForVehicle(service, current.vehicle);
-      return { ...current, services: selected ? current.services.filter((item) => item.serviceId !== service.id) : [...current.services, { serviceId: service.id, name: service.name, price: service.priceOnRequest ? 0 : Number(vehiclePrice || 0), priceOnRequest: service.priceOnRequest }] };
+      return { ...current, services: selected ? current.services.filter((item) => item.serviceId !== service.id) : [...current.services, { serviceId: service.id, name: service.name, price: service.priceOnRequest ? 0 : Number(vehiclePrice || 0), priceOnRequest: service.priceOnRequest, durationMinutes: service.durationMinutes }] };
     });
   }
   function updatePrice(serviceId, price) {
@@ -40,15 +43,15 @@ function TurnForm({ onAddTurn, initialData = null }) {
   async function handleSubmit(event) {
     event.preventDefault();
     if (!formData.date || !formData.time || !formData.client.trim() || !formData.phone.trim() || !formData.services.length) {
-      alert("Completá cliente, WhatsApp, fecha, hora y al menos un servicio.");
+      notify("Completa cliente, WhatsApp, fecha, hora y al menos un servicio.", "error");
       return;
     }
     if (!isEditing && formData.registerPayment && total <= 0) {
-      alert("Ingresá el valor de los servicios para registrar el cobro en caja.");
+      notify("Ingresa el valor de los servicios para registrar el cobro en Caja.", "error");
       return;
     }
     setIsSubmitting(true);
-    try { await onAddTurn({ ...formData, amount: total }); setFormData(initialForm); } catch { /* conservar datos */ }
+    try { await onAddTurn({ ...formData, amount: total, durationMinutes }); setFormData(initialForm); } catch { /* conservar datos */ }
     setIsSubmitting(false);
   }
 
@@ -73,7 +76,7 @@ function TurnForm({ onAddTurn, initialData = null }) {
             </div>
           </div>
 
-          {formData.services.length ? <div className="turn-selected-services full-width"><div className="turn-selected-heading"><span>Detalle seleccionado</span><strong>Total: {money.format(total)}</strong></div>{formData.services.map((service) => <div className="turn-selected-row" key={service.serviceId}><span>{service.name}</span><label>Precio<input type="number" min="0" value={service.price} onChange={(event) => updatePrice(service.serviceId, event.target.value)} /></label></div>)}</div> : null}
+          {formData.services.length ? <div className="turn-selected-services full-width"><div className="turn-selected-heading"><span>Detalle seleccionado · {Math.floor(durationMinutes / 60) ? `${Math.floor(durationMinutes / 60)} h ` : ""}{durationMinutes % 60 ? `${durationMinutes % 60} min` : ""}</span><strong>Total: {money.format(total)}</strong></div>{formData.services.map((service) => <div className="turn-selected-row" key={service.serviceId}><span>{service.name}</span><label>Precio<input type="number" min="0" value={service.price} onChange={(event) => updatePrice(service.serviceId, event.target.value)} /></label></div>)}</div> : null}
 
           <div className="admin-form-group"><label><CreditCard size={14} /> Medio de pago</label><select name="paymentMethod" value={formData.paymentMethod} onChange={handleChange}><option>Efectivo</option><option>Transferencia</option><option>Tarjeta</option><option>Billetera virtual</option></select></div>
           <label className="turn-payment-toggle"><input type="checkbox" checked={formData.registerPayment} onChange={(event) => setFormData((current) => ({ ...current, registerPayment: event.target.checked }))} /><span><Wallet size={17} /><strong>Registrar el cobro en caja</strong><small>Desmarcalo si el cliente todavía no pagó.</small></span></label>

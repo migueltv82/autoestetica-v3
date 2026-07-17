@@ -1,6 +1,5 @@
 import AdminLayout from "../../components/admin/AdminLayout";
 import PageTransition from "../../components/ui/PageTransition";
-import TurnsToolbar from "../../components/admin/TurnsToolbar";
 import TurnsTableSkeleton from "../../components/admin/TurnsTableSkeleton";
 import TurnForm from "../../components/admin/TurnForm";
 import ReceiptModal from "../../components/admin/ReceiptModal";
@@ -8,19 +7,21 @@ import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import { useTurns } from "../../hooks/useTurns";
 import { useServices } from "../../hooks/useServices";
 import { useSettings } from "../../hooks/useSettings";
-import { Calendar, CalendarRange, Columns3, ListChecks, Plus, X } from "lucide-react";
+import { Calendar, CalendarDays, CalendarRange, ListChecks, Plus, X } from "lucide-react";
 import { useState } from "react";
-import { BoardAgenda, TodayAgenda, WeekAgenda } from "../../components/admin/AgendaViews";
+import SimpleAgenda from "../../components/admin/SimpleAgenda";
+import { useFeedback } from "../../hooks/useFeedback";
+import { getTodayString } from "../../utils/date";
+import { MonthAgenda, WeekAgenda } from "../../components/admin/AgendaViews";
+import "./Turns.css";
 
 function Turns() {
+  const { notify } = useFeedback();
   const {
-    filteredTurns,
-    filters,
+    turns,
     isLoading,
     addTurn,
     updateTurn,
-    handleFilterChange,
-    clearFilters,
     updateTurnStatus,
     deleteTurn,
   } = useTurns();
@@ -31,16 +32,23 @@ function Turns() {
   const [showForm, setShowForm] = useState(false);
   const [editingTurn, setEditingTurn] = useState(null);
   const [receiptTurn, setReceiptTurn] = useState(null);
-  const [agendaView, setAgendaView] = useState("today");
+  const [selectedDate, setSelectedDate] = useState(getTodayString());
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [agendaView, setAgendaView] = useState("day");
   const [weekOffset, setWeekOffset] = useState(0);
+  const [monthOffset, setMonthOffset] = useState(0);
 
   const handleCreateTurn = async (formData) => {
     try {
       await addTurn(formData);
       setShowForm(false);
+      setSelectedDate(formData.date);
+      setAgendaView("day");
+      notify("Turno guardado. Podés enviar la confirmación desde la agenda.", "success");
     } catch (error) {
       console.error(error);
-      alert("No se pudo guardar la orden. Revisá los datos e intentá nuevamente.");
+      notify(error?.message || "No se pudo guardar la orden. Revisa los datos e intenta nuevamente.", "error");
       throw error;
     }
   };
@@ -50,9 +58,10 @@ function Turns() {
       await updateTurn(editingTurn.id, formData);
       setEditingTurn(null);
       setShowForm(false);
+      notify("Cambios del turno guardados.", "success");
     } catch (error) {
       console.error(error);
-      alert("No se pudieron guardar los cambios del turno.");
+      notify(error?.message || "No se pudieron guardar los cambios del turno.", "error");
       throw error;
     }
   };
@@ -83,32 +92,13 @@ function Turns() {
           <TurnForm key={editingTurn?.id || "new"} initialData={editingTurn} onAddTurn={editingTurn ? handleUpdateTurn : handleCreateTurn} />
         ) : null}
 
-        <div className="agenda-view-tabs" role="tablist" aria-label="Vista de agenda">
-          <button type="button" className={agendaView === "today" ? "active" : ""} onClick={() => setAgendaView("today")}><ListChecks size={17} /><span>Hoy</span></button>
-          <button type="button" className={agendaView === "week" ? "active" : ""} onClick={() => setAgendaView("week")}><CalendarRange size={17} /><span>Semana</span></button>
-          <button type="button" className={agendaView === "board" ? "active" : ""} onClick={() => setAgendaView("board")}><Columns3 size={17} /><span>En proceso</span></button>
+        <div className="simple-agenda-view-tabs" role="tablist" aria-label="Vista de agenda">
+          <button type="button" className={agendaView === "day" ? "active" : ""} onClick={() => setAgendaView("day")}><ListChecks size={17} /> Día</button>
+          <button type="button" className={agendaView === "week" ? "active" : ""} onClick={() => setAgendaView("week")}><CalendarRange size={17} /> Semana</button>
+          <button type="button" className={agendaView === "month" ? "active" : ""} onClick={() => setAgendaView("month")}><CalendarDays size={17} /> Mes</button>
         </div>
 
-        <div className="admin-stack agenda-workspace">
-          <TurnsToolbar
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onClearFilters={clearFilters}
-          />
-
-          {isLoading ? (
-            <TurnsTableSkeleton />
-          ) : agendaView === "today" ? (
-            <TodayAgenda turns={filteredTurns}
-              onStatusChange={updateTurnStatus}
-              onDeleteTurn={deleteTurn}
-              onGenerateReceipt={setReceiptTurn}
-              onEditTurn={openEdit}
-            />
-          ) : agendaView === "week" ? (
-            <WeekAgenda turns={filteredTurns} weekOffset={weekOffset} onWeekChange={setWeekOffset} onStatusChange={updateTurnStatus} onEditTurn={openEdit} onDeleteTurn={deleteTurn} />
-          ) : <BoardAgenda turns={filteredTurns} onStatusChange={updateTurnStatus} />}
-        </div>
+        {isLoading ? <TurnsTableSkeleton /> : agendaView === "day" ? <SimpleAgenda turns={turns} selectedDate={selectedDate} onDateChange={setSelectedDate} search={search} onSearchChange={setSearch} statusFilter={statusFilter} onStatusFilterChange={setStatusFilter} onStatusChange={updateTurnStatus} onDeleteTurn={deleteTurn} onGenerateReceipt={setReceiptTurn} onEditTurn={openEdit} settings={settings} /> : agendaView === "week" ? <WeekAgenda turns={turns} weekOffset={weekOffset} onWeekChange={setWeekOffset} onStatusChange={updateTurnStatus} onEditTurn={openEdit} onDeleteTurn={deleteTurn} settings={settings} /> : <MonthAgenda turns={turns} monthOffset={monthOffset} onMonthChange={setMonthOffset} onEditTurn={openEdit} />}
         {receiptTurn ? (
           <ReceiptModal
             turn={receiptTurn}

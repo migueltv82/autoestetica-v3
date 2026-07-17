@@ -3,6 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Lock, Menu, X } from "lucide-react";
 import { useSettings } from "../../hooks/useSettings";
+import defaultLogo from "../../assets/logo.jpg";
 import "./Navbar.css";
 
 function Navbar() {
@@ -19,6 +20,8 @@ function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => () => document.body.classList.remove("menu-open"), []);
 
   function toggleMenu() {
     setMenuOpen((current) => {
@@ -41,8 +44,8 @@ function Navbar() {
     <header className={`site-header ${isScrolled ? "scrolled" : ""}`}>
       <div className="container navbar-shell">
         <Link to="/" className="brand" onClick={closeMenu}>
-          <span className="brand-mark" />
-          <span className="brand-text">{settings.businessName} Tucumán</span>
+          <img className="brand-logo" src={settings.logoUrl || defaultLogo} alt="" aria-hidden="true" onError={(event) => { event.currentTarget.src = defaultLogo; }} />
+          <span className="brand-text">{settings.businessName || "Autoestética Tucumán"}</span>
         </Link>
 
         <nav className="nav-links" aria-label="Navegación principal">

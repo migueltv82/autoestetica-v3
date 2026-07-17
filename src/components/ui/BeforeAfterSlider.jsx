@@ -1,27 +1,12 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import "./BeforeAfterSlider.css";
 
 function BeforeAfterSlider({ beforeUrl, afterUrl, title, service }) {
   const [sliderPosition, setSliderPosition] = useState(50);
-  const containerRef = useRef(null);
-
-  function handleMove(event) {
-    if (!containerRef.current) return;
-
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = event.touches ? event.touches[0].clientX - rect.left : event.clientX - rect.left;
-    
-    // Clamp between 0 and 100
-    const position = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    setSliderPosition(position);
-  }
 
   return (
     <div 
       className="ba-slider-container" 
-      ref={containerRef}
-      onMouseMove={handleMove}
-      onTouchMove={handleMove}
     >
       <div className="ba-image after-image">
          <img src={afterUrl} alt="Después" />
@@ -35,6 +20,8 @@ function BeforeAfterSlider({ beforeUrl, afterUrl, title, service }) {
         <img src={beforeUrl} alt="Antes" />
         <div className="ba-label before-label">ANTES</div>
       </div>
+
+      <input className="ba-range" type="range" min="0" max="100" value={sliderPosition} onChange={(event) => setSliderPosition(Number(event.target.value))} aria-label={`Comparar antes y después de ${title || "este trabajo"}`} />
 
       <div 
         className="ba-handle" 

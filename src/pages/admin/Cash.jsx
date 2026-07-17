@@ -1,298 +1,69 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { ArrowDownRight, ArrowUpRight, Banknote, CircleDollarSign, ClipboardList, CreditCard, Download, Edit2, Landmark, LockKeyhole, Plus, ReceiptText, Trash2, TrendingDown, TrendingUp, Wallet, X } from "lucide-react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import PageTransition from "../../components/ui/PageTransition";
 import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import StatCard from "../../components/ui/StatCard";
-import { ArrowDownRight, ArrowUpRight, Plus, Wallet, TrendingUp, TrendingDown, CreditCard, Banknote, Landmark, Edit2, Trash2, X, Calendar, ClipboardList } from "lucide-react";
+import ReceiptModal from "../../components/admin/ReceiptModal";
 import { useCash } from "../../hooks/useCash";
-import "../../components/admin/TurnsTable.css";
+import { useFeedback } from "../../hooks/useFeedback";
+import { useSettings } from "../../hooks/useSettings";
+import { useServices } from "../../hooks/useServices";
+import "./Cash.css";
+
+const EMPTY_MOVEMENT = { description: "", amount: "", type: "income", method: "Efectivo" };
+const METHODS = ["Efectivo", "Transferencia", "Tarjeta", "Débito", "Crédito", "Billetera virtual"];
+const money = (value) => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(value || 0);
+
+function MethodIcon({ method }) { if (method === "Efectivo") return <Banknote size={15} />; if (method === "Transferencia") return <Landmark size={15} />; return <CreditCard size={15} />; }
 
 function Cash() {
-  const { transactions, addTransaction, updateTransaction, deleteTransaction } = useCash();
+  const { transactions, receivables, closures, receipts, isLoading, error, addTransaction, updateTransaction, deleteTransaction, collectPayment, closeDay } = useCash();
+  const { settings } = useSettings();
+  const { services } = useServices();
+  const { confirm, notify } = useFeedback();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState({ description: "", amount: "", type: "income", method: "Efectivo" });
+  const [formData, setFormData] = useState(EMPTY_MOVEMENT);
+  const [paymentForm, setPaymentForm] = useState(null);
+  const [receiptTurn, setReceiptTurn] = useState(null);
+  const [closing, setClosing] = useState(false);
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Tucuman" });
+  const [period, setPeriod] = useState({ from: `${today.slice(0, 8)}01`, to: today });
 
-  const incomes = transactions.filter((transaction) => transaction.type === "income").reduce((accumulator, current) => accumulator + current.amount, 0);
-  const expenses = transactions.filter((transaction) => transaction.type === "expense").reduce((accumulator, current) => accumulator + current.amount, 0);
-  const balance = incomes - expenses;
+  const filteredTransactions = useMemo(() => transactions.filter((item) => (!period.from || item.date >= period.from) && (!period.to || item.date <= period.to)), [transactions, period]);
+  const incomes = filteredTransactions.filter((item) => item.type === "income").reduce((sum, item) => sum + item.amount, 0);
+  const expenses = filteredTransactions.filter((item) => item.type === "expense").reduce((sum, item) => sum + item.amount, 0);
+  const outstanding = receivables.reduce((sum, order) => sum + order.balance, 0);
+  const isClosedToday = closures.some((closure) => closure.closure_date === today);
+  const methodTotals = useMemo(() => METHODS.map((method) => ({ method, amount: filteredTransactions.filter((item) => item.type === "income" && item.method === method).reduce((sum, item) => sum + item.amount, 0) })), [filteredTransactions]);
 
-  const formatMoney = (value) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(value);
+  function resetMovement() { setFormData(EMPTY_MOVEMENT); setEditingId(null); setShowForm(false); }
+  async function handleSubmit(event) { event.preventDefault(); if (!formData.description.trim() || Number(formData.amount) <= 0) return notify("Completá un concepto y un importe válido.", "error"); try { if (editingId) { await updateTransaction(editingId, formData); notify("Movimiento actualizado.", "success"); } else { await addTransaction(formData); notify("Movimiento registrado.", "success"); } resetMovement(); } catch (saveError) { notify(saveError.message || "No se pudo guardar el movimiento.", "error"); } }
+  function handleEdit(item) { setFormData({ description: item.description, amount: item.amount, type: item.type, method: item.method }); setEditingId(item.id); setShowForm(true); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  async function handleDelete(id) { if (!await confirm({ title: "Eliminar movimiento", message: "El movimiento será anulado y dejará de incluirse en los totales de Caja.", confirmLabel: "Eliminar" })) return; try { await deleteTransaction(id); notify("Movimiento eliminado.", "success"); } catch (deleteError) { notify(deleteError.message || "No se pudo eliminar el movimiento.", "error"); } }
+  async function handleCollect(event) { event.preventDefault(); try { await collectPayment(paymentForm.order, paymentForm.amount, paymentForm.method); notify("Cobro registrado y saldo actualizado.", "success"); setPaymentForm(null); } catch (paymentError) { notify(paymentError.message, "error"); } }
+  function exportCsv() { const escape = (value) => `"${String(value ?? "").replaceAll('"', '""')}"`; const rows = [["Fecha", "Tipo", "Categoría", "Descripción", "Método", "Monto"], ...filteredTransactions.map((item) => [item.date, item.type === "income" ? "Ingreso" : "Egreso", item.category, item.description, item.method, item.amount])]; const blob = new Blob(["\uFEFF" + rows.map((row) => row.map(escape).join(";")).join("\n")], { type: "text/csv;charset=utf-8" }); const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.href = url; link.download = `caja-${period.from}-${period.to}.csv`; link.click(); URL.revokeObjectURL(url); }
+  async function handleCloseToday() { const items = transactions.filter((item) => item.date === today); const dayIncome = items.filter((item) => item.type === "income").reduce((sum, item) => sum + item.amount, 0); const dayExpenses = items.filter((item) => item.type === "expense").reduce((sum, item) => sum + item.amount, 0); if (!items.length) return notify("No hay movimientos para cerrar hoy.", "error"); if (!await confirm({ title: "Cerrar caja del día", message: `Se guardará un cierre con ${items.length} movimientos y un saldo de ${money(dayIncome - dayExpenses)}.`, confirmLabel: "Cerrar caja" })) return; setClosing(true); try { await closeDay({ date: today, incomes: dayIncome, expenses: dayExpenses, count: items.length }); notify("Cierre diario registrado.", "success"); } catch (closeError) { notify(closeError.message, "error"); } finally { setClosing(false); } }
 
-  async function handleSubmit(event) {
-    event.preventDefault();
-    if (!formData.description || !formData.amount) {
-      return;
-    }
+  return <PageTransition><AdminLayout title="Control de caja" subtitle="Cobros, gastos, saldos y recibos del negocio.">
+    <section className="admin-stats-grid cash-stats"><StatCard label="Ingresos" value={money(incomes)} icon={<TrendingUp size={22} />} color="#4ade80" trend="Período seleccionado" /><StatCard label="Gastos" value={money(expenses)} icon={<TrendingDown size={22} />} color="#f87171" trend="Período seleccionado" /><StatCard label="Balance neto" value={money(incomes - expenses)} icon={<Wallet size={22} />} color="#38bdf8" trend="Resultado actual" /><StatCard label="Por cobrar" value={money(outstanding)} icon={<CircleDollarSign size={22} />} color="#fbbf24" trend={`${receivables.length} órdenes con saldo`} /></section>
 
-    if (editingId) {
-      await updateTransaction(editingId, formData);
-      setEditingId(null);
-    } else {
-      await addTransaction(formData);
-    }
+    <section className="cash-controls"><div className="cash-dates"><label>Desde<input type="date" value={period.from} onChange={(event) => setPeriod((current) => ({ ...current, from: event.target.value }))} /></label><label>Hasta<input type="date" value={period.to} onChange={(event) => setPeriod((current) => ({ ...current, to: event.target.value }))} /></label></div><div className="cash-control-actions"><button type="button" onClick={exportCsv} disabled={!filteredTransactions.length}><Download size={16} /> Exportar CSV</button><button type="button" className="cash-close-button" onClick={handleCloseToday} disabled={closing || isClosedToday}><LockKeyhole size={16} />{isClosedToday ? "Caja cerrada hoy" : closing ? "Cerrando…" : "Cerrar caja de hoy"}</button></div></section>
+    {error ? <div className="cash-error" role="alert">No pudimos actualizar todos los datos de Caja.</div> : null}
 
-    setFormData({ description: "", amount: "", type: "income", method: "Efectivo" });
-    setShowForm(false);
-  }
+    <section className="cash-methods"><header><div><span className="admin-form-kicker">Distribución</span><h3>Ingresos por medio de pago</h3></div><small>{period.from} al {period.to}</small></header><div>{methodTotals.map(({ method, amount }) => <article key={method}><span><MethodIcon method={method} /> {method}</span><strong>{money(amount)}</strong></article>)}</div></section>
 
-  function handleEdit(transaction) {
-    setFormData({
-      description: transaction.description,
-      amount: transaction.amount,
-      type: transaction.type,
-      method: transaction.method,
-    });
-    setEditingId(transaction.id);
-    setShowForm(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
+    <div className="cash-operation-grid"><section className="cash-panel"><header><div><span className="admin-form-kicker">Cuentas por cobrar</span><h3>Saldos pendientes</h3><p>Señas, pagos parciales y cancelaciones de saldo.</p></div><strong className="cash-outstanding">{money(outstanding)}</strong></header>{receivables.length ? <div className="cash-operation-list">{receivables.map((order) => <article key={order.id}><div><strong>{order.client}</strong><small>Orden #{order.number} · {order.vehicle} · {order.date}</small></div><span><small>Pagó {money(order.paid)} de {money(order.total)}</small><strong>{money(order.balance)}</strong></span><button type="button" onClick={() => setPaymentForm({ order, amount: order.balance, method: "Efectivo" })}><CircleDollarSign size={15} /> Cobrar</button></article>)}</div> : <div className="cash-empty-small">No hay saldos pendientes.</div>}</section>
+      <section className="cash-panel"><header><div><span className="admin-form-kicker">Recibos</span><h3>Listos para compartir</h3><p>Revisá el detalle y envialo por WhatsApp.</p></div><strong>{receipts.length}</strong></header>{receipts.length ? <div className="cash-operation-list">{receipts.slice(0, 10).map((receipt) => <article key={receipt.receiptId}><div><strong>#{receipt.receiptNumber} · {receipt.client}</strong><small>{receipt.date} · {receipt.vehicle} · {receipt.service}</small></div><span><small>{receipt.paymentStatus === "paid" ? "Pagado" : receipt.paymentStatus === "partial" ? "Pago parcial" : "Pendiente"}</small><strong>{money(receipt.amount)}</strong></span><button type="button" onClick={() => setReceiptTurn(receipt)}><ReceiptText size={15} /> Ver recibo</button></article>)}</div> : <div className="cash-empty-small">Todavía no hay recibos.</div>}</section></div>
 
-  async function handleDelete(id) {
-    if (window.confirm("Queres borrar este movimiento?")) {
-      await deleteTransaction(id);
-    }
-  }
+    {paymentForm ? <section className="cash-inline-form admin-form-shell"><div className="admin-form-header"><div><span className="admin-form-kicker">Registrar cobro</span><h3 className="admin-form-title">{paymentForm.order.client} · Saldo {money(paymentForm.order.balance)}</h3></div><button type="button" className="btn-ghost" onClick={() => setPaymentForm(null)} aria-label="Cancelar cobro"><X size={17} /></button></div><form onSubmit={handleCollect}><div className="admin-form-grid wide"><div className="admin-form-group"><label>Importe</label><input type="number" min="1" max={paymentForm.order.balance} value={paymentForm.amount} onChange={(event) => setPaymentForm((current) => ({ ...current, amount: event.target.value }))} required /></div><div className="admin-form-group"><label>Medio de pago</label><select value={paymentForm.method} onChange={(event) => setPaymentForm((current) => ({ ...current, method: event.target.value }))}>{METHODS.filter((method) => method !== "Tarjeta").map((method) => <option key={method}>{method}</option>)}</select></div></div><div className="admin-form-actions"><button type="submit" className="btn-form-primary">Confirmar cobro</button></div></form></section> : null}
 
-  function getMethodIcon(method) {
-    switch (method) {
-      case "Efectivo":
-        return <Banknote size={16} />;
-      case "Transferencia":
-        return <Landmark size={16} />;
-      case "Tarjeta":
-        return <CreditCard size={16} />;
-      default:
-        return null;
-    }
-  }
+    <AdminPageHeader eyebrow="Caja" icon={<Wallet size={18} />} title="Movimientos" subtitle="Todo lo que entra y sale durante el período seleccionado." actions={<button type="button" className={showForm ? "btn-ghost" : "btn-premium"} onClick={() => showForm ? resetMovement() : setShowForm(true)}>{showForm ? <X size={18} /> : <Plus size={18} />}<span>{showForm ? "Cancelar" : "Nuevo movimiento"}</span></button>} />
+    {showForm ? <section className="cash-inline-form admin-form-shell"><div className="admin-form-header"><div><span className="admin-form-kicker">{editingId ? "Edición" : "Nuevo asiento"}</span><h3 className="admin-form-title">{editingId ? "Editar movimiento" : "Registrar movimiento"}</h3></div></div><form onSubmit={handleSubmit}><div className="admin-form-grid wide"><div className="admin-form-group"><label><ClipboardList size={14} /> Concepto *</label><input required value={formData.description} onChange={(event) => setFormData({ ...formData, description: event.target.value })} placeholder="Ej: Compra de insumos" /></div><div className="admin-form-group"><label><Wallet size={14} /> Importe *</label><input type="number" min="1" required value={formData.amount} onChange={(event) => setFormData({ ...formData, amount: event.target.value })} placeholder="0" /></div><div className="admin-form-group"><label>Tipo</label><select value={formData.type} onChange={(event) => setFormData({ ...formData, type: event.target.value })}><option value="income">Ingreso (+)</option><option value="expense">Egreso (-)</option></select></div><div className="admin-form-group"><label>Medio de pago</label><select value={formData.method} onChange={(event) => setFormData({ ...formData, method: event.target.value })}>{METHODS.map((method) => <option key={method}>{method}</option>)}</select></div></div><div className="admin-form-actions"><button type="submit" className="btn-form-primary">{editingId ? "Guardar cambios" : "Registrar movimiento"}</button></div></form></section> : null}
 
-  return (
-    <PageTransition>
-      <AdminLayout
-        title="Control de Caja"
-        subtitle="Registro interno de cobros, egresos y movimientos para seguir la salud financiera del negocio."
-      >
-        <section className="admin-stats-grid">
-          <StatCard label="Ingresos totales" value={formatMoney(incomes)} icon={<TrendingUp size={24} />} color="var(--color-primary)" trend="Flujo positivo" />
-          <StatCard label="Gastos operativos" value={formatMoney(expenses)} icon={<TrendingDown size={24} />} color="#f87171" trend="Egresos registrados" />
-          <StatCard label="Balance neto" value={formatMoney(balance)} icon={<Wallet size={24} />} color="#38bdf8" trend="Resultado actual" />
-        </section>
-
-        <AdminPageHeader
-          eyebrow="Caja"
-          icon={<Wallet size={18} />}
-          title="Movimientos de caja"
-          subtitle="Registrá lo que entra y sale para conocer el resultado real del negocio."
-          actions={
-            <button
-              className={showForm ? "btn-ghost" : "btn-premium"}
-              onClick={() => {
-                setShowForm((current) => !current);
-                if (editingId) {
-                  setEditingId(null);
-                  setFormData({ description: "", amount: "", type: "income", method: "Efectivo" });
-                }
-              }}
-            >
-              {showForm ? <X size={18} /> : <Plus size={18} />}
-              <span>{showForm ? "Cancelar operacion" : "Asentar movimiento"}</span>
-            </button>
-          }
-        />
-
-        {showForm ? (
-          <section className="admin-form-shell">
-            <div className="admin-form-header">
-              <div>
-                <span className="admin-form-kicker">{editingId ? "Edicion" : "Nuevo asiento"}</span>
-                <h3 className="admin-form-title">{editingId ? "Editar movimiento contable" : "Nuevo asiento contable"}</h3>
-              </div>
-            </div>
-
-            <form onSubmit={handleSubmit}>
-              <div className="admin-form-grid wide">
-                <div className="admin-form-group">
-                  <label>
-                    <ClipboardList size={14} /> Concepto
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.description}
-                    onChange={(event) => setFormData({ ...formData, description: event.target.value })}
-                    placeholder="Ej: Pago de insumos"
-                  />
-                </div>
-
-                <div className="admin-form-group">
-                  <label>
-                    <Wallet size={14} /> Importe
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    value={formData.amount}
-                    onChange={(event) => setFormData({ ...formData, amount: event.target.value })}
-                    placeholder="0"
-                  />
-                </div>
-
-                <div className="admin-form-group">
-                  <label>
-                    <TrendingUp size={14} /> Tipo de flujo
-                  </label>
-                  <select value={formData.type} onChange={(event) => setFormData({ ...formData, type: event.target.value })}>
-                    <option value="income">Ingreso (+)</option>
-                    <option value="expense">Egreso (-)</option>
-                  </select>
-                </div>
-
-                <div className="admin-form-group">
-                  <label>
-                    <CreditCard size={14} /> Medio de pago
-                  </label>
-                  <select value={formData.method} onChange={(event) => setFormData({ ...formData, method: event.target.value })}>
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Transferencia">Transferencia</option>
-                    <option value="Tarjeta">Tarjeta</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="admin-form-actions">
-                <button type="submit" className="btn-form-primary">
-                  {editingId ? "Confirmar edicion" : "Registrar movimiento"}
-                </button>
-              </div>
-            </form>
-          </section>
-        ) : null}
-
-        <div className="admin-table-wrap">
-          <table className="admin-table desktop-only-table">
-            <thead>
-              <tr>
-                <th style={{ width: "160px" }}>Fecha</th>
-                <th>Concepto</th>
-                <th>Metodo</th>
-                <th style={{ textAlign: "right" }}>Monto</th>
-                <th style={{ textAlign: "right", width: "100px" }}>Gestion</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((transaction) => (
-                <tr key={transaction.id} className={transaction.type === "income" ? "row-income" : "row-expense"}>
-                  <td>
-                    <div className="turn-date-val">
-                      <Calendar size={14} /> {transaction.date}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="turn-client-cell">
-                      <div className="turn-client-name">{transaction.description}</div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="vehicle-badge">
-                      {getMethodIcon(transaction.method)}
-                      {transaction.method}
-                    </div>
-                  </td>
-                  <td style={{ textAlign: "right" }}>
-                    <div
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                        fontWeight: 800,
-                        color: transaction.type === "income" ? "var(--color-primary)" : "#f87171",
-                        fontSize: "1.15rem",
-                        letterSpacing: "-0.01em",
-                      }}
-                    >
-                      {transaction.type === "income" ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}
-                      {formatMoney(transaction.amount)}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="turn-actions-cell">
-                      <button className="btn-ghost btn-mini-action" onClick={() => handleEdit(transaction)} title="Editar">
-                        <Edit2 size={14} />
-                      </button>
-                      <button className="btn-danger btn-mini-action" onClick={() => handleDelete(transaction.id)} title="Borrar">
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <div className="mobile-only-card">
-            {transactions.map((transaction) => (
-              <div key={transaction.id} className={`turn-mobile-card ${transaction.type === "income" ? "row-income" : "row-expense"}`}>
-                <div className="card-header-mobile" style={{ marginBottom: "0.5rem" }}>
-                  <div className="date-val-mobile">
-                    <Calendar size={12} style={{ display: "inline" }} /> {transaction.date}
-                  </div>
-                  <div
-                    style={{
-                      fontWeight: 800,
-                      color: transaction.type === "income" ? "var(--color-primary)" : "#f87171",
-                      fontSize: "1.2rem",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.4rem",
-                    }}
-                  >
-                    {transaction.type === "income" ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
-                    {formatMoney(transaction.amount)}
-                  </div>
-                </div>
-                <div className="client-info-mini">
-                  <strong>{transaction.description}</strong>
-                </div>
-                <div className="card-details-grid-mobile" style={{ padding: "0.8rem" }}>
-                  <div className="detail-item-mobile">
-                    <span className="detail-label">Metodo</span>
-                    <div className="detail-val">
-                      {getMethodIcon(transaction.method)} {transaction.method}
-                    </div>
-                  </div>
-                  <div className="detail-item-mobile">
-                    <span className="detail-label">Flujo</span>
-                    <div className="detail-val" style={{ color: transaction.type === "income" ? "var(--color-primary)" : "#f87171" }}>
-                      {transaction.type === "income" ? "Ingreso (+)" : "Egreso (-)"}
-                    </div>
-                  </div>
-                </div>
-                <div className="card-footer-mobile" style={{ paddingTop: "0.5rem" }}>
-                  <div className="card-actions-mobile">
-                    <button className="btn-ghost-mini" onClick={() => handleEdit(transaction)}>
-                      <Edit2 size={16} />
-                    </button>
-                    <button className="btn-danger-mini" onClick={() => handleDelete(transaction.id)}>
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {transactions.length === 0 ? (
-            <div className="admin-empty-state">
-              <Wallet size={48} />
-              <p>Aun no se registraron movimientos de caja.</p>
-            </div>
-          ) : null}
-        </div>
-      </AdminLayout>
-    </PageTransition>
-  );
+    {!isLoading && filteredTransactions.length ? <section className="cash-movement-list" aria-label="Movimientos de caja">{filteredTransactions.map((item) => <article key={item.id} className={item.type}><span className="cash-flow-icon">{item.type === "income" ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}</span><div className="cash-movement-main"><strong>{item.description}</strong><small>{item.date} · {item.category || "Sin categoría"}</small></div><span className="cash-method"><MethodIcon method={item.method} /> {item.method}</span><strong className="cash-amount">{item.type === "income" ? "+" : "−"}{money(item.amount)}</strong><div className="cash-row-actions"><button type="button" onClick={() => handleEdit(item)} aria-label="Editar movimiento"><Edit2 size={15} /></button><button type="button" className="danger" onClick={() => handleDelete(item.id)} aria-label="Eliminar movimiento"><Trash2 size={15} /></button></div></article>)}</section> : null}
+    {isLoading ? <div className="cash-empty">Cargando movimientos…</div> : null}{!isLoading && !filteredTransactions.length ? <div className="cash-empty"><Wallet size={32} /><strong>Sin movimientos en este período</strong><span>Cambiá las fechas o registrá un nuevo movimiento.</span></div> : null}
+  </AdminLayout>{receiptTurn ? <ReceiptModal turn={receiptTurn} services={services} settings={settings} onClose={() => setReceiptTurn(null)} /> : null}</PageTransition>;
 }
-
 export default Cash;

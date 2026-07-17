@@ -1,11 +1,17 @@
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CheckCircle2, MapPin, MessageCircle, ShieldCheck, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import PublicLayout from "../../components/layout/PublicLayout";
 import PageTransition from "../../components/ui/PageTransition";
 import { useServices } from "../../hooks/useServices";
-import { getServiceCoverUrl } from "../../utils/serviceMedia";
 import heroImg from "../../assets/hero-premium.png";
+import defaultLogo from "../../assets/logo.jpg";
+import { useSettings } from "../../hooks/useSettings";
+import { useGallery } from "../../hooks/useGallery";
+import BeforeAfterSlider from "../../components/ui/BeforeAfterSlider";
+import fallbackBefore from "../../assets/hero-polishing.jpeg";
+import fallbackAfter from "../../assets/result-interior.jpg";
+import ServiceSalesCard from "../../components/services/ServiceSalesCard";
 import "./Home.css";
 
 const FADE_UP = {
@@ -32,7 +38,12 @@ const TRUST_ITEMS = [
 
 function Home() {
   const { services } = useServices();
-  const featuredServices = Array.isArray(services) ? services.slice(0, 3) : [];
+  const { settings } = useSettings();
+  const { publishedImages } = useGallery();
+  const featuredServices = Array.isArray(services) ? [...services.filter((service) => service.featured), ...services.filter((service) => !service.featured)].slice(0, 3) : [];
+  const whatsappNumber = (settings.whatsapp || "5493815448147").replace(/\D/g, "");
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hola, quiero consultar por un servicio de detailing para mi vehículo.")}`;
+  const comparison = publishedImages.find((item) => item.beforeUrl && item.afterUrl) || { beforeUrl: fallbackBefore, afterUrl: fallbackAfter, title: "Transformación profesional", service: "Resultado de detailing" };
 
   return (
     <PageTransition>
@@ -61,7 +72,7 @@ function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.56, delay: 0.08 }}
                 >
-                  Estética automotriz de alto nivel
+                  Tu vehículo puede volver a sentirse nuevo
                 </motion.h1>
 
                 <motion.p
@@ -69,7 +80,7 @@ function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.56, delay: 0.16 }}
                 >
-                  Cuidamos cada detalle de tu vehículo con tratamientos profesionales, terminaciones limpias y protección duradera.
+                  Detailing profesional, corrección estética y protección para recuperar el brillo, la limpieza y el valor de tu vehículo.
                 </motion.p>
 
                 <motion.div
@@ -78,14 +89,21 @@ function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.56, delay: 0.24 }}
                 >
-                  <Link to="/consulta" className="home-btn home-btn-primary">
-                    Solicitar diagnóstico <ArrowRight size={17} />
-                  </Link>
+                  <a href={whatsappLink} target="_blank" rel="noreferrer" className="home-btn home-btn-primary"><MessageCircle size={18} /> Consultar por WhatsApp</a>
                   <Link to="/servicios" className="home-btn home-btn-secondary">
-                    Ver servicios
+                    Ver tratamientos <ArrowRight size={16} />
                   </Link>
                 </motion.div>
+                <motion.div className="home-hero-proof" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .5, delay: .32 }}><span><ShieldCheck size={16} /> Atención personalizada</span><span><Sparkles size={16} /> Terminación profesional</span><span><MapPin size={16} /> Tucumán</span></motion.div>
               </div>
+              <motion.aside className="home-brand-card" initial={{ opacity: 0, x: 22 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .65, delay: .2 }}><div className="home-brand-glow" /><img src={settings.logoUrl || defaultLogo} alt={`Logo de ${settings.businessName || "Autoestética Tucumán"}`} /><span>Detailing studio</span><h2>{settings.businessName || "Autoestética Tucumán"}</h2><p><CheckCircle2 size={15} /> Evaluación previa para recomendar el tratamiento correcto.</p><a href={whatsappLink} target="_blank" rel="noreferrer">Reservar una consulta <ArrowRight size={15} /></a></motion.aside>
+            </div>
+          </section>
+
+          <section className="home-transformation" aria-labelledby="home-transformation-title">
+            <div className="container home-transformation-grid">
+              <motion.div {...FADE_UP} className="home-transformation-copy"><span className="home-kicker">El resultado habla</span><h2 id="home-transformation-title">Deslizá y descubrí la diferencia</h2><p>No maquillamos el vehículo: trabajamos cada superficie con un proceso pensado para recuperar su apariencia y proteger el resultado.</p><div><span><CheckCircle2 size={16} /> Trabajo documentado</span><span><CheckCircle2 size={16} /> Resultado real</span></div><Link to="/galeria">Ver todos los trabajos <ArrowRight size={15} /></Link></motion.div>
+              <motion.div {...FADE_UP} className="home-transformation-slider"><BeforeAfterSlider beforeUrl={comparison.beforeUrl} afterUrl={comparison.afterUrl} title={comparison.title} service={comparison.service} /></motion.div>
             </div>
           </section>
 
@@ -98,23 +116,13 @@ function Home() {
 
               <div className="home-featured-grid">
                 {featuredServices.map((service, index) => (
-                  <motion.article
+                  <motion.div
                     key={service.id}
                     {...FADE_UP}
                     transition={{ ...FADE_UP.transition, delay: index * 0.06 }}
-                    className="home-service-card"
                   >
-                    <div className="home-service-image">
-                      <img src={getServiceCoverUrl(service)} alt={service.name} loading="lazy" decoding="async" />
-                    </div>
-                    <div className="home-service-content">
-                      <span>{service.category || "Detailing técnico"}</span>
-                      <h3>{service.name}</h3>
-                      <Link to="/servicios" className="home-card-link">
-                        Ver servicio <ArrowRight size={14} />
-                      </Link>
-                    </div>
-                  </motion.article>
+                    <ServiceSalesCard service={service} whatsappNumber={settings.whatsapp} compact />
+                  </motion.div>
                 ))}
               </div>
             </div>

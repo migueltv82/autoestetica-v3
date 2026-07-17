@@ -34,7 +34,7 @@ function Carousel({ images = [] }) {
             exit={{ opacity: 0, x: -100 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
           >
-            <img src={images[currentIndex].url} alt={`Slide ${currentIndex}`} />
+            <img src={images[currentIndex].url} alt={images[currentIndex].label || `Imagen ${currentIndex + 1} de ${images.length}`} loading="lazy" decoding="async" />
             {images[currentIndex].label && (
               <div className="carousel-caption">
                 <Hash size={14} />
@@ -46,10 +46,10 @@ function Carousel({ images = [] }) {
 
         {images.length > 1 && (
           <>
-            <button className="carousel-nav prev" onClick={prevSlide}>
+            <button type="button" className="carousel-nav prev" onClick={prevSlide} aria-label="Imagen anterior">
               <ChevronLeft size={24} />
             </button>
-            <button className="carousel-nav next" onClick={nextSlide}>
+            <button type="button" className="carousel-nav next" onClick={nextSlide} aria-label="Imagen siguiente">
               <ChevronRight size={24} />
             </button>
           </>
@@ -59,9 +59,12 @@ function Carousel({ images = [] }) {
       <div className="carousel-dots">
         {images.map((_, index) => (
           <button
+            type="button"
             key={index}
             className={`carousel-dot ${index === currentIndex ? "active" : ""}`}
             onClick={() => setCurrentIndex(index)}
+            aria-label={`Ver imagen ${index + 1}`}
+            aria-current={index === currentIndex ? "true" : undefined}
           />
         ))}
       </div>

@@ -35,16 +35,11 @@
 }
 
 .admin-shell :is(.btn-primary-admin, .btn-premium, .btn-form-primary) {
-  border-color: #e8edf4;
-  background: #e8edf4;
-  color: #0c1118;
+  border-color:#75d3ff;background:linear-gradient(135deg,#dff6ff,#57c7ff 55%,#249fe5);color:#04131d;
 }
 
 .admin-shell :is(.btn-primary-admin, .btn-premium, .btn-form-primary):hover:not(:disabled) {
-  border-color: #fff;
-  background: #fff;
-  color: #070a0f;
-  box-shadow: 0 7px 20px rgba(0, 0, 0, 0.24);
+  border-color:#b9e8ff;background:linear-gradient(135deg,#fff,#7bd7ff 55%,#32aceb);color:#020d14;box-shadow:0 10px 26px rgba(36,159,229,.24);
 }
 
 .admin-shell :is(.btn-ghost, .btn-form-secondary) {

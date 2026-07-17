@@ -3,13 +3,17 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Loader from "../components/ui/Loader";
 import ScrollToTop from "../components/ui/ScrollToTop";
 import ProtectedRoute from "../components/admin/ProtectedRoute";
+import Seo from "../components/ui/Seo";
 
 // Public pages
 const Home = lazy(() => import("../pages/public/Home"));
 const Services = lazy(() => import("../pages/public/Services"));
+const ServiceDetail = lazy(() => import("../pages/public/ServiceDetail"));
 const Gallery = lazy(() => import("../pages/public/Gallery"));
 const Contact = lazy(() => import("../pages/public/Contact"));
 const Inquiry = lazy(() => import("../pages/public/Inquiry"));
+const Privacy = lazy(() => import("../pages/public/Privacy"));
+const Terms = lazy(() => import("../pages/public/Terms"));
 
 // Admin pages
 const Login = lazy(() => import("../pages/admin/Login"));
@@ -25,15 +29,19 @@ export default function RouterProviderApp() {
   const protect = (element) => <ProtectedRoute>{element}</ProtectedRoute>;
   return (
     <BrowserRouter>
+      <Seo />
       <ScrollToTop />
       <Suspense fallback={<Loader />}>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/servicios" element={<Services />} />
+          <Route path="/servicios/:slug" element={<ServiceDetail />} />
           <Route path="/galeria" element={<Gallery />} />
           <Route path="/consulta" element={<Inquiry />} />
           <Route path="/contacto" element={<Contact />} />
+          <Route path="/privacidad" element={<Privacy />} />
+          <Route path="/terminos" element={<Terms />} />
 
           {/* Admin Routes */}
           <Route path="/admin" element={<Navigate to="/admin/login" replace />} />

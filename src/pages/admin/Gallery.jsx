@@ -4,23 +4,30 @@ import PageTransition from "../../components/ui/PageTransition";
 import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import { Plus, X, UploadCloud, Trash2, Eye, EyeOff, Image as ImageIcon } from "lucide-react";
 import { useGallery } from "../../hooks/useGallery";
+import { useFeedback } from "../../hooks/useFeedback";
+import { compressImageFile } from "../../utils/imageUpload";
+import { useServices } from "../../hooks/useServices";
 import "./Gallery.css";
 
 function AdminGallery() {
-  const { images, addImage, deleteImage, toggleStatus } = useGallery();
+  const { images, isLoading, error, addImage, deleteImage, toggleStatus } = useGallery();
+  const { services } = useServices();
+  const { confirm, notify } = useFeedback();
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [service, setService] = useState("");
   const [beforeImage, setBeforeImage] = useState(null);
   const [afterImage, setAfterImage] = useState(null);
+  const [publicationConsent, setPublicationConsent] = useState(false);
+  const [publishNow, setPublishNow] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const beforeInputRef = useRef(null);
   const afterInputRef = useRef(null);
 
-  const fileToBase64 = (file) =>
+  const blobToBase64 = (blob) =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(blob);
       reader.onload = () => resolve(reader.result);
       reader.onerror = (error) => reject(error);
     });
@@ -31,43 +38,51 @@ function AdminGallery() {
       return;
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      alert("La imagen es demasiado pesada. Usa una menor a 2MB para no llenar la memoria del navegador.");
+    if (file.size > 20 * 1024 * 1024) {
+      notify("La imagen supera los 20 MB. Elegi una imagen mas liviana.", "error");
       return;
     }
 
     try {
       setIsProcessing(true);
-      const base64 = await fileToBase64(file);
+      const compressed = await compressImageFile(file, { maxWidth: 1800, maxHeight: 1350, quality: 0.84 });
+      const base64 = await blobToBase64(compressed);
       if (type === "before") setBeforeImage(base64);
       if (type === "after") setAfterImage(base64);
     } catch (error) {
       console.error(error);
-      alert("Error al procesar la imagen.");
+      notify("No se pudo procesar la imagen.", "error");
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (!title || !service || !afterImage) {
-      alert("El titulo, el servicio y al menos la foto final son obligatorios.");
+      notify("Completa el titulo, el servicio y la foto final.", "error");
       return;
     }
 
-    addImage({
-      title,
-      service,
-      beforeUrl: beforeImage,
-      afterUrl: afterImage,
-    });
+    setIsProcessing(true);
+    try {
+      await addImage({ title, service, beforeUrl: beforeImage, afterUrl: afterImage, publicationConsent, publishNow });
+      setTitle(""); setService(""); setBeforeImage(null); setAfterImage(null); setPublicationConsent(false); setPublishNow(true); setShowForm(false);
+      notify("Trabajo agregado a la galería.", "success");
+    } catch (uploadError) { notify(uploadError.message || "No se pudo guardar el trabajo.", "error"); }
+    finally { setIsProcessing(false); }
+  };
 
-    setTitle("");
-    setService("");
-    setBeforeImage(null);
-    setAfterImage(null);
-    setShowForm(false);
+  const handleDeleteImage = async (id) => {
+    const accepted = await confirm({ title: "Eliminar trabajo", message: "La publicacion dejara de aparecer en la galeria.", confirmLabel: "Eliminar" });
+    if (!accepted) return;
+    try { await deleteImage(id); notify("Publicación eliminada.", "success"); }
+    catch (deleteError) { notify(deleteError.message || "No se pudo eliminar la publicación.", "error"); }
+  };
+
+  const handleToggleStatus = async (id) => {
+    try { await toggleStatus(id); notify("Visibilidad actualizada.", "success"); }
+    catch (statusError) { notify(statusError.message || "No se pudo cambiar la visibilidad.", "error"); }
   };
 
   return (
@@ -106,7 +121,7 @@ function AdminGallery() {
                 </div>
                 <div className="admin-form-group">
                   <label>Categoria / servicio</label>
-                  <input type="text" required value={service} onChange={(event) => setService(event.target.value)} placeholder="Ej: Pulido" />
+                  <select required value={service} onChange={(event) => setService(event.target.value)}><option value="">Seleccionar servicio</option>{services.map((item) => <option key={item.id} value={item.name}>{item.name}</option>)}</select>
                 </div>
               </div>
 
@@ -121,12 +136,12 @@ function AdminGallery() {
                       </button>
                     </div>
                   ) : (
-                    <div className="uploader-placeholder" onClick={() => beforeInputRef.current?.click()}>
+                    <button type="button" className="uploader-placeholder" onClick={() => beforeInputRef.current?.click()}>
                       <UploadCloud size={32} />
-                      <p>Haz clic para cargar la foto inicial</p>
-                    </div>
+                      <p>Cargar foto inicial <small>Opcional</small></p>
+                    </button>
                   )}
-                  <input type="file" accept="image/*" ref={beforeInputRef} style={{ display: "none" }} onChange={(event) => handleImageChange(event, "before")} />
+                  <input type="file" accept="image/*" ref={beforeInputRef} className="gallery-file-input" onChange={(event) => handleImageChange(event, "before")} />
                 </div>
 
                 <div className="gallery-uploader-box">
@@ -139,14 +154,16 @@ function AdminGallery() {
                       </button>
                     </div>
                   ) : (
-                    <div className="uploader-placeholder premium-dropzone" onClick={() => afterInputRef.current?.click()}>
+                    <button type="button" className="uploader-placeholder premium-dropzone" onClick={() => afterInputRef.current?.click()}>
                       <UploadCloud size={32} />
-                      <p>Haz clic para cargar la foto final</p>
-                    </div>
+                      <p>Cargar foto final <small>Obligatoria</small></p>
+                    </button>
                   )}
-                  <input type="file" accept="image/*" ref={afterInputRef} style={{ display: "none" }} onChange={(event) => handleImageChange(event, "after")} />
+                  <input type="file" accept="image/*" ref={afterInputRef} className="gallery-file-input" onChange={(event) => handleImageChange(event, "after")} />
                 </div>
               </div>
+
+              <div className="gallery-publication-options"><label><input type="checkbox" checked={publicationConsent} onChange={(event) => setPublicationConsent(event.target.checked)} /><span><strong>Autorización del cliente</strong><small>Confirmo que el cliente autorizó usar estas imágenes en el sitio.</small></span></label><label><input type="checkbox" checked={publishNow} onChange={(event) => setPublishNow(event.target.checked)} disabled={!publicationConsent} /><span><strong>Publicar ahora</strong><small>Si está desactivado, el trabajo se guarda como borrador.</small></span></label></div>
 
               <div className="admin-form-actions">
                 <button type="submit" disabled={isProcessing} className="btn-form-primary">
@@ -167,7 +184,7 @@ function AdminGallery() {
                     <img src={image.beforeUrl} alt="Antes" loading="lazy" />
                   </div>
                 ) : null}
-                <div className="img-wrapper after-col" style={{ gridColumn: image.beforeUrl ? "span 1" : "span 2" }}>
+                <div className={`img-wrapper after-col ${image.beforeUrl ? "" : "single"}`}>
                   <span className="img-badge success">DESPUES</span>
                   <img src={image.afterUrl} alt="Despues" loading="lazy" />
                 </div>
@@ -177,12 +194,13 @@ function AdminGallery() {
                 <div>
                   <h4 className="gallery-card-title">{image.title}</h4>
                   <p className="gallery-card-service">{image.service}</p>
+                  {!image.publicationConsent ? <span className="gallery-consent-warning">Sin autorización para publicar</span> : null}
                 </div>
 
                 <div className="gallery-card-actions">
                   <button
                     className={`btn-action-sm ${image.status === "published" ? "btn-success" : "btn-warning"}`}
-                    onClick={() => toggleStatus(image.id)}
+                    onClick={() => handleToggleStatus(image.id)}
                     title={image.status === "published" ? "Ocultar de la web" : "Publicar en la web"}
                   >
                     {image.status === "published" ? <Eye size={16} /> : <EyeOff size={16} />}
@@ -191,7 +209,7 @@ function AdminGallery() {
                   <button
                     className="btn-action-sm btn-danger"
                     onClick={() => {
-                      if (window.confirm("Estas seguro de eliminar esta foto?")) deleteImage(image.id);
+                      handleDeleteImage(image.id);
                     }}
                     title="Eliminar definitivamente"
                   >
@@ -202,7 +220,9 @@ function AdminGallery() {
             </div>
           ))}
 
-          {images.length === 0 && !showForm ? (
+          {isLoading ? <div className="admin-empty-state gallery-empty-state"><p>Cargando trabajos…</p></div> : null}
+          {error ? <div className="gallery-admin-error gallery-empty-state" role="alert">No pudimos actualizar la galería.</div> : null}
+          {!isLoading && images.length === 0 && !showForm ? (
             <div className="admin-empty-state gallery-empty-state">
               <ImageIcon size={48} />
               <p>Aun no has subido imagenes al portfolio.</p>

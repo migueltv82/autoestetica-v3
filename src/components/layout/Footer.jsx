@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { useSettings } from "../../hooks/useSettings";
 import { InstagramIcon, FacebookIcon, TikTokIcon, WhatsAppIcon } from "../ui/SocialIcons";
+import defaultLogo from "../../assets/logo.jpg";
 import "./Footer.css";
 
 function Footer() {
@@ -24,8 +25,10 @@ function Footer() {
       <div className="container footer-shell">
         <div className="footer-top">
           <div className="footer-brand">
-            <span className="footer-brand-mark" />
-            <h3>{settings.businessName}</h3>
+            <div className="footer-brand-identity">
+              <img src={settings.logoUrl || defaultLogo} alt={`Logo de ${settings.businessName || "Autoestética Tucumán"}`} loading="lazy" decoding="async" onError={(event) => { event.currentTarget.src = defaultLogo; }} />
+              <h3>{settings.businessName || "Autoestética Tucumán"}</h3>
+            </div>
             <p className="footer-tagline">Estética automotriz premium.</p>
 
             {socialLinks.length > 0 && (
@@ -72,10 +75,10 @@ function Footer() {
         </div>
 
         <div className="footer-bottom">
-          <p>© {new Date().getFullYear()} {settings.businessName} Tucumán. Todos los derechos reservados.</p>
+          <p>© {new Date().getFullYear()} {settings.businessName || "Autoestética Tucumán"}. Todos los derechos reservados.</p>
           <div className="footer-legal">
-            <span>Privacidad</span>
-            <span>Términos</span>
+            <Link to="/privacidad">Privacidad</Link>
+            <Link to="/terminos">Condiciones</Link>
           </div>
         </div>
       </div>

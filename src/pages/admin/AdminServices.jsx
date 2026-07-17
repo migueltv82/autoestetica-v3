@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Camera,
   Check,
   ChevronDown,
   ChevronUp,
@@ -15,6 +14,9 @@ import {
   Star,
   Trash2,
   X,
+  UploadCloud,
+  ArrowLeft,
+  ArrowRight,
 } from "lucide-react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import AdminPageHeader from "../../components/admin/AdminPageHeader";
@@ -25,6 +27,7 @@ import { useServices } from "../../hooks/useServices";
 import { getAvailableIcons, getIcon } from "../../utils/iconMapper";
 import { isTwoWheelService } from "../../utils/servicePricing";
 import { getServiceCoverUrl } from "../../utils/serviceMedia";
+import { useFeedback } from "../../hooks/useFeedback";
 import "./AdminServices.css";
 
 const containerVariants = {
@@ -40,14 +43,18 @@ const cardVariants = {
 
 const emptyForm = {
   name: "",
+  category: "",
   description: "",
   price: "",
   carPrice: "",
   truckPrice: "",
   priceOnRequest: false,
   duration: "",
+  durationMinutes: 120,
   iconName: "Zap",
   coverImageUrl: "",
+  active: true,
+  publicVisible: true,
   featured: false,
   display: {
     name: true,
@@ -102,8 +109,17 @@ function AdminServices() {
     updateService,
     deleteService,
     toggleFeatured,
+    togglePublished,
     updateVisibility,
+    uploadServiceImage,
+    setServiceCover,
+    reorderServiceImages,
+    deleteServiceImage,
+    clearServiceImages,
+    isLoading,
+    error,
   } = useServices();
+  const { confirm, notify } = useFeedback();
 
   const [editingService, setEditingService] = useState(null);
   const [editingGallery, setEditingGallery] = useState(null);
@@ -112,6 +128,8 @@ function AdminServices() {
   const [showVisibility, setShowVisibility] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const galleryInputRef = useRef(null);
 
   const formDisplay = { ...emptyForm.display, ...form.display };
   const isNew = editingService === "new";
@@ -144,14 +162,18 @@ function AdminServices() {
   const openEdit = (service) => {
     setForm({
       name: service.name,
+      category: service.category || "",
       description: service.description,
       price: service.price,
       carPrice: service.carPrice,
       truckPrice: service.truckPrice,
       priceOnRequest: service.priceOnRequest,
       duration: service.duration,
+      durationMinutes: service.durationMinutes,
       iconName: service.iconName,
       coverImageUrl: service.coverImageUrl || "",
+      active: service.active !== false,
+      publicVisible: service.publicVisible !== false,
       featured: Boolean(service.featured),
       display: { ...emptyForm.display, ...service.display },
       gallery: [...(service.gallery || [])],
@@ -163,7 +185,8 @@ function AdminServices() {
   };
 
   const handleSave = async () => {
-    if (!form.name || !form.duration) {
+    if (!form.name.trim() || !form.duration.trim()) {
+      notify("Completá el nombre y la duración del servicio.", "error");
       return;
     }
 
@@ -173,6 +196,7 @@ function AdminServices() {
       price: Number.parseFloat(form.price) || 0,
       carPrice: Number.parseFloat(form.carPrice) || 0,
       truckPrice: usesSinglePrice ? Number.parseFloat(form.carPrice) || 0 : Number.parseFloat(form.truckPrice) || 0,
+      durationMinutes: Math.max(15, Number.parseInt(form.durationMinutes, 10) || 120),
     };
 
     setIsSaving(true);
@@ -180,6 +204,7 @@ function AdminServices() {
     try {
       if (editingService === "new") await addService(payload);
       else await updateService(editingService, payload);
+      notify(isNew ? "Servicio creado." : "Cambios del servicio guardados.", "success");
       resetEditState();
     } catch (error) {
       console.error(error);
@@ -196,38 +221,62 @@ function AdminServices() {
     }));
   };
 
-  const handleDeleteService = (service) => {
-    if (window.confirm(`Eliminar "${service.name}"?`)) {
-      deleteService(service.id);
+  const handleDeleteService = async (service) => {
+    if (await confirm({ title: "Eliminar servicio", message: `El servicio "${service.name}" dejara de mostrarse en el catalogo.`, confirmLabel: "Eliminar" })) {
+      await deleteService(service.id);
+      notify("Servicio eliminado.", "success");
     }
   };
 
   const openGallery = (service) => setEditingGallery(service);
   const closeGallery = () => setEditingGallery(null);
 
-  const addMockImage = () => {
-    if (!editingGallery) {
-      return;
-    }
-
-    const mockImage = {
-      url: "https://images.unsplash.com/photo-1574067332341-35f11e967a5b?q=80&w=1470&auto=format&fit=crop",
-      label: "Nueva foto",
-    };
-    const updatedGallery = [...(editingGallery.gallery || []), mockImage];
-    const updatedService = { ...editingGallery, gallery: updatedGallery };
-
-    updateService(editingGallery.id, { gallery: updatedGallery });
-    setEditingGallery(updatedService);
+  const handleGalleryUpload = async (event) => {
+    const files = [...(event.target.files || [])];
+    if (!files.length || !editingGallery) return;
+    setIsUploading(true);
+    try {
+      let gallery = [...(editingGallery.gallery || [])];
+      let coverImageUrl = editingGallery.coverImageUrl;
+      for (const file of files.slice(0, 6)) {
+        const image = await uploadServiceImage(editingGallery.id, file, { gallery, coverImageUrl });
+        gallery = [...gallery, image];
+        coverImageUrl ||= image.url;
+      }
+      setEditingGallery((current) => ({ ...current, gallery, coverImageUrl }));
+      notify(`${files.slice(0, 6).length} imagenes cargadas.`, "success");
+    } catch (error) { notify(error.message || "No se pudieron cargar las imagenes.", "error"); }
+    finally { setIsUploading(false); event.target.value = ""; }
   };
 
-  const clearGallery = () => {
-    if (!editingGallery) {
-      return;
-    }
+  const handleSetCover = async (image) => {
+    await setServiceCover(editingGallery.id, image);
+    setEditingGallery((current) => ({ ...current, coverImageUrl: image.url }));
+    notify("Portada actualizada.", "success");
+  };
 
-    updateService(editingGallery.id, { gallery: [] });
-    setEditingGallery({ ...editingGallery, gallery: [] });
+  const handleMoveImage = async (index, direction) => {
+    const gallery = [...editingGallery.gallery];
+    const target = index + direction;
+    if (target < 0 || target >= gallery.length) return;
+    [gallery[index], gallery[target]] = [gallery[target], gallery[index]];
+    await reorderServiceImages(editingGallery.id, gallery);
+    setEditingGallery((current) => ({ ...current, gallery }));
+  };
+
+  const handleDeleteGalleryImage = async (image) => {
+    if (!await confirm({ title: "Eliminar imagen", message: "La imagen se eliminara tambien de Supabase Storage.", confirmLabel: "Eliminar" })) return;
+    await deleteServiceImage(editingGallery.id, image);
+    const gallery = editingGallery.gallery.filter((item) => item.url !== image.url);
+    setEditingGallery((current) => ({ ...current, gallery, coverImageUrl: current.coverImageUrl === image.url ? gallery[0]?.url || "" : current.coverImageUrl }));
+    notify("Imagen eliminada.", "success");
+  };
+
+  const clearGallery = async () => {
+    if (!editingGallery || !await confirm({ title: "Limpiar galeria", message: "Se eliminaran todas las imagenes cargadas para este servicio.", confirmLabel: "Eliminar todas" })) return;
+    await clearServiceImages(editingGallery.id);
+    setEditingGallery({ ...editingGallery, gallery: [], coverImageUrl: "" });
+    notify("Galeria vaciada.", "success");
   };
 
   return (
@@ -251,6 +300,9 @@ function AdminServices() {
               }
             />
 
+            {error ? <div className="svc-admin-error" role="alert">No pudimos actualizar el catálogo. Revisá la conexión.</div> : null}
+            {isLoading ? <div className="svc-admin-loading">Cargando servicios…</div> : null}
+
             <motion.div
               className="admin-services-grid"
               variants={containerVariants}
@@ -263,17 +315,19 @@ function AdminServices() {
                 return (
                   <motion.div
                     key={service.id}
-                    className={`service-card-pro ${service.featured ? "is-featured" : ""}`}
+                    className={`service-card-pro ${service.featured ? "is-featured" : ""} ${service.active && service.publicVisible ? "is-published" : "is-hidden"}`}
                     variants={cardVariants}
                     whileHover="hover"
                   >
                     <div className="svc-card-cover"><img src={getServiceCoverUrl(service)} alt={service.name} loading="lazy" /></div>
+                    <span className={`svc-publish-badge ${service.active && service.publicVisible ? "published" : "hidden"}`}>{service.active && service.publicVisible ? <><Eye size={12} /> Publicado</> : <><EyeOff size={12} /> Oculto</>}</span>
                     <div className="svc-card-header">
                       <div className="service-icon-wrapper">
                         {getIcon(service.iconName, { size: 20 })}
                       </div>
 
                       <div className="svc-card-controls">
+                        <button type="button" className="btn-icon-sm" title={service.active && service.publicVisible ? "Ocultar del sitio" : "Publicar en el sitio"} onClick={() => togglePublished(service.id)}>{service.active && service.publicVisible ? <Eye size={14} /> : <EyeOff size={14} />}</button>
                         <button
                           type="button"
                           className="btn-icon-sm"
@@ -405,24 +459,6 @@ function AdminServices() {
                 />
               </div>
 
-              <div className="svc-form-row">
-                 <div className="admin-form-group svc-form-group-wide">
-                  <label>Imagen de Portada (URL)</label>
-                  <input
-                    type="text"
-                    className="admin-input"
-                    value={form.coverImageUrl}
-                    onChange={(event) => setForm((previous) => ({ ...previous, coverImageUrl: event.target.value }))}
-                    placeholder="https://images.unsplash.com/..."
-                  />
-                </div>
-                {form.coverImageUrl && (
-                  <div className="svc-cover-preview">
-                    <img src={form.coverImageUrl} alt="Vista previa" />
-                  </div>
-                )}
-              </div>
-
               <div className="svc-price-mode">
                 <label className="svc-consult-toggle">
                   <input type="checkbox" checked={form.priceOnRequest} onChange={(event) => setForm((previous) => ({ ...previous, priceOnRequest: event.target.checked }))} />
@@ -432,6 +468,11 @@ function AdminServices() {
                   <div className="admin-form-group"><label>{usesSinglePrice ? "Precio del servicio ($)" : "Precio Auto ($)"}</label><input type="number" min="0" className="admin-input" value={form.carPrice} onChange={(event) => setForm((previous) => ({ ...previous, carPrice: event.target.value }))} placeholder="15000" /></div>
                   {!usesSinglePrice ? <div className="admin-form-group"><label>Precio Camioneta ($)</label><input type="number" min="0" className="admin-input" value={form.truckPrice} onChange={(event) => setForm((previous) => ({ ...previous, truckPrice: event.target.value }))} placeholder="20000" /></div> : null}
                 </div> : <div className="svc-consult-note">La tarjeta publica mostrara “Consultar” en lugar de un valor fijo.</div>}
+              </div>
+
+              <div className="admin-form-group">
+                <label>Categoría</label>
+                <input type="text" className="admin-input" value={form.category} onChange={(event) => setForm((previous) => ({ ...previous, category: event.target.value }))} placeholder="Ej: Lavado, Interior o Protección" />
               </div>
 
               <div className="svc-form-row">
@@ -445,6 +486,11 @@ function AdminServices() {
                     onChange={(event) => setForm((previous) => ({ ...previous, duration: event.target.value }))}
                     placeholder="2h / 2 dias"
                   />
+                </div>
+
+                <div className="admin-form-group svc-form-group">
+                  <label>Minutos para la agenda</label>
+                  <input type="number" min="15" step="15" className="admin-input" value={form.durationMinutes} onChange={(event) => setForm((previous) => ({ ...previous, durationMinutes: event.target.value }))} placeholder="120" />
                 </div>
 
                 <div className="admin-form-group svc-featured-toggle svc-featured-field">
@@ -529,13 +575,19 @@ function AdminServices() {
               <div className="gallery-manager-main">
                 <Carousel images={editingGallery.gallery || []} />
 
-                <div className="gallery-actions">
-                  <button type="button" className="btn-premium" onClick={addMockImage}>
-                    <Camera size={18} />
-                    <span>Anadir foto</span>
-                  </button>
+                <input ref={galleryInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden onChange={handleGalleryUpload} />
+                <button type="button" className="svc-upload-zone" onClick={() => galleryInputRef.current?.click()} disabled={isUploading}>
+                  <UploadCloud size={22} /><span><strong>{isUploading ? "Comprimiendo y subiendo..." : "Agregar imagenes"}</strong><small>JPG, PNG o WebP. Se optimizan automaticamente.</small></span>
+                </button>
 
-                  <button type="button" className="btn-ghost gallery-clear-btn" onClick={clearGallery}>
+                {editingGallery.gallery?.length ? <div className="svc-gallery-list">{editingGallery.gallery.map((image, index) => <article className={`svc-gallery-item ${editingGallery.coverImageUrl === image.url ? "is-cover" : ""}`} key={image.url}>
+                  <img src={image.url} alt={image.label || `${editingGallery.name} ${index + 1}`} />
+                  <div><strong>{editingGallery.coverImageUrl === image.url ? "Portada" : `Imagen ${index + 1}`}</strong><span>{image.label || editingGallery.name}</span></div>
+                  <div className="svc-gallery-item-actions"><button type="button" onClick={() => handleMoveImage(index, -1)} disabled={index === 0} title="Mover a la izquierda"><ArrowLeft size={14} /></button><button type="button" onClick={() => handleMoveImage(index, 1)} disabled={index === editingGallery.gallery.length - 1} title="Mover a la derecha"><ArrowRight size={14} /></button>{editingGallery.coverImageUrl !== image.url ? <button type="button" onClick={() => handleSetCover(image)} title="Usar como portada"><ImageIcon size={14} /></button> : null}<button type="button" className="danger" onClick={() => handleDeleteGalleryImage(image)} title="Eliminar"><Trash2 size={14} /></button></div>
+                </article>)}</div> : <p className="svc-gallery-empty">Todavia no cargaste fotos propias. La tarjeta usa la imagen predeterminada del proyecto.</p>}
+
+                <div className="gallery-actions">
+                  <button type="button" className="btn-ghost gallery-clear-btn" onClick={clearGallery} disabled={!editingGallery.gallery?.length || isUploading}>
                     <Trash2 size={16} />
                     <span>Limpiar todo</span>
                   </button>
@@ -554,7 +606,7 @@ function AdminServices() {
                   Se recomienda usar imagenes de alta calidad (JPG/PNG) y formato 16:9.
                 </p>
                 <div className="gallery-stats-box">
-                  <strong>Fotos actuales:</strong> {editingGallery.gallery.length}
+                  <strong>Fotos actuales:</strong> {editingGallery.gallery?.length || 0}
                 </div>
               </div>
             </div>

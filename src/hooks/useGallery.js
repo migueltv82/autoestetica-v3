@@ -8,7 +8,7 @@ function publicUrl(path) {
   return supabase.storage.from("portfolio").getPublicUrl(path).data.publicUrl;
 }
 function mapItem(item) {
-  return { id: item.id, title: item.title, service: item.service_name, beforeUrl: publicUrl(item.before_path), afterUrl: publicUrl(item.after_path), beforePath: item.before_path, afterPath: item.after_path, date: item.created_at?.slice(0, 10), status: item.status };
+  return { id: item.id, title: item.title, service: item.service_name, beforeUrl: publicUrl(item.before_path), afterUrl: publicUrl(item.after_path), beforePath: item.before_path, afterPath: item.after_path, date: item.created_at?.slice(0, 10), status: item.status, publicationConsent: Boolean(item.publication_consent) };
 }
 function dataUrlToBlob(dataUrl) {
   const [header, content] = dataUrl.split(",");
@@ -49,14 +49,20 @@ export function useGallery() {
   }
 
   async function addImage(image) {
-    const beforePath = await uploadImage(image.beforeUrl, "antes");
-    const afterPath = await uploadImage(image.afterUrl, "despues");
-    const { error: insertError } = await supabase.from("portfolio_items").insert({
-      organization_id: organizationId, title: image.title.trim(), service_name: image.service.trim(),
-      before_path: beforePath, after_path: afterPath, status: "published", publication_consent: true,
-    });
-    if (insertError) throw insertError;
-    await refresh();
+    const uploadedPaths = [];
+    try {
+      const beforePath = await uploadImage(image.beforeUrl, "antes");
+      if (beforePath) uploadedPaths.push(beforePath);
+      const afterPath = await uploadImage(image.afterUrl, "despues");
+      if (afterPath) uploadedPaths.push(afterPath);
+      const publicationConsent = Boolean(image.publicationConsent);
+      const { error: insertError } = await supabase.from("portfolio_items").insert({ organization_id: organizationId, title: image.title.trim(), service_name: image.service.trim(), before_path: beforePath, after_path: afterPath, status: image.publishNow && publicationConsent ? "published" : "draft", publication_consent: publicationConsent });
+      if (insertError) throw insertError;
+      await refresh();
+    } catch (error) {
+      if (uploadedPaths.length) await supabase.storage.from("portfolio").remove(uploadedPaths);
+      throw error;
+    }
   }
   async function deleteImage(id) {
     const item = images.find((image) => image.id === id);
@@ -69,6 +75,7 @@ export function useGallery() {
   }
   async function toggleStatus(id) {
     const item = images.find((image) => image.id === id);
+    if (item.status !== "published" && !item.publicationConsent) throw new Error("Necesitás confirmar la autorización del cliente antes de publicar.");
     const { error: updateError } = await supabase.from("portfolio_items").update({ status: item.status === "published" ? "draft" : "published" })
       .eq("id", id).eq("organization_id", organizationId);
     if (updateError) throw updateError;

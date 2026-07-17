@@ -40,9 +40,14 @@ function TurnsToolbar({ filters, onFilterChange, onClearFilters }) {
           >
             <option value="">Todos los estados</option>
             <option value="Pendiente">Pendiente</option>
+            <option value="Consulta">Consulta</option>
+            <option value="Seña pendiente">Seña pendiente</option>
             <option value="Confirmado">Confirmado</option>
+            <option value="En proceso">En proceso</option>
+            <option value="Listo">Listo</option>
             <option value="Finalizado">Finalizado</option>
             <option value="Cancelado">Cancelado</option>
+            <option value="No asistió">No asistió</option>
           </select>
         </div>
 

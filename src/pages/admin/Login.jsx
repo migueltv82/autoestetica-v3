@@ -28,7 +28,6 @@ function Login() {
       setError(authError.message === "Invalid login credentials" ? "Email o contraseña incorrectos." : "No pudimos iniciar sesión. Intentá nuevamente.");
       return;
     }
-    // ProtectedRoute will verify the organization profile after Auth updates.
     navigate(location.state?.from || "/admin/dashboard", { replace: true });
   }
 
@@ -59,7 +58,7 @@ function Login() {
               <div className="login-title-group">
                 <span className="premium-badge">Acceso seguro</span>
                 <h1 className="login-main-title">Sistema de gestión</h1>
-                <p className="login-sub-text">Iniciá sesión con tu cuenta autorizada para administrar el negocio.</p>
+                <p className="login-sub-text">Iniciá sesión con tu cuenta autorizada para administrar Autoestética Tucumán.</p>
               </div>
             </div>
             <form onSubmit={handleSubmit} className="premium-login-form">
