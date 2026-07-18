@@ -8,7 +8,12 @@
     "build": "vite build",
     "lint": "eslint .",
     "predeploy": "node scripts/predeploy.mjs && npm run lint && npm run build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "supabase:login": "supabase login",
+    "supabase:link": "supabase link",
+    "supabase:function:deploy": "supabase functions deploy create-team-member --no-verify-jwt",
+    "supabase:function:delete:deploy": "supabase functions deploy delete-team-member --no-verify-jwt",
+    "supabase:functions:deploy": "npm run supabase:function:deploy && npm run supabase:function:delete:deploy"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.101.1",
@@ -27,6 +32,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "supabase": "^2.109.1",
     "vite": "^8.0.1"
   }
 }

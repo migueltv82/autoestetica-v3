@@ -1,6 +1,6 @@
-# Base de datos nueva de Autoestética
+# Base de datos de Autoestética Tucumán
 
-La aplicación usa una sola fuente de verdad en Supabase. `localStorage` será retirado de los módulos operativos.
+La aplicación usa Supabase como única fuente de verdad. El frontend nunca debe guardar claves `service_role` ni secretos.
 
 ## Instalación limpia
 
@@ -11,7 +11,8 @@ La aplicación usa una sola fuente de verdad en Supabase. `localStorage` será r
 5. Crear el usuario propietario en Authentication > Users.
 6. Ejecutar el bloque de vinculación incluido abajo.
 7. Ejecutar `VERIFY_DATABASE.sql`: todos los controles de integridad deben devolver `0`.
-8. Aplicar el procedimiento de respaldo documentado en `BACKUP_AND_RECOVERY.md`.
+8. Desplegar las Edge Functions de equipo para poder crear/invitar/eliminar usuarios desde Ajustes > Equipo y permisos.
+9. Aplicar el procedimiento de respaldo documentado en `BACKUP_AND_RECOVERY.md`.
 
 ## Vincular el propietario
 
@@ -37,8 +38,31 @@ from public.organizations where slug = 'autoestetica-tucuman'
 on conflict (organization_id) do update set business_name = excluded.business_name;
 ```
 
+## Desplegar creación segura de usuarios
+
+La sección Ajustes > Equipo y permisos usa Edge Functions para crear/invitar/eliminar usuarios en Supabase Auth sin exponer la `service_role` en el navegador.
+
+```bash
+npm run supabase:functions:deploy
+```
+
+Antes del primer despliegue, iniciar sesión y vincular el proyecto:
+
+```bash
+npm run supabase:login
+npm run supabase:link -- --project-ref TU_PROJECT_REF
+```
+
+La función valida manualmente el JWT del usuario que llama, exige rol `owner/admin`, y usa `SUPABASE_SERVICE_ROLE_KEY` solo dentro del entorno seguro de Supabase.
+
+Si tu proyecto no tiene configurada la variable `SUPABASE_SERVICE_ROLE_KEY` en Edge Functions, agregala desde Supabase Dashboard > Edge Functions > Secrets.
+
+En Ajustes > Equipo y permisos:
+
+- Si completás `Clave temporal`, el usuario entra con email + esa clave.
+- Si dejás `Clave temporal` vacía, Supabase envía una invitación por email.
+- La clave temporal debe tener al menos 8 caracteres.
+
 ## Modelo
 
 `organización → cliente → vehículos → órdenes de trabajo → servicios/pagos/fotos/recibos`
-
-Nunca guardar una clave `service_role` o `secret` dentro del frontend.

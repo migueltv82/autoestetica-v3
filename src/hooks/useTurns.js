@@ -2,10 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "./useAuth";
 import { useFeedback } from "./useFeedback";
+import { usePermissions } from "./usePermissions";
 import { useRealtimeRefresh } from "./useRealtimeRefresh";
 import { normalizeStoredArgentinaPhone } from "../utils/whatsapp";
 
-const TURN_REALTIME_TABLES = ["work_orders", "work_order_items", "payments", "cash_movements", "receipts"];
+const TURN_REALTIME_TABLES = ["work_orders", "work_order_items"];
+const FINANCE_TURN_REALTIME_TABLES = ["payments", "cash_movements", "receipts"];
 
 const STATUS_TO_DB = {
   Consulta: "inquiry", Pendiente: "pending", "Seña pendiente": "deposit_pending",
@@ -42,6 +44,7 @@ function mapOrder(order) {
 export function useTurns() {
   const { organizationId, user } = useAuth();
   const { confirm, notify } = useFeedback();
+  const { canManageFinance, canManageTurns, canDeleteTurns } = usePermissions();
   const [turns, setTurns] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -63,9 +66,14 @@ export function useTurns() {
     const timer = setTimeout(() => refresh(), 0);
     return () => clearTimeout(timer);
   }, [refresh]);
-  useRealtimeRefresh(organizationId, TURN_REALTIME_TABLES, refresh);
+  const realtimeTables = useMemo(
+    () => (canManageFinance ? [...TURN_REALTIME_TABLES, ...FINANCE_TURN_REALTIME_TABLES] : TURN_REALTIME_TABLES),
+    [canManageFinance],
+  );
+  useRealtimeRefresh(organizationId, realtimeTables, refresh);
 
   async function addTurn(formData) {
+    if (!canManageTurns) throw new Error("No tenes permiso para crear turnos.");
     if (!organizationId || !user?.id) throw new Error("La sesión no está lista. Volvé a ingresar.");
     if (!formData.services?.length) throw new Error("Seleccioná al menos un servicio.");
     const { start, end } = getSchedule(formData);
@@ -90,13 +98,17 @@ export function useTurns() {
   }
 
   async function updateTurnStatus(turnId, nextStatus) {
-    const { error: updateError } = await supabase.from("work_orders").update({ status: STATUS_TO_DB[nextStatus] || "pending" })
-      .eq("id", turnId).eq("organization_id", organizationId);
+    if (!canManageTurns) throw new Error("No tenes permiso para cambiar el estado del turno.");
+    const { error: updateError } = await supabase.rpc("set_work_order_status", {
+      p_order_id: turnId,
+      p_status: STATUS_TO_DB[nextStatus] || "pending",
+    });
     if (updateError) throw updateError;
     setTurns((current) => current.map((turn) => turn.id === turnId ? { ...turn, status: nextStatus } : turn));
   }
 
   async function updateTurn(turnId, formData) {
+    if (!canManageTurns) throw new Error("No tenes permiso para modificar turnos.");
     const current = turns.find((turn) => turn.id === turnId);
     if (!current) throw new Error("Turno no encontrado.");
     if (!formData.services?.length) throw new Error("Seleccioná al menos un servicio.");
@@ -144,6 +156,7 @@ export function useTurns() {
   }
 
   async function deleteTurn(turnId) {
+    if (!canDeleteTurns) throw new Error("No tenes permiso para eliminar turnos.");
     const accepted = await confirm({ title: "Eliminar turno definitivamente", message: "Se eliminarán el turno, sus ingresos, pagos y recibo. El cliente y su vehículo se conservarán. Esta acción no se puede deshacer.", confirmLabel: "Eliminar todo" });
     if (!accepted) return;
     const { error: deleteError } = await supabase.rpc("void_work_order", { target_order: turnId });

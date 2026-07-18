@@ -2,9 +2,9 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
-import polishingImg from "../../assets/hero-polishing.jpeg";
-import interiorImg from "../../assets/result-interior.jpg";
-import engineImg from "../../assets/result-engine.jpeg";
+import polishingImg from "../../assets/hero-polishing.webp";
+import interiorImg from "../../assets/result-interior.webp";
+import engineImg from "../../assets/result-engine.webp";
 import "./Hero.css";
 
 const BG_IMAGES = [

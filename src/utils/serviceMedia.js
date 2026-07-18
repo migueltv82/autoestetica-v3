@@ -1,12 +1,12 @@
-import coverExterior from "../assets/hero-polishing.jpeg";
-import coverInterior from "../assets/result-interior.jpg";
-import coverTechnical from "../assets/result-engine.jpeg";
-import premiumWorkshop from "../assets/services-detailing/lavado-premium-taller.jpg";
-import interiorWorkshop from "../assets/services-detailing/limpieza-interior-hilux.jpg";
-import polishWorkshop from "../assets/services-detailing/abrillantado-taller.jpg";
-import ceramicWorkshop from "../assets/services-detailing/tratamiento-ceramico.jpg";
-import bicycleWorkshop from "../assets/services-detailing/lavado-bicicleta.jpg";
-import motorcycleWorkshop from "../assets/services-detailing/lavado-moto.jpg";
+import coverExterior from "../assets/hero-polishing.webp";
+import coverInterior from "../assets/result-interior.webp";
+import coverTechnical from "../assets/result-engine.webp";
+import premiumWorkshop from "../assets/services-detailing/lavado-premium-taller.webp";
+import interiorWorkshop from "../assets/services-detailing/limpieza-interior-hilux.webp";
+import polishWorkshop from "../assets/services-detailing/abrillantado-taller.webp";
+import ceramicWorkshop from "../assets/services-detailing/tratamiento-ceramico.webp";
+import bicycleWorkshop from "../assets/services-detailing/lavado-bicicleta.webp";
+import motorcycleWorkshop from "../assets/services-detailing/lavado-moto.webp";
 
 export function classifyService(service) {
   const name = (service?.name || "").toLowerCase();

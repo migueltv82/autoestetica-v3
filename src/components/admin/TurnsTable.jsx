@@ -19,7 +19,7 @@ import "./TurnsTable.css";
 
 const STATUS_OPTIONS = ["Consulta", "Pendiente", "Seña pendiente", "Confirmado", "En proceso", "Listo", "Finalizado", "Cancelado", "No asistió"];
 
-function TurnsTable({ turns, onStatusChange, onDeleteTurn, onGenerateReceipt, onEditTurn }) {
+function TurnsTable({ turns, onStatusChange, onDeleteTurn, onGenerateReceipt, onEditTurn, canUseOperationalActions = true }) {
   if (!turns.length) {
     return (
       <EmptyState
@@ -53,6 +53,8 @@ function TurnsTable({ turns, onStatusChange, onDeleteTurn, onGenerateReceipt, on
     }
   };
 
+  const hasActions = Boolean((canUseOperationalActions && turns.some((turn) => turn.phone && !["Cancelado", "Finalizado"].includes(turn.status))) || onEditTurn || onGenerateReceipt || onDeleteTurn);
+
   return (
     <div className="simple-table-container">
       <table className="simple-admin-table">
@@ -62,7 +64,7 @@ function TurnsTable({ turns, onStatusChange, onDeleteTurn, onGenerateReceipt, on
             <th>Servicio</th>
             <th>Horario</th>
             <th>Estado</th>
-            <th style={{ textAlign: "right" }}>Acciones</th>
+            {hasActions ? <th className="turn-actions-header">Acciones</th> : null}
           </tr>
         </thead>
         <tbody>
@@ -93,7 +95,7 @@ function TurnsTable({ turns, onStatusChange, onDeleteTurn, onGenerateReceipt, on
                 </div>
               </td>
               <td>
-                <select
+                {onStatusChange ? <select
                   className={`status-select-simple ${getStatusClass(turn.status)}`}
                   value={turn.status}
                   onChange={(e) => onStatusChange(turn.id, e.target.value)}
@@ -101,10 +103,10 @@ function TurnsTable({ turns, onStatusChange, onDeleteTurn, onGenerateReceipt, on
                   {STATUS_OPTIONS.map((opt) => (
                     <option key={opt} value={opt}>{opt}</option>
                   ))}
-                </select>
+                </select> : <span className={`status-pill-simple ${getStatusClass(turn.status)}`}>{turn.status}</span>}
               </td>
-              <td style={{ textAlign: "right" }}>
-                {turn.phone && !["Cancelado", "Finalizado"].includes(turn.status) ? <a className="btn-action-confirm" href={appointmentWhatsAppLink(turn)} target="_blank" rel="noreferrer" title={turn.status === "Listo" ? "Avisar por WhatsApp" : "Enviar confirmación por WhatsApp"}><MessageCircle size={16} /><span>{turn.status === "Listo" ? "Avisar listo" : "Confirmar turno"}</span></a> : null}
+              {hasActions ? <td className="turn-actions-cell">
+                {canUseOperationalActions && turn.phone && !["Cancelado", "Finalizado"].includes(turn.status) ? <a className="btn-action-confirm" href={appointmentWhatsAppLink(turn)} target="_blank" rel="noreferrer" title={turn.status === "Listo" ? "Avisar por WhatsApp" : "Enviar confirmación por WhatsApp"}><MessageCircle size={16} /><span>{turn.status === "Listo" ? "Avisar listo" : "Confirmar turno"}</span></a> : null}
                 {onEditTurn ? <button className="btn-ghost btn-mini-action" onClick={() => onEditTurn(turn)} title="Editar turno"><Pencil size={16} /></button> : null}
                 {onGenerateReceipt ? (
                   <button
@@ -115,14 +117,16 @@ function TurnsTable({ turns, onStatusChange, onDeleteTurn, onGenerateReceipt, on
                     <ReceiptText size={16} />
                   </button>
                 ) : null}
-                <button 
-                  className="btn-action-danger" 
-                  onClick={() => onDeleteTurn(turn.id)}
-                  title="Eliminar"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </td>
+                {onDeleteTurn ? (
+                  <button
+                    className="btn-action-danger"
+                    onClick={() => onDeleteTurn(turn.id)}
+                    title="Eliminar"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                ) : null}
+              </td> : null}
             </tr>
           ))}
         </tbody>

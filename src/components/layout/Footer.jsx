@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { useSettings } from "../../hooks/useSettings";
 import { InstagramIcon, FacebookIcon, TikTokIcon, WhatsAppIcon } from "../ui/SocialIcons";
-import defaultLogo from "../../assets/logo.jpg";
+import defaultLogo from "../../assets/logo.webp";
 import "./Footer.css";
 
 function Footer() {

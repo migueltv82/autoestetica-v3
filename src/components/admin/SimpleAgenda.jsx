@@ -20,7 +20,7 @@ function dateLabel(value) {
   return new Date(`${value}T12:00:00`).toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
 }
 
-export default function SimpleAgenda({ turns, selectedDate, onDateChange, search, onSearchChange, statusFilter, onStatusFilterChange, onStatusChange, onEditTurn, onDeleteTurn, onGenerateReceipt, settings }) {
+export default function SimpleAgenda({ turns, selectedDate, onDateChange, search, onSearchChange, statusFilter, onStatusFilterChange, onStatusChange, onEditTurn, onDeleteTurn, onGenerateReceipt, settings, canUseOperationalActions = true }) {
   const visibleTurns = turns
     .filter((turn) => turn.date === selectedDate)
     .filter((turn) => !search.trim() || [turn.client, turn.service, turn.vehicle, turn.phone].some((value) => String(value).toLowerCase().includes(search.trim().toLowerCase())))
@@ -49,12 +49,12 @@ export default function SimpleAgenda({ turns, selectedDate, onDateChange, search
 
     <section className="agenda-card-list">
       {visibleTurns.map((turn) => <article className={`agenda-mobile-turn status-${turn.status.toLowerCase().replaceAll(" ", "-")}`} key={turn.id}>
-        <header><div className="agenda-turn-time"><Clock3 size={17} /><strong>{turn.time}</strong><span>– {turn.endTime}</span></div><select value={turn.status} onChange={(event) => onStatusChange(turn.id, event.target.value)} aria-label={`Estado de ${turn.client}`}>{STATUSES.map((status) => <option key={status}>{status}</option>)}</select></header>
+        <header><div className="agenda-turn-time"><Clock3 size={17} /><strong>{turn.time}</strong><span>– {turn.endTime}</span></div>{onStatusChange ? <select value={turn.status} onChange={(event) => onStatusChange(turn.id, event.target.value)} aria-label={`Estado de ${turn.client}`}>{STATUSES.map((status) => <option key={status}>{status}</option>)}</select> : <span className="agenda-readonly-status">{turn.status}</span>}</header>
         <div className="agenda-turn-client"><span><UserRound size={18} /></span><div><h3>{turn.client}</h3><p><Car size={14} /> {turn.vehicle}</p></div></div>
         <p className="agenda-turn-service">{turn.service}</p>
         {turn.amount > 0 ? <strong className="agenda-turn-price">{money.format(turn.amount)}</strong> : null}
-        <div className="agenda-primary-action">{turn.phone && !["Cancelado", "Finalizado"].includes(turn.status) ? <a href={turn.status === "Listo" ? readyTurnWhatsAppLink(turn, settings?.readyMessageTemplate, settings?.openingHours) : turnConfirmationWhatsAppLink(turn, settings?.businessName, settings?.confirmationMessageTemplate)} target="_blank" rel="noreferrer"><MessageCircle size={18} /> {turn.status === "Listo" ? "Avisar vehículo listo" : "Confirmar turno"}</a> : <span>Sin acción de WhatsApp</span>}</div>
-        <footer><button type="button" onClick={() => onEditTurn(turn)}><Pencil size={16} /> Editar</button><button type="button" onClick={() => onGenerateReceipt(turn)}><ReceiptText size={16} /> Recibo</button><button className="danger" type="button" onClick={() => onDeleteTurn(turn.id)} aria-label="Eliminar turno"><Trash2 size={16} /></button></footer>
+        {canUseOperationalActions ? <div className="agenda-primary-action">{turn.phone && !["Cancelado", "Finalizado"].includes(turn.status) ? <a href={turn.status === "Listo" ? readyTurnWhatsAppLink(turn, settings?.readyMessageTemplate, settings?.openingHours) : turnConfirmationWhatsAppLink(turn, settings?.businessName, settings?.confirmationMessageTemplate)} target="_blank" rel="noreferrer"><MessageCircle size={18} /> {turn.status === "Listo" ? "Avisar vehículo listo" : "Confirmar turno"}</a> : <span>Sin acción de WhatsApp</span>}</div> : null}
+        {onEditTurn || onGenerateReceipt || onDeleteTurn ? <footer>{onEditTurn ? <button type="button" onClick={() => onEditTurn(turn)}><Pencil size={16} /> Editar</button> : null}{onGenerateReceipt ? <button type="button" onClick={() => onGenerateReceipt(turn)}><ReceiptText size={16} /> Recibo</button> : null}{onDeleteTurn ? <button className="danger" type="button" onClick={() => onDeleteTurn(turn.id)} aria-label="Eliminar turno"><Trash2 size={16} /></button> : null}</footer> : null}
       </article>)}
       {!visibleTurns.length ? <div className="agenda-empty"><CalendarDays size={35} /><h3>No hay turnos para este día</h3><p>Elegí otra fecha o agregá un turno nuevo.</p></div> : null}
     </section>

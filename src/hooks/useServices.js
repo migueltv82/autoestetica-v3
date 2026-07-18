@@ -3,6 +3,7 @@ import { supabase } from "../lib/supabase";
 import { getPublicOrganizationId } from "../lib/organization";
 import { useAuth } from "./useAuth";
 import { compressImageFile } from "../utils/imageUpload";
+import { usePermissions } from "./usePermissions";
 
 const DEFAULT_DISPLAY = { name: true, description: true, gallery: true, duration: true, price: true };
 const INITIAL_CATALOG = [
@@ -29,6 +30,7 @@ const mapService = (service) => ({
 
 export function useServices() {
   const { organizationId } = useAuth();
+  const { canManageCatalog } = usePermissions();
   const [services, setServices] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -41,7 +43,7 @@ export function useServices() {
       if (!organizationId) query = query.eq("active", true).eq("public_visible", true);
       let { data, error: queryError } = await query.order("created_at", { ascending: true });
       if (queryError) throw queryError;
-      if (organizationId) {
+      if (organizationId && canManageCatalog) {
         const existingNames = new Set((data || []).map((service) => service.name.toLowerCase()));
         const missing = INITIAL_CATALOG.filter((service) => !existingNames.has(service.name.toLowerCase()));
         if (missing.length) {
@@ -58,7 +60,7 @@ export function useServices() {
       setServices((data || []).map(mapService)); setError("");
     } catch (queryError) { setError(queryError.message); }
     setIsLoading(false);
-  }, [organizationId]);
+  }, [organizationId, canManageCatalog]);
 
   useEffect(() => { const timer = setTimeout(() => refresh(), 0); return () => clearTimeout(timer); }, [refresh]);
 

@@ -3,20 +3,22 @@ import { supabase } from "../lib/supabase";
 import { useAuth } from "./useAuth";
 import { useRealtimeRefresh } from "./useRealtimeRefresh";
 import { normalizeStoredArgentinaPhone } from "../utils/whatsapp";
+import { usePermissions } from "./usePermissions";
 
-const CLIENT_REALTIME_TABLES = ["clients", "vehicles", "work_orders", "work_order_items", "payments"];
+const CLIENT_REALTIME_TABLES = ["clients", "vehicles", "work_orders", "work_order_items"];
+const FINANCE_CLIENT_REALTIME_TABLES = ["payments"];
 
 const formatMoney = (value) => new Intl.NumberFormat("es-AR", {
   style: "currency", currency: "ARS", maximumFractionDigits: 0,
 }).format(value || 0);
 
-function mapClient(client) {
+function mapClient(client, canManageFinance) {
   const vehicles = (client.vehicles || []).filter((vehicle) => !vehicle.deleted_at);
   const activeOrders = (client.work_orders || []).filter((order) => order.status !== "cancelled");
   const history = activeOrders.map((order) => {
-    const itemsTotal = (order.work_order_items || []).reduce((sum, item) => sum + Number(item.total || 0), 0);
-    const total = Number(order.total || 0) || itemsTotal;
-    const paid = (order.payments || []).filter((payment) => !payment.voided_at).reduce((sum, payment) => sum + (payment.kind === "refund" ? -Number(payment.amount) : Number(payment.amount)), 0);
+    const itemsTotal = canManageFinance ? (order.work_order_items || []).reduce((sum, item) => sum + Number(item.total || 0), 0) : 0;
+    const total = canManageFinance ? Number(order.total || 0) || itemsTotal : 0;
+    const paid = canManageFinance ? (order.payments || []).filter((payment) => !payment.voided_at).reduce((sum, payment) => sum + (payment.kind === "refund" ? -Number(payment.amount) : Number(payment.amount)), 0) : 0;
     return { id: order.id, number: order.number, date: order.scheduled_start ? new Date(order.scheduled_start).toLocaleDateString("en-CA", { timeZone: "America/Argentina/Tucuman" }) : "", status: order.status, services: (order.work_order_items || []).map((item) => item.description).join(", "), total, paid, balance: Math.max(total - paid, 0) };
   });
   const billed = history.reduce((sum, order) => sum + order.total, 0);
@@ -39,6 +41,7 @@ function mapClient(client) {
 
 export function useClients() {
   const { organizationId } = useAuth();
+  const { canManageFinance, canManageClients } = usePermissions();
   const [allClients, setAllClients] = useState([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -47,27 +50,35 @@ export function useClients() {
   const refresh = useCallback(async (options = {}) => {
     if (!organizationId) return;
     if (!options.silent) setIsLoading(true);
+    const orderSelect = canManageFinance
+      ? "work_orders(id,number,total,status,scheduled_start,work_order_items(description,total),payments(amount,kind,voided_at))"
+      : "work_orders(id,number,status,scheduled_start,work_order_items(description))";
     const { data, error: queryError } = await supabase
       .from("clients")
-      .select("id,name,phone,email,notes,tags,created_at,vehicles(id,type,brand,model,license_plate,color,year,notes,deleted_at),work_orders(id,number,total,status,scheduled_start,work_order_items(description,total),payments(amount,kind,voided_at))")
+      .select(`id,name,phone,email,notes,tags,created_at,vehicles(id,type,brand,model,license_plate,color,year,notes,deleted_at),${orderSelect}`)
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
       .order("created_at", { ascending: false });
     if (queryError) setError(queryError.message);
     else {
-      setAllClients((data || []).map(mapClient));
+      setAllClients((data || []).map((client) => mapClient(client, canManageFinance)));
       setError("");
     }
     setIsLoading(false);
-  }, [organizationId]);
+  }, [organizationId, canManageFinance]);
 
   useEffect(() => {
     const timer = setTimeout(() => refresh(), 0);
     return () => clearTimeout(timer);
   }, [refresh]);
-  useRealtimeRefresh(organizationId, CLIENT_REALTIME_TABLES, refresh);
+  const realtimeTables = useMemo(
+    () => (canManageFinance ? [...CLIENT_REALTIME_TABLES, ...FINANCE_CLIENT_REALTIME_TABLES] : CLIENT_REALTIME_TABLES),
+    [canManageFinance],
+  );
+  useRealtimeRefresh(organizationId, realtimeTables, refresh);
 
   async function addClient(newClient) {
+    if (!canManageClients) throw new Error("No tenes permiso para crear clientes.");
     const normalizedPhone = normalizeStoredArgentinaPhone(newClient.phone);
     if (normalizedPhone.length < 8) throw new Error("Ingresá un número de WhatsApp válido.");
     const { data: client, error: clientError } = await supabase.from("clients").insert({
@@ -89,6 +100,7 @@ export function useClients() {
   }
 
   async function updateClient(id, updatedData) {
+    if (!canManageClients) throw new Error("No tenes permiso para modificar clientes.");
     const normalizedPhone = normalizeStoredArgentinaPhone(updatedData.phone);
     if (normalizedPhone.length < 8) throw new Error("Ingresá un número de WhatsApp válido.");
     const { error: clientError } = await supabase.from("clients").update({
@@ -111,6 +123,7 @@ export function useClients() {
   }
 
   async function deleteClient(id) {
+    if (!canManageClients) throw new Error("No tenes permiso para eliminar clientes.");
     const { error: deleteError } = await supabase.from("clients")
       .update({ deleted_at: new Date().toISOString() }).eq("id", id).eq("organization_id", organizationId);
     if (deleteError) throw deleteError;
@@ -118,12 +131,14 @@ export function useClients() {
   }
 
   async function addVehicle(clientId, vehicle) {
+    if (!canManageClients) throw new Error("No tenes permiso para agregar vehiculos.");
     const { error: vehicleError } = await supabase.from("vehicles").insert({ organization_id: organizationId, client_id: clientId, type: vehicle.type, brand: vehicle.brand.trim() || null, model: vehicle.model.trim() || null, license_plate: vehicle.licensePlate.trim().toUpperCase() || null, color: vehicle.color.trim() || null, year: vehicle.year ? Number(vehicle.year) : null });
     if (vehicleError) throw vehicleError;
     await refresh();
   }
 
   async function deleteVehicle(vehicleId) {
+    if (!canManageClients) throw new Error("No tenes permiso para eliminar vehiculos.");
     const { error: vehicleError } = await supabase.from("vehicles").update({ deleted_at: new Date().toISOString() }).eq("id", vehicleId).eq("organization_id", organizationId);
     if (vehicleError) throw vehicleError;
     await refresh();

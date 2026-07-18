@@ -15,24 +15,26 @@ import {
 import "./AdminNavbar.css";
 import { useAuth } from "../../hooks/useAuth";
 import { useState } from "react";
+import { OWNER_ADMIN_ROLES, OWNER_ROLES, hasRole } from "../../utils/permissions";
 
 const items = [
-  { to: "/admin/dashboard", label: "Inicio", icon: <LayoutDashboard size={20} /> },
+  { to: "/admin/dashboard", label: "Inicio", icon: <LayoutDashboard size={20} />, roles: OWNER_ADMIN_ROLES },
   { to: "/admin/turnos", label: "Agenda", icon: <CalendarDays size={20} /> },
-  { to: "/admin/caja", label: "Caja", icon: <Wallet size={20} /> },
+  { to: "/admin/caja", label: "Caja", icon: <Wallet size={20} />, roles: OWNER_ADMIN_ROLES },
   { to: "/admin/clientes", label: "Clientes", icon: <Users size={20} /> },
-  { to: "/admin/servicios", label: "Servicios", icon: <Wrench size={20} /> },
-  { to: "/admin/galeria", label: "Galeria", icon: <ImageIcon size={20} /> },
-  { to: "/admin/configuracion", label: "Ajustes", icon: <Settings size={20} /> },
+  { to: "/admin/servicios", label: "Servicios", icon: <Wrench size={20} />, roles: OWNER_ADMIN_ROLES },
+  { to: "/admin/galeria", label: "Galeria", icon: <ImageIcon size={20} />, roles: OWNER_ADMIN_ROLES },
+  { to: "/admin/configuracion", label: "Ajustes", icon: <Settings size={20} />, roles: OWNER_ROLES },
 ];
 
 function AdminNavbar() {
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [showMore, setShowMore] = useState(false);
-  const primaryItems = items.slice(0, 4);
-  const secondaryItems = items.slice(4);
+  const visibleItems = items.filter((item) => !item.roles || hasRole(profile, item.roles));
+  const primaryItems = visibleItems.slice(0, 4);
+  const secondaryItems = visibleItems.slice(4);
 
   function getLinkClassName({ isActive }) {
     return `admin-sidebar-link${isActive ? " active" : ""}`;
@@ -54,17 +56,17 @@ function AdminNavbar() {
       </div>
 
       <nav className="sidebar-nav">
-        {items.map((item) => (
+        {visibleItems.map((item) => (
           <NavLink key={item.to} to={item.to} className={getLinkClassName}>
             <span className="link-icon">{item.icon}</span>
             <span className="link-label">{item.label}</span>
           </NavLink>
         ))}
         {primaryItems.map((item) => <NavLink key={`mobile-${item.to}`} to={item.to} className={({ isActive }) => `admin-mobile-link${isActive ? " active" : ""}`} onClick={() => setShowMore(false)}><span>{item.icon}</span><small>{item.label}</small></NavLink>)}
-        <button type="button" className={`admin-mobile-link mobile-more-trigger ${secondaryItems.some((item) => location.pathname.startsWith(item.to)) ? "active" : ""}`} onClick={() => setShowMore((current) => !current)} aria-expanded={showMore}><span>{showMore ? <X size={20} /> : <MoreHorizontal size={20} />}</span><small>Más</small></button>
+        {secondaryItems.length ? <button type="button" className={`admin-mobile-link mobile-more-trigger ${secondaryItems.some((item) => location.pathname.startsWith(item.to)) ? "active" : ""}`} onClick={() => setShowMore((current) => !current)} aria-expanded={showMore}><span>{showMore ? <X size={20} /> : <MoreHorizontal size={20} />}</span><small>Más</small></button> : null}
       </nav>
 
-      {showMore ? <div className="admin-mobile-more" role="dialog" aria-label="Más opciones"><header><div><strong>Más opciones</strong><span>{user?.email}</span></div><button type="button" onClick={() => setShowMore(false)} aria-label="Cerrar"><X size={20} /></button></header><div>{secondaryItems.map((item) => <NavLink key={`more-${item.to}`} to={item.to} className={getLinkClassName} onClick={() => setShowMore(false)}><span className="link-icon">{item.icon}</span><span className="link-label">{item.label}</span></NavLink>)}</div><Link to="/" className="admin-sidebar-link" onClick={() => setShowMore(false)}><span className="link-icon"><Globe size={20} /></span><span className="link-label">Ver sitio público</span></Link><button type="button" className="admin-sidebar-link logout sidebar-logout" onClick={handleSignOut}><span className="link-icon"><LogIn size={20} /></span><span className="link-label">Cerrar sesión</span></button></div> : null}
+      {showMore && secondaryItems.length ? <div className="admin-mobile-more" role="dialog" aria-label="Más opciones"><header><div><strong>Más opciones</strong><span>{user?.email}</span></div><button type="button" onClick={() => setShowMore(false)} aria-label="Cerrar"><X size={20} /></button></header><div>{secondaryItems.map((item) => <NavLink key={`more-${item.to}`} to={item.to} className={getLinkClassName} onClick={() => setShowMore(false)}><span className="link-icon">{item.icon}</span><span className="link-label">{item.label}</span></NavLink>)}</div><Link to="/" className="admin-sidebar-link" onClick={() => setShowMore(false)}><span className="link-icon"><Globe size={20} /></span><span className="link-label">Ver sitio público</span></Link><button type="button" className="admin-sidebar-link logout sidebar-logout" onClick={handleSignOut}><span className="link-icon"><LogIn size={20} /></span><span className="link-label">Cerrar sesión</span></button></div> : null}
 
       <div className="sidebar-footer">
         {user?.email ? <span className="sidebar-user" title={user.email}>{user.email}</span> : null}

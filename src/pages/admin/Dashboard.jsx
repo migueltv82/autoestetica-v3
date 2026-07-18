@@ -23,6 +23,7 @@ import { useTurns } from "../../hooks/useTurns";
 import { useClients } from "../../hooks/useClients";
 import { useCash } from "../../hooks/useCash";
 import { useSettings } from "../../hooks/useSettings";
+import { usePermissions } from "../../hooks/usePermissions";
 import { getTodayString, shiftDateByDays } from "../../utils/date";
 import "./Dashboard.css";
 
@@ -37,6 +38,7 @@ function Dashboard() {
   const { totalClients, error: clientsError } = useClients();
   const { transactions, receivables, error: cashError } = useCash();
   const { settings } = useSettings();
+  const { canManageFinance, canManageCatalog, canDeleteTurns } = usePermissions();
   const today = getTodayString();
   const yesterday = shiftDateByDays(-1);
 
@@ -88,7 +90,7 @@ function Dashboard() {
     : 0;
   const currentHour = Number(new Intl.DateTimeFormat("es-AR", { hour: "2-digit", hour12: false, timeZone: "America/Argentina/Tucuman" }).format(new Date()));
   const greeting = currentHour < 12 ? "Buen día" : currentHour < 19 ? "Buenas tardes" : "Buenas noches";
-  const dataError = turnsError || clientsError || cashError;
+  const dataError = turnsError || clientsError || (canManageFinance ? cashError : null);
 
   return (
     <PageTransition>
@@ -120,28 +122,28 @@ function Dashboard() {
               <strong>{isLoading ? "—" : summary.activeTurns}</strong>
               <p>{summary.confirmed} confirmados · {summary.pending} pendientes</p>
             </article>
-            <article className="dashboard-kpi kpi-income">
+            {canManageFinance ? <article className="dashboard-kpi kpi-income">
               <div className="kpi-topline"><span>Ingresos registrados</span><TrendingUp size={19} /></div>
               <strong>{moneyFormatter.format(summary.income)}</strong>
               <p className={incomeVariation !== null && incomeVariation < 0 ? "negative" : "positive"}>
                 {incomeVariation === null ? "Sin base para comparar ayer" : `${incomeVariation >= 0 ? "+" : ""}${incomeVariation}% frente a ayer`}
               </p>
-            </article>
-            <article className="dashboard-kpi kpi-balance">
+            </article> : null}
+            {canManageFinance ? <article className="dashboard-kpi kpi-balance">
               <div className="kpi-topline"><span>Resultado neto de hoy</span><Wallet size={19} /></div>
               <strong>{moneyFormatter.format(summary.net)}</strong>
               <p>{moneyFormatter.format(summary.expenses)} en gastos registrados</p>
-            </article>
+            </article> : null}
             <article className="dashboard-kpi kpi-clients">
               <div className="kpi-topline"><span>Clientes registrados</span><Users size={19} /></div>
               <strong>{totalClients}</strong>
               <p>Base total de clientes</p>
             </article>
-            <article className="dashboard-kpi kpi-receivable">
+            {canManageFinance ? <article className="dashboard-kpi kpi-receivable">
               <div className="kpi-topline"><span>Saldo por cobrar</span><Banknote size={19} /></div>
               <strong>{moneyFormatter.format(summary.outstanding)}</strong>
               <p>{summary.pendingPayments} {summary.pendingPayments === 1 ? "orden pendiente" : "órdenes pendientes"}</p>
-            </article>
+            </article> : null}
           </section>
 
           <section className="dashboard-status-strip">
@@ -149,9 +151,7 @@ function Dashboard() {
               <span className="status-strip-label">Progreso de la jornada</span>
               <strong>{completionRate}% completado</strong>
             </div>
-            <div className="status-progress" aria-label={`${completionRate}% de turnos completados`}>
-              <span style={{ width: `${completionRate}%` }} />
-            </div>
+            <progress className="status-progress" max="100" value={completionRate} aria-label={`${completionRate}% de turnos completados`} />
             <div className="status-counts">
               <span><CheckCircle2 size={15} /> {summary.completed} finalizados</span>
               <span><Clock3 size={15} /> {summary.confirmed} confirmados</span>
@@ -168,7 +168,7 @@ function Dashboard() {
               {isLoading ? (
                 <TurnsTableSkeleton />
               ) : summary.todaysTurns.length ? (
-                <TurnsTable turns={summary.todaysTurns.slice(0, 5)} onStatusChange={updateTurnStatus} onDeleteTurn={deleteTurn} />
+                <TurnsTable turns={summary.todaysTurns.slice(0, 5)} onStatusChange={updateTurnStatus} onDeleteTurn={canDeleteTurns ? deleteTurn : null} />
               ) : (
                 <div className="dashboard-empty"><CalendarDays size={28} /><strong>La agenda está libre</strong><span>No hay turnos cargados para hoy.</span></div>
               )}
@@ -183,12 +183,12 @@ function Dashboard() {
                     <span><strong>{summary.pending ? `${summary.pending} turno${summary.pending > 1 ? "s" : ""} sin confirmar` : "Agenda confirmada"}</strong><small>{summary.pending ? "Revisá la agenda de hoy" : "No hay confirmaciones pendientes"}</small></span>
                     <ArrowRight size={15} />
                   </Link>
-                  <Link to="/admin/caja" className="priority-item">
+                  {canManageFinance ? <Link to="/admin/caja" className="priority-item">
                     <span className="priority-icon"><Wallet size={18} /></span>
                     <span><strong>{summary.recentTransactions.length ? `${summary.recentTransactions.length} movimientos hoy` : "Caja sin movimientos"}</strong><small>Ingresos y egresos registrados</small></span>
                     <ArrowRight size={15} />
-                  </Link>
-                  {summary.pendingPayments ? <Link to="/admin/caja" className="priority-item warning">
+                  </Link> : null}
+                  {canManageFinance && summary.pendingPayments ? <Link to="/admin/caja" className="priority-item warning">
                     <span className="priority-icon"><Banknote size={18} /></span>
                     <span><strong>{moneyFormatter.format(summary.outstanding)} por cobrar</strong><small>{summary.pendingPayments} {summary.pendingPayments === 1 ? "trabajo con saldo" : "trabajos con saldo"}</small></span>
                     <ArrowRight size={15} />
@@ -201,15 +201,15 @@ function Dashboard() {
                 <div className="quick-actions">
                   <Link to="/admin/turnos"><CalendarDays size={18} /><span>Nuevo turno</span></Link>
                   <Link to="/admin/clientes"><UserPlus size={18} /><span>Nuevo cliente</span></Link>
-                  <Link to="/admin/caja"><Wallet size={18} /><span>Registrar movimiento</span></Link>
-                  <Link to="/admin/servicios"><Plus size={18} /><span>Gestionar servicios</span></Link>
+                  {canManageFinance ? <Link to="/admin/caja"><Wallet size={18} /><span>Registrar movimiento</span></Link> : null}
+                  {canManageCatalog ? <Link to="/admin/servicios"><Plus size={18} /><span>Gestionar servicios</span></Link> : null}
                 </div>
               </div>
             </aside>
           </section>
 
-          <section className="dashboard-lower-grid">
-            <div className="dashboard-panel">
+          <section className={`dashboard-lower-grid${canManageFinance ? "" : " single"}`}>
+            {canManageFinance ? <div className="dashboard-panel">
               <div className="panel-heading"><div><span>Caja diaria</span><h2>Últimos movimientos</h2></div><Link to="/admin/caja">Ver caja <ArrowRight size={15} /></Link></div>
               {summary.recentTransactions.length ? (
                 <div className="movement-list">
@@ -222,7 +222,7 @@ function Dashboard() {
                   ))}
                 </div>
               ) : <div className="dashboard-empty small"><Wallet size={24} /><span>Todavía no hay movimientos cargados hoy.</span></div>}
-            </div>
+            </div> : null}
 
             <div className="dashboard-panel">
               <div className="panel-heading"><div><span>Próximos días</span><h2>Siguiente agenda</h2></div><Link to="/admin/turnos">Ver todo <ArrowRight size={15} /></Link></div>

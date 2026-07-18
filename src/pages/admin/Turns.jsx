@@ -7,6 +7,7 @@ import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import { useTurns } from "../../hooks/useTurns";
 import { useServices } from "../../hooks/useServices";
 import { useSettings } from "../../hooks/useSettings";
+import { usePermissions } from "../../hooks/usePermissions";
 import { Calendar, CalendarDays, CalendarRange, ListChecks, Plus, X } from "lucide-react";
 import { useState } from "react";
 import SimpleAgenda from "../../components/admin/SimpleAgenda";
@@ -28,6 +29,7 @@ function Turns() {
 
   const { services } = useServices();
   const { settings } = useSettings();
+  const { canManageTurns, canManageFinance, canDeleteTurns } = usePermissions();
 
   const [showForm, setShowForm] = useState(false);
   const [editingTurn, setEditingTurn] = useState(null);
@@ -80,15 +82,15 @@ function Turns() {
           icon={<Calendar size={18} />}
           title="Agenda de turnos"
           subtitle="Organizá los trabajos del día y mantené cada cliente al tanto."
-          actions={
+          actions={canManageTurns ? (
             <button className={showForm ? "btn-form-primary" : "btn-primary-admin"} onClick={() => { setEditingTurn(null); setShowForm((current) => !current); }}>
               {showForm ? <X size={18} /> : <Plus size={18} />}
               <span>{showForm ? "Cerrar" : "Nuevo Turno"}</span>
             </button>
-          }
+          ) : null}
         />
 
-        {showForm ? (
+        {showForm && canManageTurns ? (
           <TurnForm key={editingTurn?.id || "new"} initialData={editingTurn} onAddTurn={editingTurn ? handleUpdateTurn : handleCreateTurn} />
         ) : null}
 
@@ -98,7 +100,7 @@ function Turns() {
           <button type="button" className={agendaView === "month" ? "active" : ""} onClick={() => setAgendaView("month")}><CalendarDays size={17} /> Mes</button>
         </div>
 
-        {isLoading ? <TurnsTableSkeleton /> : agendaView === "day" ? <SimpleAgenda turns={turns} selectedDate={selectedDate} onDateChange={setSelectedDate} search={search} onSearchChange={setSearch} statusFilter={statusFilter} onStatusFilterChange={setStatusFilter} onStatusChange={updateTurnStatus} onDeleteTurn={deleteTurn} onGenerateReceipt={setReceiptTurn} onEditTurn={openEdit} settings={settings} /> : agendaView === "week" ? <WeekAgenda turns={turns} weekOffset={weekOffset} onWeekChange={setWeekOffset} onStatusChange={updateTurnStatus} onEditTurn={openEdit} onDeleteTurn={deleteTurn} settings={settings} /> : <MonthAgenda turns={turns} monthOffset={monthOffset} onMonthChange={setMonthOffset} onEditTurn={openEdit} />}
+        {isLoading ? <TurnsTableSkeleton /> : agendaView === "day" ? <SimpleAgenda turns={turns} selectedDate={selectedDate} onDateChange={setSelectedDate} search={search} onSearchChange={setSearch} statusFilter={statusFilter} onStatusFilterChange={setStatusFilter} onStatusChange={canManageTurns ? updateTurnStatus : null} onDeleteTurn={canDeleteTurns ? deleteTurn : null} onGenerateReceipt={canManageFinance ? setReceiptTurn : null} onEditTurn={canManageTurns ? openEdit : null} settings={settings} canUseOperationalActions={canManageTurns} /> : agendaView === "week" ? <WeekAgenda turns={turns} weekOffset={weekOffset} onWeekChange={setWeekOffset} onStatusChange={canManageTurns ? updateTurnStatus : null} onEditTurn={canManageTurns ? openEdit : null} onDeleteTurn={canDeleteTurns ? deleteTurn : null} settings={settings} canUseOperationalActions={canManageTurns} /> : <MonthAgenda turns={turns} monthOffset={monthOffset} onMonthChange={setMonthOffset} onEditTurn={canManageTurns ? openEdit : null} />}
         {receiptTurn ? (
           <ReceiptModal
             turn={receiptTurn}

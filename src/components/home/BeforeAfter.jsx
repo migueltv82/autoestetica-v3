@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import interiorImg from "../../assets/result-interior.jpg";
-import engineImg from "../../assets/result-engine.jpg";
+import interiorImg from "../../assets/result-interior.webp";
+import engineImg from "../../assets/result-engine.webp";
 import "./BeforeAfter.css";
 
 const results = [

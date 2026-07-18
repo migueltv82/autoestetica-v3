@@ -5,7 +5,7 @@ export function useRealtimeRefresh(organizationId, tables, refresh) {
   const tableKey = tables.join(",");
 
   useEffect(() => {
-    if (!organizationId) return undefined;
+    if (!organizationId || !tables.length) return undefined;
     let timer;
     const scheduleRefresh = () => {
       clearTimeout(timer);

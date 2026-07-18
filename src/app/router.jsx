@@ -4,6 +4,7 @@ import Loader from "../components/ui/Loader";
 import ScrollToTop from "../components/ui/ScrollToTop";
 import ProtectedRoute from "../components/admin/ProtectedRoute";
 import Seo from "../components/ui/Seo";
+import { OWNER_ADMIN_ROLES, OWNER_ROLES } from "../utils/permissions";
 
 // Public pages
 const Home = lazy(() => import("../pages/public/Home"));
@@ -27,6 +28,8 @@ const Settings = lazy(() => import("../pages/admin/Settings"));
 
 export default function RouterProviderApp() {
   const protect = (element) => <ProtectedRoute>{element}</ProtectedRoute>;
+  const protectOwnerAdmin = (element) => <ProtectedRoute roles={OWNER_ADMIN_ROLES}>{element}</ProtectedRoute>;
+  const protectOwner = (element) => <ProtectedRoute roles={OWNER_ROLES}>{element}</ProtectedRoute>;
   return (
     <BrowserRouter>
       <Seo />
@@ -46,13 +49,13 @@ export default function RouterProviderApp() {
           {/* Admin Routes */}
           <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
           <Route path="/admin/login" element={<Login />} />
-          <Route path="/admin/dashboard" element={protect(<Dashboard />)} />
+          <Route path="/admin/dashboard" element={protectOwnerAdmin(<Dashboard />)} />
           <Route path="/admin/turnos" element={protect(<Turns />)} />
-          <Route path="/admin/caja" element={protect(<Cash />)} />
+          <Route path="/admin/caja" element={protectOwnerAdmin(<Cash />)} />
           <Route path="/admin/clientes" element={protect(<Clients />)} />
-          <Route path="/admin/servicios" element={protect(<AdminServices />)} />
-          <Route path="/admin/galeria" element={protect(<GalleryAdmin />)} />
-          <Route path="/admin/configuracion" element={protect(<Settings />)} />
+          <Route path="/admin/servicios" element={protectOwnerAdmin(<AdminServices />)} />
+          <Route path="/admin/galeria" element={protectOwnerAdmin(<GalleryAdmin />)} />
+          <Route path="/admin/configuracion" element={protectOwner(<Settings />)} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

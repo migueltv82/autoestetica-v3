@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "./useAuth";
 import { useRealtimeRefresh } from "./useRealtimeRefresh";
+import { usePermissions } from "./usePermissions";
 
 const CASH_REALTIME_TABLES = ["work_orders", "work_order_items", "payments", "cash_movements", "receipts"];
 
@@ -20,6 +21,7 @@ function mapMovement(movement) {
 
 export function useCash() {
   const { organizationId, user } = useAuth();
+  const { canManageFinance } = usePermissions();
   const [transactions, setTransactions] = useState([]);
   const [receivables, setReceivables] = useState([]);
   const [closures, setClosures] = useState([]);
@@ -29,6 +31,15 @@ export function useCash() {
 
   const refresh = useCallback(async (options = {}) => {
     if (!organizationId) return;
+    if (!canManageFinance) {
+      setTransactions([]);
+      setReceivables([]);
+      setClosures([]);
+      setReceipts([]);
+      setError("");
+      setIsLoading(false);
+      return;
+    }
     if (!options.silent) setIsLoading(true);
     const [movementResult, orderResult, closureResult, receiptResult] = await Promise.all([
       supabase.from("cash_movements").select("id,occurred_at,description,type,amount,method,category,work_order_id").eq("organization_id", organizationId).is("voided_at", null).order("occurred_at", { ascending: false }),
@@ -52,15 +63,17 @@ export function useCash() {
       setError("");
     }
     setIsLoading(false);
-  }, [organizationId]);
+  }, [organizationId, canManageFinance]);
 
   useEffect(() => {
     const timer = setTimeout(() => refresh(), 0);
     return () => clearTimeout(timer);
   }, [refresh]);
-  useRealtimeRefresh(organizationId, CASH_REALTIME_TABLES, refresh);
+  const realtimeTables = useMemo(() => (canManageFinance ? CASH_REALTIME_TABLES : []), [canManageFinance]);
+  useRealtimeRefresh(organizationId, realtimeTables, refresh);
 
   async function addTransaction(transaction) {
+    if (!canManageFinance) throw new Error("No tenes permiso para administrar caja.");
     const { error: insertError } = await supabase.from("cash_movements").insert({
       organization_id: organizationId,
       type: transaction.type,
@@ -76,6 +89,7 @@ export function useCash() {
   }
 
   async function updateTransaction(id, transaction) {
+    if (!canManageFinance) throw new Error("No tenes permiso para administrar caja.");
     const { error: updateError } = await supabase.from("cash_movements").update({
       type: transaction.type,
       category: transaction.category || (transaction.type === "income" ? "Servicios" : "Gastos operativos"),
@@ -88,6 +102,7 @@ export function useCash() {
   }
 
   async function deleteTransaction(id) {
+    if (!canManageFinance) throw new Error("No tenes permiso para administrar caja.");
     const { error: voidError } = await supabase.from("cash_movements").update({
       voided_at: new Date().toISOString(), void_reason: "Anulado desde el panel",
     }).eq("id", id).eq("organization_id", organizationId);
@@ -96,6 +111,7 @@ export function useCash() {
   }
 
   async function collectPayment(order, amount, method) {
+    if (!canManageFinance) throw new Error("No tenes permiso para registrar cobros.");
     const value = Number(amount);
     if (!value || value <= 0) throw new Error("Ingresá un importe válido.");
     if (value > order.balance) throw new Error("El cobro no puede superar el saldo pendiente.");
@@ -111,6 +127,7 @@ export function useCash() {
   }
 
   async function closeDay({ date, incomes, expenses, count, notes }) {
+    if (!canManageFinance) throw new Error("No tenes permiso para cerrar caja.");
     const { error: closeError } = await supabase.from("cash_closures").insert({ organization_id: organizationId, closure_date: date, income_total: incomes, expense_total: expenses, balance_total: incomes - expenses, movement_count: count, notes: notes || null, closed_by: user.id });
     if (closeError?.code === "23505") throw new Error("Ese día ya tiene un cierre registrado.");
     if (closeError) throw closeError;

@@ -1,0 +1,35 @@
+/* Refuerzos WCAG AA para textos auxiliares sobre superficies oscuras. */
+.admin-shell .agenda-day-nav input,
+.admin-shell .agenda-quick-summary span,
+.admin-shell .agenda-turn-client p {
+  color: #a7b2c1;
+}
+
+.admin-shell .agenda-primary-action > span,
+.admin-shell .agenda-empty,
+.admin-shell .week-day > header span,
+.admin-shell .week-day > header small,
+.admin-shell .week-turn span,
+.admin-shell .week-empty,
+.admin-shell .board-card-top > span,
+.admin-shell .board-card p,
+.admin-shell .board-complete,
+.admin-shell .board-empty {
+  color: #a3afbf;
+}
+
+.admin-shell .week-turn select {
+  color: #bdc7d4;
+}
+
+.admin-shell .week-turn.status-listo .week-turn-actions a::after {
+  content: "Listo";
+}
+
+@media (max-width: 640px) {
+  .admin-shell small,
+  .admin-shell [class*="kicker"],
+  .admin-shell [class*="hint"] {
+    line-height: 1.45;
+  }
+}

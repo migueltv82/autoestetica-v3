@@ -21,8 +21,10 @@
 .dashboard-status-strip { display: grid; grid-template-columns: 170px minmax(160px, 1fr) auto; align-items: center; gap: 1.25rem; padding: 1rem 1.25rem; background: rgba(255,255,255,.025); border: 1px solid var(--color-border); border-radius: 16px; }
 .status-strip-label { display: block; color: var(--color-text-muted); font-size: .7rem; margin-bottom: .2rem; }
 .dashboard-status-strip strong { font-size: .88rem; }
-.status-progress { height: 6px; background: rgba(255,255,255,.07); border-radius: 99px; overflow: hidden; }
-.status-progress span { display: block; height: 100%; background: linear-gradient(90deg, #38bdf8, #4ade80); border-radius: inherit; transition: width .5s ease; }
+.status-progress { width: 100%; height: 6px; background: rgba(255,255,255,.07); border: 0; border-radius: 99px; overflow: hidden; appearance: none; }
+.status-progress::-webkit-progress-bar { background: rgba(255,255,255,.07); border-radius: 99px; }
+.status-progress::-webkit-progress-value { background: linear-gradient(90deg, #38bdf8, #4ade80); border-radius: 99px; transition: width .5s ease; }
+.status-progress::-moz-progress-bar { background: linear-gradient(90deg, #38bdf8, #4ade80); border-radius: 99px; }
 .status-counts { display: flex; gap: 1rem; color: var(--color-text-soft); font-size: .7rem; }
 .status-counts span { display: flex; align-items: center; gap: .35rem; white-space: nowrap; }
 .status-counts span:nth-child(1) svg { color: #4ade80; } .status-counts span:nth-child(2) svg { color: #38bdf8; } .status-counts span:nth-child(3) svg { color: #fbbf24; }
@@ -50,6 +52,7 @@
 .quick-actions a:hover { color: var(--color-white); border-color: var(--color-border-strong); background: rgba(255,255,255,.05); }
 
 .dashboard-lower-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.dashboard-lower-grid.single { grid-template-columns: 1fr; }
 .movement-row, .upcoming-row { display: flex; align-items: center; gap: .75rem; min-height: 58px; padding: .65rem 0; border-bottom: 1px solid var(--color-border); }
 .movement-row:last-child, .upcoming-row:last-child { border-bottom: 0; }
 .movement-icon { flex: 0 0 34px; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; }

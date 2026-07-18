@@ -3,7 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Lock, Menu, X } from "lucide-react";
 import { useSettings } from "../../hooks/useSettings";
-import defaultLogo from "../../assets/logo.jpg";
+import defaultLogo from "../../assets/logo.webp";
 import "./Navbar.css";
 
 function Navbar() {

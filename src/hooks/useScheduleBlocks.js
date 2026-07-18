@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "./useAuth";
+import { usePermissions } from "./usePermissions";
 
 export function useScheduleBlocks() {
   const { organizationId, user } = useAuth();
+  const { canManageScheduleBlocks } = usePermissions();
   const [blocks, setBlocks] = useState([]);
   const [error, setError] = useState("");
 
@@ -18,6 +20,7 @@ export function useScheduleBlocks() {
   useEffect(() => { const timer = setTimeout(refresh, 0); return () => clearTimeout(timer); }, [refresh]);
 
   async function addBlock({ date, reason }) {
+    if (!canManageScheduleBlocks) throw new Error("No tenes permiso para bloquear dias.");
     const startsAt = `${date}T00:00:00-03:00`;
     const endsAt = `${date}T23:59:59-03:00`;
     const { error: insertError } = await supabase.from("schedule_blocks").insert({
@@ -29,6 +32,7 @@ export function useScheduleBlocks() {
   }
 
   async function deleteBlock(id) {
+    if (!canManageScheduleBlocks) throw new Error("No tenes permiso para habilitar dias.");
     const { error: deleteError } = await supabase.from("schedule_blocks").delete()
       .eq("id", id).eq("organization_id", organizationId);
     if (deleteError) throw deleteError;
@@ -37,4 +41,3 @@ export function useScheduleBlocks() {
 
   return { blocks, error, addBlock, deleteBlock };
 }
-

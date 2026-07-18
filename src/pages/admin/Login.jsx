@@ -3,8 +3,9 @@ import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Lock, Mail, ArrowRight, ArrowLeft } from "lucide-react";
 import PageTransition from "../../components/ui/PageTransition";
 import { useAuth } from "../../hooks/useAuth";
-import loginBg from "../../assets/login_bg.png";
-import businessLogo from "../../assets/logo.jpg";
+import { getDefaultAdminPath } from "../../utils/permissions";
+import loginBg from "../../assets/login-bg.webp";
+import businessLogo from "../../assets/logo.webp";
 import "./Login.css";
 
 function Login() {
@@ -28,7 +29,7 @@ function Login() {
       setError(authError.message === "Invalid login credentials" ? "Email o contraseña incorrectos." : "No pudimos iniciar sesión. Intentá nuevamente.");
       return;
     }
-    navigate(location.state?.from || "/admin/dashboard", { replace: true });
+    navigate(location.state?.from || getDefaultAdminPath(profile), { replace: true });
   }
 
   async function handleResetPassword() {
@@ -42,7 +43,7 @@ function Login() {
     else setMessage("Te enviamos un enlace de recuperación a tu email.");
   }
 
-  if (!isLoading && user && profile) return <Navigate to="/admin/dashboard" replace />;
+  if (!isLoading && user && profile?.active !== false) return <Navigate to={getDefaultAdminPath(profile)} replace />;
 
   return (
     <PageTransition>
@@ -79,6 +80,12 @@ function Login() {
               {!isLoading && user && !profile ? (
                 <div className="login-feedback error" role="alert">
                   La cuenta existe pero no está vinculada al negocio.
+                  <button type="button" className="login-inline-action" onClick={signOut}>Cerrar esta sesión</button>
+                </div>
+              ) : null}
+              {!isLoading && user && profile?.active === false ? (
+                <div className="login-feedback error" role="alert">
+                  Tu usuario está bloqueado y no puede acceder al panel.
                   <button type="button" className="login-inline-action" onClick={signOut}>Cerrar esta sesión</button>
                 </div>
               ) : null}

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Download, FileText, MessageCircle, Plus, Trash2 } from "lucide-react";
 import Modal from "../ui/Modal";
-import defaultLogoUrl from "../../assets/logo.jpg";
+import defaultLogoUrl from "../../assets/logo.webp";
 import "./ReceiptModal.css";
 import { useFeedback } from "../../hooks/useFeedback";
 import { normalizeArgentinaPhone } from "../../utils/whatsapp";

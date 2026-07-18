@@ -4,13 +4,13 @@ import { Link } from "react-router-dom";
 import PublicLayout from "../../components/layout/PublicLayout";
 import PageTransition from "../../components/ui/PageTransition";
 import { useServices } from "../../hooks/useServices";
-import heroImg from "../../assets/hero-premium.png";
-import defaultLogo from "../../assets/logo.jpg";
+import heroImg from "../../assets/hero-premium.webp";
+import defaultLogo from "../../assets/logo.webp";
 import { useSettings } from "../../hooks/useSettings";
 import { useGallery } from "../../hooks/useGallery";
 import BeforeAfterSlider from "../../components/ui/BeforeAfterSlider";
-import fallbackBefore from "../../assets/hero-polishing.jpeg";
-import fallbackAfter from "../../assets/result-interior.jpg";
+import fallbackBefore from "../../assets/hero-polishing.webp";
+import fallbackAfter from "../../assets/result-interior.webp";
 import ServiceSalesCard from "../../components/services/ServiceSalesCard";
 import "./Home.css";
 
