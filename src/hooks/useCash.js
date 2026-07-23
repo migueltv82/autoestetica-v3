@@ -16,6 +16,7 @@ function mapMovement(movement) {
     method: movement.method,
     category: movement.category,
     workOrderId: movement.work_order_id,
+    paymentId: movement.payment_id,
   };
 }
 
@@ -42,7 +43,7 @@ export function useCash() {
     }
     if (!options.silent) setIsLoading(true);
     const [movementResult, orderResult, closureResult, receiptResult] = await Promise.all([
-      supabase.from("cash_movements").select("id,occurred_at,description,type,amount,method,category,work_order_id").eq("organization_id", organizationId).is("voided_at", null).order("occurred_at", { ascending: false }),
+      supabase.from("cash_movements").select("id,occurred_at,description,type,amount,method,category,work_order_id,payment_id").eq("organization_id", organizationId).is("voided_at", null).order("occurred_at", { ascending: false }),
       supabase.from("work_orders").select("id,number,status,total,scheduled_start,client_id,clients(name,phone),vehicles(type),work_order_items(total),payments(amount,kind,voided_at)").eq("organization_id", organizationId).is("deleted_at", null).not("status", "in", "(cancelled,no_show)").order("scheduled_start", { ascending: false }),
       supabase.from("cash_closures").select("*").eq("organization_id", organizationId).order("closure_date", { ascending: false }).limit(31),
       supabase.from("receipts").select("id,number,total,payment_status,issued_at,work_order_id,clients(name,phone),work_orders(scheduled_start,scheduled_end,vehicles(type),work_order_items(id,description,quantity,unit_price,total,service_id))").eq("organization_id", organizationId).eq("status", "issued").order("issued_at", { ascending: false }).limit(50),
@@ -81,6 +82,7 @@ export function useCash() {
       description: transaction.description.trim(),
       amount: Number(transaction.amount),
       method: transaction.method,
+      occurred_at: transaction.date ? `${transaction.date}T12:00:00-03:00` : undefined,
       work_order_id: transaction.workOrderId || null,
       created_by: user.id,
     });
@@ -96,6 +98,7 @@ export function useCash() {
       description: transaction.description.trim(),
       amount: Number(transaction.amount),
       method: transaction.method,
+      occurred_at: transaction.date ? `${transaction.date}T12:00:00-03:00` : undefined,
     }).eq("id", id).eq("organization_id", organizationId).is("voided_at", null);
     if (updateError) throw updateError;
     await refresh();
