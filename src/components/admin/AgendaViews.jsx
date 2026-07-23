@@ -160,6 +160,21 @@ export function MonthAgenda({ turns, monthOffset, onMonthChange, onEditTurn }) {
     };
   }, [monthOffset]);
   const today = getTodayString();
+  const monthSegments = Array.from({ length: 6 }, (_, row) => {
+    const rowStart = dateKey(days[row * 7].date);
+    const rowEnd = dateKey(days[row * 7 + 6].date);
+    return turns
+      .filter((turn) => {
+        const turnEnd = turn.lastOccupiedDate || turn.endDate || turn.date;
+        return turn.status !== "Cancelado" && turnEnd > turn.date && turn.date <= rowEnd && turnEnd >= rowStart;
+      })
+      .map((turn, lane) => {
+        const turnEnd = turn.lastOccupiedDate || turn.endDate;
+        const visibleStart = turn.date < rowStart ? rowStart : turn.date;
+        const visibleEnd = turnEnd > rowEnd ? rowEnd : turnEnd;
+        return { turn, row, lane, startColumn: dayDistance(rowStart, visibleStart) + 1, endColumn: dayDistance(rowStart, visibleEnd) + 2 };
+      });
+  }).flat();
 
   return (
     <div className="agenda-view-content month-agenda">
@@ -176,34 +191,27 @@ export function MonthAgenda({ turns, monthOffset, onMonthChange, onEditTurn }) {
         {days.map(({ date, currentMonth }, index) => {
           const key = dateKey(date);
           const dayTurns = turns.filter((turn) => turnOccupiesDate(turn, key) && turn.status !== "Cancelado");
-          const rowStart = dateKey(days[Math.floor(index / 7) * 7].date);
-          const rowEnd = dateKey(days[Math.floor(index / 7) * 7 + 6].date);
-          const displayTurns = dayTurns.filter((turn) => {
-            const turnEnd = turn.lastOccupiedDate || turn.endDate || turn.date;
-            return turnEnd === turn.date ? turn.date === key : key === (turn.date > rowStart ? turn.date : rowStart);
-          });
+          const row = Math.floor(index / 7);
+          const laneCount = monthSegments.filter((segment) => segment.row === row).length;
+          const displayTurns = dayTurns.filter((turn) => (turn.lastOccupiedDate || turn.endDate || turn.date) === turn.date && turn.date === key);
 
           return (
-            <section key={key} className={`month-day ${currentMonth ? "" : "outside"} ${key === today ? "is-today" : ""}`}>
+            <section key={key} style={{ "--month-lanes": Math.min(laneCount, 3) }} className={`month-day${laneCount ? " has-spans" : ""} ${currentMonth ? "" : "outside"} ${key === today ? "is-today" : ""}`}>
               <header>
                 <strong>{date.getDate()}</strong>
                 {dayTurns.length ? <small>{dayTurns.length}</small> : null}
               </header>
               <div>
                 {displayTurns.slice(0, 3).map((turn) => {
-                  const turnEnd = turn.lastOccupiedDate || turn.endDate || turn.date;
-                  const visibleEnd = turnEnd > rowEnd ? rowEnd : turnEnd;
-                  const span = Math.max(1, dayDistance(key, visibleEnd) + 1);
-                  const isSpanning = span > 1 || turnEnd > rowEnd || turn.date < rowStart;
-                  const className = `month-turn${isSpanning ? " is-spanning" : ""} status-${turn.status.toLowerCase().replaceAll(" ", "-")}`;
+                  const className = `month-turn status-${turn.status.toLowerCase().replaceAll(" ", "-")}`;
                   const title = `${turn.time} · ${turn.client} · ${turn.service}`;
                   return onEditTurn ? (
-                    <button type="button" key={`${turn.id}-${rowStart}`} className={className} style={{ "--day-span": span }} onClick={() => onEditTurn(turn)} title={title}>
-                      {isSpanning ? <><strong>{turn.client}</strong><small>{turn.vehicle} · {turn.service}</small><span>{turn.date} → {turn.endDate}</span></> : <><span>{turn.time}</span>{turn.client}</>}
+                    <button type="button" key={turn.id} className={className} onClick={() => onEditTurn(turn)} title={title}>
+                      <span>{turn.time}</span>{turn.client}
                     </button>
                   ) : (
-                    <div key={`${turn.id}-${rowStart}`} className={className} style={{ "--day-span": span }} title={title}>
-                      {isSpanning ? <><strong>{turn.client}</strong><small>{turn.vehicle} · {turn.service}</small><span>{turn.date} → {turn.endDate}</span></> : <><span>{turn.time}</span>{turn.client}</>}
+                    <div key={turn.id} className={className} title={title}>
+                      <span>{turn.time}</span>{turn.client}
                     </div>
                   );
                 })}
@@ -211,6 +219,11 @@ export function MonthAgenda({ turns, monthOffset, onMonthChange, onEditTurn }) {
               </div>
             </section>
           );
+        })}
+        {monthSegments.map(({ turn, row, lane, startColumn, endColumn }) => {
+          const className = `month-span-turn status-${turn.status.toLowerCase().replaceAll(" ", "-")}`;
+          const style = { gridColumn: `${startColumn} / ${endColumn}`, gridRow: row + 1, "--month-lane": Math.min(lane, 2) };
+          return onEditTurn ? <button type="button" key={`${turn.id}-${row}`} className={className} style={style} onClick={() => onEditTurn(turn)} title={`${turn.client} · ${turn.service}`}><strong>{turn.client}</strong><small>{turn.vehicle} · {turn.service}</small><span>{turn.date} → {turn.endDate}</span></button> : <div key={`${turn.id}-${row}`} className={className} style={style}><strong>{turn.client}</strong><small>{turn.vehicle} · {turn.service}</small><span>{turn.date} → {turn.endDate}</span></div>;
         })}
       </div>
     </div>
