@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { ArrowRight, CalendarDays, Car, ChevronLeft, ChevronRight, Clock3, MessageCircle, Pencil, Trash2, User } from "lucide-react";
 import TurnsTable from "./TurnsTable";
-import { getTodayString } from "../../utils/date";
+import { getTodayString, turnOccupiesDate } from "../../utils/date";
 import { appointmentWhatsAppLink, readyTurnWhatsAppLink, turnConfirmationWhatsAppLink } from "../../utils/whatsapp";
 import "./AgendaViews.css";
 import "./MonthAgenda.css";
@@ -31,9 +31,13 @@ function dateKey(date) {
   return `${year}-${month}-${day}`;
 }
 
+function dayDistance(from, to) {
+  return Math.round((new Date(`${to}T12:00:00`) - new Date(`${from}T12:00:00`)) / 86400000);
+}
+
 export function TodayAgenda({ turns, onStatusChange, onDeleteTurn, onGenerateReceipt, onEditTurn, canUseOperationalActions = true }) {
   const today = getTodayString();
-  const todayTurns = turns.filter((turn) => turn.date === today);
+  const todayTurns = turns.filter((turn) => turnOccupiesDate(turn, today));
   const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes();
   const overdue = todayTurns.filter((turn) => ["Consulta", "Pendiente", "Seña pendiente"].includes(turn.status) && Number(turn.time.slice(0, 2)) * 60 + Number(turn.time.slice(3, 5)) <= nowMinutes).length;
   const pending = todayTurns.filter((turn) => ["Consulta", "Pendiente", "Seña pendiente"].includes(turn.status)).length;
@@ -69,6 +73,8 @@ export function WeekAgenda({ turns, weekOffset, onWeekChange, onStatusChange, on
     });
   }, [weekOffset]);
   const rangeLabel = `${days[0].toLocaleDateString("es-AR", { day: "numeric", month: "short" })} – ${days[6].toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" })}`;
+  const weekStartKey = dateKey(days[0]);
+  const weekEndKey = dateKey(days[6]);
 
   return (
     <div className="agenda-view-content">
@@ -81,7 +87,13 @@ export function WeekAgenda({ turns, weekOffset, onWeekChange, onStatusChange, on
       <div className="week-grid">
         {days.map((day) => {
           const key = dateKey(day);
-          const dayTurns = turns.filter((turn) => turn.date === key && turn.status !== "Cancelado");
+          const dayTurns = turns.filter((turn) => {
+            if (turn.status === "Cancelado") return false;
+            const turnEnd = turn.lastOccupiedDate || turn.endDate || turn.date;
+            const visibleStart = turn.date < weekStartKey ? weekStartKey : turn.date;
+            return turnEnd === turn.date ? turn.date === key : visibleStart === key && turn.date <= weekEndKey && turnEnd >= weekStartKey;
+          });
+          const occupiedCount = turns.filter((turn) => turnOccupiesDate(turn, key) && turn.status !== "Cancelado").length;
           const isToday = key === getTodayString();
 
           return (
@@ -89,13 +101,13 @@ export function WeekAgenda({ turns, weekOffset, onWeekChange, onStatusChange, on
               <header>
                 <span>{day.toLocaleDateString("es-AR", { weekday: "short" })}</span>
                 <strong>{day.getDate()}</strong>
-                <small>{dayTurns.length} turnos</small>
+                <small>{occupiedCount} turnos</small>
               </header>
               <div className="week-day-list">
                 {dayTurns.length ? dayTurns.map((turn) => (
-                  <article className={`week-turn status-${turn.status.toLowerCase().replaceAll(" ", "-")}`} key={turn.id}>
+                  <article className={`week-turn${(turn.lastOccupiedDate || turn.endDate || turn.date) > turn.date ? " is-spanning" : ""} status-${turn.status.toLowerCase().replaceAll(" ", "-")}`} style={{ "--week-span": Math.max(1, dayDistance(key, (turn.lastOccupiedDate || turn.endDate) > weekEndKey ? weekEndKey : (turn.lastOccupiedDate || turn.endDate || turn.date)) + 1) }} key={turn.id}>
                     <div className="week-turn-heading">
-                      <div className="week-turn-time"><Clock3 size={12} />{turn.time}–{turn.endTime}</div>
+                      <div className="week-turn-time"><Clock3 size={12} />{turn.date === key ? turn.time : "En curso"}{turn.endDate === key ? `–${turn.endTime}` : turn.endDate !== turn.date ? ` · hasta ${turn.endDate}` : `–${turn.endTime}`}</div>
                       {canUseOperationalActions || onEditTurn || onDeleteTurn ? (
                         <div className="week-turn-actions">
                           {canUseOperationalActions ? (
@@ -161,9 +173,15 @@ export function MonthAgenda({ turns, monthOffset, onMonthChange, onEditTurn }) {
         {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((day) => <span key={day}>{day}</span>)}
       </div>
       <div className="month-grid">
-        {days.map(({ date, currentMonth }) => {
+        {days.map(({ date, currentMonth }, index) => {
           const key = dateKey(date);
-          const dayTurns = turns.filter((turn) => turn.date === key && turn.status !== "Cancelado");
+          const dayTurns = turns.filter((turn) => turnOccupiesDate(turn, key) && turn.status !== "Cancelado");
+          const rowStart = dateKey(days[Math.floor(index / 7) * 7].date);
+          const rowEnd = dateKey(days[Math.floor(index / 7) * 7 + 6].date);
+          const displayTurns = dayTurns.filter((turn) => {
+            const turnEnd = turn.lastOccupiedDate || turn.endDate || turn.date;
+            return turnEnd === turn.date ? turn.date === key : key === (turn.date > rowStart ? turn.date : rowStart);
+          });
 
           return (
             <section key={key} className={`month-day ${currentMonth ? "" : "outside"} ${key === today ? "is-today" : ""}`}>
@@ -172,16 +190,20 @@ export function MonthAgenda({ turns, monthOffset, onMonthChange, onEditTurn }) {
                 {dayTurns.length ? <small>{dayTurns.length}</small> : null}
               </header>
               <div>
-                {dayTurns.slice(0, 3).map((turn) => {
-                  const className = `month-turn status-${turn.status.toLowerCase().replaceAll(" ", "-")}`;
+                {displayTurns.slice(0, 3).map((turn) => {
+                  const turnEnd = turn.lastOccupiedDate || turn.endDate || turn.date;
+                  const visibleEnd = turnEnd > rowEnd ? rowEnd : turnEnd;
+                  const span = Math.max(1, dayDistance(key, visibleEnd) + 1);
+                  const isSpanning = span > 1 || turnEnd > rowEnd || turn.date < rowStart;
+                  const className = `month-turn${isSpanning ? " is-spanning" : ""} status-${turn.status.toLowerCase().replaceAll(" ", "-")}`;
                   const title = `${turn.time} · ${turn.client} · ${turn.service}`;
                   return onEditTurn ? (
-                    <button type="button" key={turn.id} className={className} onClick={() => onEditTurn(turn)} title={title}>
-                      <span>{turn.time}</span>{turn.client}
+                    <button type="button" key={`${turn.id}-${rowStart}`} className={className} style={{ "--day-span": span }} onClick={() => onEditTurn(turn)} title={title}>
+                      {isSpanning ? <><strong>{turn.client}</strong><small>{turn.vehicle} · {turn.service}</small><span>{turn.date} → {turn.endDate}</span></> : <><span>{turn.time}</span>{turn.client}</>}
                     </button>
                   ) : (
-                    <div key={turn.id} className={className} title={title}>
-                      <span>{turn.time}</span>{turn.client}
+                    <div key={`${turn.id}-${rowStart}`} className={className} style={{ "--day-span": span }} title={title}>
+                      {isSpanning ? <><strong>{turn.client}</strong><small>{turn.vehicle} · {turn.service}</small><span>{turn.date} → {turn.endDate}</span></> : <><span>{turn.time}</span>{turn.client}</>}
                     </div>
                   );
                 })}

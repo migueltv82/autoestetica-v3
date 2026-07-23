@@ -46,7 +46,7 @@ export function useCash() {
       supabase.from("cash_movements").select("id,occurred_at,description,type,amount,method,category,work_order_id,payment_id").eq("organization_id", organizationId).is("voided_at", null).order("occurred_at", { ascending: false }),
       supabase.from("work_orders").select("id,number,status,total,scheduled_start,client_id,clients(name,phone),vehicles(type),work_order_items(total),payments(amount,kind,voided_at)").eq("organization_id", organizationId).is("deleted_at", null).not("status", "in", "(cancelled,no_show)").order("scheduled_start", { ascending: false }),
       supabase.from("cash_closures").select("*").eq("organization_id", organizationId).order("closure_date", { ascending: false }).limit(31),
-      supabase.from("receipts").select("id,number,total,payment_status,issued_at,work_order_id,clients(name,phone),work_orders(scheduled_start,scheduled_end,vehicles(type),work_order_items(id,description,quantity,unit_price,total,service_id))").eq("organization_id", organizationId).eq("status", "issued").order("issued_at", { ascending: false }).limit(50),
+      supabase.from("receipts").select("id,number,total,payment_status,issued_at,work_order_id,clients(name,phone),receipt_items(id,description,quantity,unit_price,total),work_orders(scheduled_start,scheduled_end,vehicles(type))").eq("organization_id", organizationId).eq("status", "issued").order("issued_at", { ascending: false }).limit(50),
     ]);
     const closureError = closureResult.error && !["PGRST205", "42P01"].includes(closureResult.error.code) ? closureResult.error : null;
     const queryError = movementResult.error || orderResult.error || closureError || receiptResult.error;
@@ -54,7 +54,7 @@ export function useCash() {
     else {
       setTransactions((movementResult.data || []).map(mapMovement));
       setClosures(closureResult.data || []);
-      setReceipts((receiptResult.data || []).map((receipt) => { const start = receipt.work_orders?.scheduled_start ? new Date(receipt.work_orders.scheduled_start) : null; const end = receipt.work_orders?.scheduled_end ? new Date(receipt.work_orders.scheduled_end) : null; const items = receipt.work_orders?.work_order_items || []; return { receiptId: receipt.id, receiptNumber: receipt.number, id: receipt.work_order_id, client: receipt.clients?.name || "Sin cliente", phone: receipt.clients?.phone || "", vehicle: receipt.work_orders?.vehicles?.type || "Vehículo", date: start ? start.toLocaleDateString("en-CA", { timeZone: "America/Argentina/Tucuman" }) : "", time: start ? start.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "America/Argentina/Tucuman" }) : "", endTime: end ? end.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "America/Argentina/Tucuman" }) : "", service: items.map((item) => item.description).join(", "), services: items, amount: Number(receipt.total || 0), paymentStatus: receipt.payment_status, issuedAt: receipt.issued_at }; }));
+      setReceipts((receiptResult.data || []).map((receipt) => { const start = receipt.work_orders?.scheduled_start ? new Date(receipt.work_orders.scheduled_start) : null; const end = receipt.work_orders?.scheduled_end ? new Date(receipt.work_orders.scheduled_end) : null; const items = receipt.receipt_items || []; return { receiptId: receipt.id, receiptNumber: receipt.number, id: receipt.work_order_id, client: receipt.clients?.name || "Sin cliente", phone: receipt.clients?.phone || "", vehicle: receipt.work_orders?.vehicles?.type || "Vehículo", date: start ? start.toLocaleDateString("en-CA", { timeZone: "America/Argentina/Tucuman" }) : "", time: start ? start.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "America/Argentina/Tucuman" }) : "", endTime: end ? end.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "America/Argentina/Tucuman" }) : "", service: items.map((item) => item.description).join(", "), services: items, amount: Number(receipt.total || 0), paymentStatus: receipt.payment_status, issuedAt: receipt.issued_at }; }));
       setReceivables((orderResult.data || []).map((order) => {
         const itemsTotal = (order.work_order_items || []).reduce((sum, item) => sum + Number(item.total || 0), 0);
         const total = Number(order.total || 0) || itemsTotal;
@@ -129,6 +129,41 @@ export function useCash() {
     await refresh();
   }
 
+  async function updateReceipt(receiptId, items) {
+    if (!canManageFinance) throw new Error("No tenes permiso para modificar recibos.");
+    const cleanItems = items.map((item) => ({
+      organization_id: organizationId,
+      receipt_id: receiptId,
+      description: item.description.trim(),
+      quantity: Number(item.quantity),
+      unit_price: Number(item.price),
+    }));
+    if (!cleanItems.length || cleanItems.some((item) => !item.description || item.quantity <= 0 || item.unit_price < 0)) {
+      throw new Error("Revisá el detalle, la cantidad y el precio de los servicios.");
+    }
+    const total = cleanItems.reduce((sum, item) => sum + item.quantity * item.unit_price, 0);
+    const { data: inserted, error: insertError } = await supabase.from("receipt_items").insert(cleanItems).select("id");
+    if (insertError) throw insertError;
+    const previousIds = receipts.find((receipt) => receipt.receiptId === receiptId)?.services.map((item) => item.id) || [];
+    if (previousIds.length) {
+      const { error: deleteError } = await supabase.from("receipt_items").delete().in("id", previousIds).eq("organization_id", organizationId);
+      if (deleteError) {
+        await supabase.from("receipt_items").delete().in("id", inserted.map((item) => item.id));
+        throw deleteError;
+      }
+    }
+    const { error: receiptError } = await supabase.from("receipts").update({ total }).eq("id", receiptId).eq("organization_id", organizationId).eq("status", "issued");
+    if (receiptError) throw receiptError;
+    await refresh();
+  }
+
+  async function voidReceipt(receiptId) {
+    if (!canManageFinance) throw new Error("No tenes permiso para eliminar recibos.");
+    const { error: voidError } = await supabase.from("receipts").update({ status: "voided", notes: "Anulado desde Caja" }).eq("id", receiptId).eq("organization_id", organizationId).eq("status", "issued");
+    if (voidError) throw voidError;
+    await refresh();
+  }
+
   async function closeDay({ date, incomes, expenses, count, notes }) {
     if (!canManageFinance) throw new Error("No tenes permiso para cerrar caja.");
     const { error: closeError } = await supabase.from("cash_closures").insert({ organization_id: organizationId, closure_date: date, income_total: incomes, expense_total: expenses, balance_total: incomes - expenses, movement_count: count, notes: notes || null, closed_by: user.id });
@@ -137,5 +172,5 @@ export function useCash() {
     await refresh();
   }
 
-  return { transactions, receivables, closures, receipts, isLoading, error, refresh, addTransaction, updateTransaction, deleteTransaction, collectPayment, closeDay };
+  return { transactions, receivables, closures, receipts, isLoading, error, refresh, addTransaction, updateTransaction, deleteTransaction, collectPayment, updateReceipt, voidReceipt, closeDay };
 }

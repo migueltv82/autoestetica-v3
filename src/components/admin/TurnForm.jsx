@@ -12,6 +12,8 @@ const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS
 const buildInitialForm = (canManageFinance) => ({
   date: "",
   time: "",
+  endDate: "",
+  endTime: "",
   client: "",
   phone: "",
   vehicle: "Auto",
@@ -26,6 +28,8 @@ function mapInitialData(initialData) {
   return {
     date: initialData.date || "",
     time: initialData.time || "",
+    endDate: initialData.endDate || initialData.date || "",
+    endTime: initialData.endTime || "",
     client: initialData.client || "",
     phone: initialData.phone || "",
     vehicle: initialData.vehicle || "Auto",
@@ -96,8 +100,8 @@ function TurnForm({ onAddTurn, initialData = null }) {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (!formData.date || !formData.time || !formData.client.trim() || !formData.phone.trim() || !formData.services.length) {
-      notify("Completá cliente, WhatsApp, fecha, hora y al menos un servicio.", "error");
+    if (!formData.date || !formData.time || !formData.endDate || !formData.endTime || !formData.client.trim() || !formData.phone.trim() || !formData.services.length) {
+      notify("Completá cliente, WhatsApp, inicio, finalización y al menos un servicio.", "error");
       return;
     }
     if (!isEditing && canManageFinance && formData.registerPayment && total <= 0) {
@@ -146,11 +150,19 @@ function TurnForm({ onAddTurn, initialData = null }) {
             <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="381 555 0000" required />
           </div>
 
-          <div className="admin-form-group">
-            <label><Clock size={14} /> Fecha y hora</label>
+          <div className="admin-form-group turn-schedule-group">
+            <label><Clock size={14} /> Inicio del trabajo</label>
             <div className="turn-form-inline">
               <input type="date" name="date" value={formData.date} onChange={handleChange} required />
               <input type="time" name="time" value={formData.time} onChange={handleChange} required />
+            </div>
+          </div>
+
+          <div className="admin-form-group turn-schedule-group">
+            <label><CheckCircle2 size={14} /> Finalización estimada</label>
+            <div className="turn-form-inline">
+              <input type="date" name="endDate" min={formData.date || undefined} value={formData.endDate} onChange={handleChange} required />
+              <input type="time" name="endTime" value={formData.endTime} onChange={handleChange} required />
             </div>
           </div>
 

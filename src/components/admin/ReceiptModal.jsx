@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Download, FileText, MessageCircle, Plus, Trash2 } from "lucide-react";
+import { Download, FileText, MessageCircle, Plus, Save, Trash2 } from "lucide-react";
 import Modal from "../ui/Modal";
 import defaultLogoUrl from "../../assets/logo.webp";
 import "./ReceiptModal.css";
@@ -40,7 +40,7 @@ function wrapText(context, text, x, y, maxWidth, lineHeight) {
   return currentY;
 }
 
-function ReceiptModal({ turn, services, settings, onClose }) {
+function ReceiptModal({ turn, services, settings, onClose, onSave, onDelete }) {
   const { notify } = useFeedback();
   const matchedService = services.find(
     (service) => service.name.toLowerCase() === (turn?.service || "").toLowerCase()
@@ -209,6 +209,20 @@ function ReceiptModal({ turn, services, settings, onClose }) {
     } finally { setIsWorking(false); }
   }
 
+  async function handleSave() {
+    if (!onSave || !items.length || total <= 0) return;
+    setIsWorking(true);
+    try {
+      await onSave(items);
+      notify("Recibo actualizado.", "success");
+      onClose();
+    } catch (error) {
+      notify(error?.message || "No se pudo actualizar el recibo.", "error");
+    } finally {
+      setIsWorking(false);
+    }
+  }
+
   return (
     <Modal isOpen={Boolean(turn)} onClose={onClose} title="Generar recibo" maxWidth="900px">
       <div className="receipt-editor">
@@ -235,6 +249,8 @@ function ReceiptModal({ turn, services, settings, onClose }) {
         <div className="receipt-total"><span>Total a pagar</span><strong>{money.format(total)}</strong></div>
         {total <= 0 ? <p className="receipt-warning">Ingresá el precio de al menos un servicio para generar el recibo.</p> : null}
         <div className="receipt-actions">
+          {onDelete ? <button type="button" className="receipt-delete" onClick={onDelete} disabled={isWorking}><Trash2 size={18} /> Eliminar recibo</button> : null}
+          {onSave ? <button type="button" className="receipt-save" onClick={handleSave} disabled={isWorking || total <= 0}><Save size={18} /> Guardar cambios</button> : null}
           <button type="button" className="receipt-download" onClick={handleDownload} disabled={isWorking || total <= 0}><Download size={18} /> Descargar PNG</button>
           <button type="button" className="receipt-whatsapp" onClick={handleWhatsApp} disabled={isWorking || total <= 0}><MessageCircle size={18} /> {isWorking ? "Generando…" : "Enviar por WhatsApp"}</button>
         </div>

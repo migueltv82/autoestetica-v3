@@ -11,3 +11,8 @@ export function shiftDateByDays(days, baseDate = new Date()) {
   nextDate.setDate(nextDate.getDate() + days);
   return getTodayString(nextDate);
 }
+
+export function turnOccupiesDate(turn, date) {
+  const lastDate = turn.lastOccupiedDate || turn.endDate || turn.date;
+  return Boolean(turn.date && date && turn.date <= date && date <= lastDate);
+}
