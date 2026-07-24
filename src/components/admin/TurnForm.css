@@ -44,6 +44,7 @@
 .turn-form-submit {
   min-width: 220px;
 }
+.turn-form select{color:#f5f9fc!important;background-color:#111a26!important;color-scheme:dark;font-weight:700}.turn-form select option{color:#f5f9fc;background:#111a26;font-weight:600}.turn-form select:focus{color:#fff!important;background-color:#162230!important}
 
 @media (max-width: 900px) {
   .turn-form-schedule {

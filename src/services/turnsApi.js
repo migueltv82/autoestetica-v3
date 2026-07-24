@@ -37,6 +37,8 @@ export function mapWorkOrder(order) {
     clientId: order.client_id,
     phone: order.clients?.phone || "",
     vehicle: order.vehicles?.type || "Sin vehículo",
+    vehicleBrand: order.vehicles?.brand || "",
+    vehicleModel: order.vehicles?.model || "",
     vehicleId: order.vehicle_id,
     service: items.map((item) => item.description).join(", ") || "Sin servicios",
     services: items,
@@ -71,6 +73,17 @@ function mapPaymentMethod(method) {
     "Billetera virtual": "wallet",
   };
   return paymentMethods[method] || "other";
+}
+
+async function saveVehicleDetails(orderId, formData) {
+  const { data: order, error: orderError } = await supabase.from("work_orders").select("vehicle_id").eq("id", orderId).single();
+  if (orderError) throw orderError;
+  if (!order?.vehicle_id) return;
+  const { error: vehicleError } = await supabase.from("vehicles").update({
+    brand: formData.vehicleBrand?.trim() || null,
+    model: formData.vehicleModel?.trim() || null,
+  }).eq("id", order.vehicle_id);
+  if (vehicleError) throw vehicleError;
 }
 
 export async function fetchTurns(organizationId) {
@@ -134,6 +147,7 @@ export async function createScheduledTurn({ formData, phone }) {
     p_cash_method: formData.paymentMethod,
   });
   if (error) throw error;
+  await saveVehicleDetails(orderId, formData);
 
   return {
     id: orderId,
@@ -144,6 +158,8 @@ export async function createScheduledTurn({ formData, phone }) {
     client: formData.client.trim(),
     phone,
     vehicle: formData.vehicle,
+    vehicleBrand: formData.vehicleBrand?.trim() || "",
+    vehicleModel: formData.vehicleModel?.trim() || "",
     service: orderItems.map((item) => item.name).join(", "),
     services: orderItems,
     status: formData.status,
@@ -167,6 +183,7 @@ export async function updateScheduledTurn({ turnId, formData, phone }) {
     p_services: items,
   });
   if (error) throw error;
+  await saveVehicleDetails(turnId, formData);
 }
 
 export async function saveTurnStatus({ turnId, status }) {

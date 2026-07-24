@@ -17,6 +17,8 @@ const buildInitialForm = (canManageFinance) => ({
   client: "",
   phone: "",
   vehicle: "Auto",
+  vehicleBrand: "",
+  vehicleModel: "",
   services: [],
   status: "Confirmado",
   notes: "",
@@ -33,6 +35,8 @@ function mapInitialData(initialData) {
     client: initialData.client || "",
     phone: initialData.phone || "",
     vehicle: initialData.vehicle || "Auto",
+    vehicleBrand: initialData.vehicleBrand || "",
+    vehicleModel: initialData.vehicleModel || "",
     services: (initialData.services || []).map((service) => ({
       serviceId: service.service_id,
       name: service.description,
@@ -171,6 +175,16 @@ function TurnForm({ onAddTurn, initialData = null }) {
             <select name="vehicle" value={formData.vehicle} onChange={handleChange}>
               {VEHICLE_OPTIONS.map((vehicle) => <option key={vehicle}>{vehicle}</option>)}
             </select>
+          </div>
+
+          <div className="admin-form-group">
+            <label><Car size={14} /> Marca</label>
+            <input type="text" name="vehicleBrand" value={formData.vehicleBrand} onChange={handleChange} placeholder="Ej: Toyota" autoComplete="off" />
+          </div>
+
+          <div className="admin-form-group">
+            <label><Car size={14} /> Modelo</label>
+            <input type="text" name="vehicleModel" value={formData.vehicleModel} onChange={handleChange} placeholder="Ej: Hilux SRX" autoComplete="off" />
           </div>
 
           <div className="admin-form-group full-width turn-services-field">

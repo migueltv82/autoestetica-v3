@@ -7,6 +7,7 @@ import "./AgendaViews.css";
 import "./MonthAgenda.css";
 
 const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
+const vehicleLabel = (turn) => [turn.vehicle, turn.vehicleBrand, turn.vehicleModel].filter(Boolean).join(" · ");
 const BOARD_COLUMNS = [
   { key: "pending", label: "Por confirmar", statuses: ["Consulta", "Pendiente", "Seña pendiente"], next: "Confirmado", tone: "amber" },
   { key: "confirmed", label: "Confirmados", statuses: ["Confirmado"], next: "En proceso", tone: "blue" },
@@ -126,7 +127,7 @@ export function WeekAgenda({ turns, weekOffset, onWeekChange, onStatusChange, on
                       ) : null}
                     </div>
                     <strong>{turn.client}</strong>
-                    <span>{turn.vehicle} · {turn.service}</span>
+                    <span>{vehicleLabel(turn)} · {turn.service}</span>
                     {onStatusChange ? (
                       <select value={turn.status} onChange={(event) => onStatusChange(turn.id, event.target.value)}>
                         {WEEK_STATUS_OPTIONS.map((status) => <option key={status}>{status}</option>)}
@@ -208,7 +209,7 @@ export function MonthAgenda({ turns, monthOffset, onMonthChange, onStatusChange,
                 const style = { "--month-span": endColumn - startColumn, "--month-lane": Math.min(lane, 2) };
                 return <article key={`${turn.id}-${row}`} className={className} style={style}>
                   <div className="month-span-heading"><div className="week-turn-time"><Clock3 size={12} />{turn.date} {turn.time} → {turn.endDate} {turn.endTime}</div><div className="week-turn-actions">{canUseOperationalActions ? <a href={turn.status === "Listo" ? readyTurnWhatsAppLink(turn, settings?.readyMessageTemplate, settings?.openingHours) : turnConfirmationWhatsAppLink(turn, settings?.businessName, settings?.confirmationMessageTemplate)} target="_blank" rel="noreferrer" title="Abrir WhatsApp"><MessageCircle size={13} /></a> : null}{onEditTurn ? <button type="button" onClick={() => onEditTurn(turn)} title="Editar turno"><Pencil size={13} /></button> : null}{onDeleteTurn ? <button type="button" className="danger" onClick={() => onDeleteTurn(turn.id)} title="Eliminar turno"><Trash2 size={13} /></button> : null}</div></div>
-                  <strong>{turn.client}</strong><span>{turn.vehicle} · {turn.service}</span>
+                  <strong>{turn.client}</strong><span>{vehicleLabel(turn)} · {turn.service}</span>
                   {onStatusChange ? <select value={turn.status} onChange={(event) => onStatusChange(turn.id, event.target.value)}>{WEEK_STATUS_OPTIONS.map((status) => <option key={status}>{status}</option>)}</select> : <span className="week-readonly-status">{turn.status}</span>}
                 </article>;
               })}
@@ -254,7 +255,7 @@ export function BoardAgenda({ turns, onStatusChange, canUseOperationalActions = 
                       {canUseOperationalActions ? <a href={appointmentWhatsAppLink(turn)} target="_blank" rel="noreferrer" title="Abrir WhatsApp"><MessageCircle size={15} /></a> : null}
                     </div>
                     <h3>{turn.client}</h3>
-                    <p><Car size={14} />{turn.vehicle}</p>
+                    <p><Car size={14} />{vehicleLabel(turn)}</p>
                     <p className="board-service">{turn.service}</p>
                     {turn.amount > 0 ? <strong className="board-price">{money.format(turn.amount)}</strong> : null}
                     {column.next && onStatusChange ? <button type="button" onClick={() => onStatusChange(turn.id, column.next)}>{column.next}<ArrowRight size={14} /></button> : <span className="board-complete"><User size={14} /> Trabajo entregado</span>}

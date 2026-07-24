@@ -5,6 +5,7 @@ import "./SimpleAgenda.css";
 
 const STATUSES = ["Pendiente", "Confirmado", "En proceso", "Listo", "Finalizado", "Cancelado"];
 const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
+const vehicleLabel = (turn) => [turn.vehicle, turn.vehicleBrand, turn.vehicleModel].filter(Boolean).join(" · ");
 
 function moveDate(value, days) {
   const date = new Date(`${value}T12:00:00`);
@@ -23,7 +24,7 @@ function dateLabel(value) {
 export default function SimpleAgenda({ turns, selectedDate, onDateChange, search, onSearchChange, statusFilter, onStatusFilterChange, onStatusChange, onEditTurn, onDeleteTurn, onGenerateReceipt, settings, canUseOperationalActions = true }) {
   const visibleTurns = turns
     .filter((turn) => turnOccupiesDate(turn, selectedDate))
-    .filter((turn) => !search.trim() || [turn.client, turn.service, turn.vehicle, turn.phone].some((value) => String(value).toLowerCase().includes(search.trim().toLowerCase())))
+    .filter((turn) => !search.trim() || [turn.client, turn.service, turn.vehicle, turn.vehicleBrand, turn.vehicleModel, turn.phone].some((value) => String(value || "").toLowerCase().includes(search.trim().toLowerCase())))
     .filter((turn) => !statusFilter || turn.status === statusFilter)
     .sort((a, b) => a.time.localeCompare(b.time));
   const activeCount = visibleTurns.filter((turn) => !["Finalizado", "Cancelado"].includes(turn.status)).length;
@@ -50,7 +51,7 @@ export default function SimpleAgenda({ turns, selectedDate, onDateChange, search
     <section className="agenda-card-list">
       {visibleTurns.map((turn) => <article className={`agenda-mobile-turn status-${turn.status.toLowerCase().replaceAll(" ", "-")}`} key={turn.id}>
         <header><div className="agenda-turn-time"><Clock3 size={17} /><strong>{turn.date === selectedDate ? turn.time : "En curso"}</strong><span>{turn.date !== turn.endDate ? `hasta ${turn.endDate} · ${turn.endTime}` : `– ${turn.endTime}`}</span></div>{onStatusChange ? <select value={turn.status} onChange={(event) => onStatusChange(turn.id, event.target.value)} aria-label={`Estado de ${turn.client}`}>{STATUSES.map((status) => <option key={status}>{status}</option>)}</select> : <span className="agenda-readonly-status">{turn.status}</span>}</header>
-        <div className="agenda-turn-client"><span><UserRound size={18} /></span><div><h3>{turn.client}</h3><p><Car size={14} /> {turn.vehicle}</p></div></div>
+        <div className="agenda-turn-client"><span><UserRound size={18} /></span><div><h3>{turn.client}</h3><p><Car size={14} /> {vehicleLabel(turn)}</p></div></div>
         <p className="agenda-turn-service">{turn.service}</p>
         {turn.amount > 0 ? <strong className="agenda-turn-price">{money.format(turn.amount)}</strong> : null}
         {canUseOperationalActions ? <div className="agenda-primary-action">{turn.phone && !["Cancelado", "Finalizado"].includes(turn.status) ? <a href={turn.status === "Listo" ? readyTurnWhatsAppLink(turn, settings?.readyMessageTemplate, settings?.openingHours) : turnConfirmationWhatsAppLink(turn, settings?.businessName, settings?.confirmationMessageTemplate)} target="_blank" rel="noreferrer"><MessageCircle size={18} /> {turn.status === "Listo" ? "Avisar vehículo listo" : "Confirmar turno"}</a> : <span>Sin acción de WhatsApp</span>}</div> : null}
