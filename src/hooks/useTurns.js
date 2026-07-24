@@ -77,8 +77,16 @@ export function useTurns() {
   async function updateTurnStatus(turnId, nextStatus) {
     if (!canManageTurns) throw new Error("No tenes permiso para cambiar el estado del turno.");
 
-    await saveTurnStatus({ turnId, status: nextStatus });
+    const fidelityResult = await saveTurnStatus({ turnId, status: nextStatus });
     setTurns((current) => current.map((turn) => turn.id === turnId ? { ...turn, status: nextStatus } : turn));
+
+    if (fidelityResult?.card) {
+      if (fidelityResult.newlyUnlocked) {
+        notify("🎉 ¡Fidelity Pass completado! Se estampó el 4° sello y el cliente tiene su 5° Lavado Gratis listo.", "success");
+      } else if (!fidelityResult.alreadyUnlocked) {
+        notify(`✨ Troquel Fidelity asignado (Sello ${fidelityResult.card.stampsCount}/4).`, "info");
+      }
+    }
   }
 
   async function updateTurn(turnId, formData) {

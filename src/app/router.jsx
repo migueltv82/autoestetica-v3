@@ -15,6 +15,7 @@ const Contact = lazy(() => import("../pages/public/Contact"));
 const Inquiry = lazy(() => import("../pages/public/Inquiry"));
 const Privacy = lazy(() => import("../pages/public/Privacy"));
 const Terms = lazy(() => import("../pages/public/Terms"));
+const ClientFidelityCardPage = lazy(() => import("../pages/public/ClientFidelityCardPage"));
 
 // Admin pages
 const Login = lazy(() => import("../pages/admin/Login"));
@@ -45,6 +46,9 @@ export default function RouterProviderApp() {
           <Route path="/contacto" element={<Contact />} />
           <Route path="/privacidad" element={<Privacy />} />
           <Route path="/terminos" element={<Terms />} />
+          <Route path="/tarjeta" element={<ClientFidelityCardPage />} />
+          <Route path="/mi-tarjeta" element={<ClientFidelityCardPage />} />
+          <Route path="/clientes" element={<ClientFidelityCardPage />} />
 
           {/* Admin Routes */}
           <Route path="/admin" element={<Navigate to="/admin/login" replace />} />

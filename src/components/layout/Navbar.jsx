@@ -58,6 +58,9 @@ function Navbar() {
           <NavLink to="/galeria" className={getNavLinkClassName} onClick={closeMenu}>
             Galería
           </NavLink>
+          <NavLink to="/clientes" className={getNavLinkClassName} onClick={closeMenu}>
+            Clientes
+          </NavLink>
           <Link to="/consulta" className="btn-minimal" onClick={closeMenu}>
             Consultar
           </Link>
@@ -98,6 +101,9 @@ function Navbar() {
               </NavLink>
               <NavLink to="/galeria" className={getNavLinkClassName} onClick={closeMenu}>
                 Galería
+              </NavLink>
+              <NavLink to="/clientes" className={getNavLinkClassName} onClick={closeMenu}>
+                Clientes
               </NavLink>
               <Link to="/consulta" className="nav-cta" onClick={closeMenu}>
                 Consultar

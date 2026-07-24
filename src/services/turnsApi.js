@@ -1,4 +1,5 @@
 import { supabase } from "../lib/supabase";
+import { stampFidelityCardForClient } from "./fidelityApi";
 
 export const TURN_REALTIME_TABLES = ["work_orders", "work_order_items"];
 export const FINANCE_TURN_REALTIME_TABLES = ["payments", "cash_movements", "receipts"];
@@ -187,11 +188,31 @@ export async function updateScheduledTurn({ turnId, formData, phone }) {
 }
 
 export async function saveTurnStatus({ turnId, status }) {
+  const dbStatus = STATUS_TO_DB[status] || "pending";
   const { error } = await supabase.rpc("set_work_order_status", {
     p_order_id: turnId,
-    p_status: STATUS_TO_DB[status] || "pending",
+    p_status: dbStatus,
   });
   if (error) throw error;
+
+  let fidelityResult = null;
+  if (dbStatus === "delivered") {
+    try {
+      const { data: order } = await supabase
+        .from("work_orders")
+        .select("client_id")
+        .eq("id", turnId)
+        .single();
+
+      if (order?.client_id) {
+        fidelityResult = await stampFidelityCardForClient(order.client_id, turnId, "Vehículo entregado");
+      }
+    } catch (err) {
+      console.warn("No se pudo estampar troquel Fidelity:", err);
+    }
+  }
+
+  return fidelityResult;
 }
 
 export async function voidTurn(turnId) {
