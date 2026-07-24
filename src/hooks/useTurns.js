@@ -81,12 +81,15 @@ export function useTurns() {
     setTurns((current) => current.map((turn) => turn.id === turnId ? { ...turn, status: nextStatus } : turn));
 
     if (fidelityResult?.card) {
-      if (fidelityResult.newlyUnlocked) {
+      if (fidelityResult.confirmationReady && fidelityResult.created) {
+        notify("Tarjeta Fidelity creada. Ya podés enviársela al cliente por WhatsApp.", "success");
+      } else if (fidelityResult.newlyUnlocked) {
         notify("🎉 ¡Fidelity Pass completado! Se estampó el 4° sello y el cliente tiene su 5° Lavado Gratis listo.", "success");
       } else if (!fidelityResult.alreadyUnlocked) {
         notify(`✨ Troquel Fidelity asignado (Sello ${fidelityResult.card.stampsCount}/4).`, "info");
       }
     }
+    return fidelityResult;
   }
 
   async function updateTurn(turnId, formData) {

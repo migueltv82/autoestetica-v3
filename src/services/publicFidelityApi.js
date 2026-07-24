@@ -8,6 +8,7 @@ export async function lookupPublicFidelityCard(phone) {
   if (!card) return null;
   return {
     clientName: card.client_name,
+    client: { name: card.client_name },
     stampsCount: Number(card.stamps_count || 0),
     totalStamps: Number(card.total_stamps || 4),
     status: card.status || "active",

@@ -13,17 +13,18 @@ import { useState } from "react";
 import SimpleAgenda from "../../components/admin/SimpleAgenda";
 import { useFeedback } from "../../hooks/useFeedback";
 import { getTodayString } from "../../utils/date";
+import { fidelityWelcomeWhatsAppLink } from "../../utils/whatsapp";
 import { MonthAgenda, WeekAgenda } from "../../components/admin/AgendaViews";
 import "./Turns.css";
 
 function Turns() {
-  const { notify } = useFeedback();
+  const { confirm, notify } = useFeedback();
   const {
     turns,
     isLoading,
     addTurn,
     updateTurn,
-    updateTurnStatus,
+    updateTurnStatus: saveTurnStatus,
     deleteTurn,
   } = useTurns();
 
@@ -72,6 +73,18 @@ function Turns() {
     setEditingTurn(turn);
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const updateTurnStatus = async (turnId, nextStatus) => {
+    const turn = turns.find((item) => item.id === turnId);
+    const fidelityResult = await saveTurnStatus(turnId, nextStatus);
+    if (nextStatus !== "Confirmado" || !turn?.phone || !fidelityResult?.card) return;
+    const accepted = await confirm({
+      title: "Enviar Tarjeta Fidelity",
+      message: `El turno de ${turn.client} quedó confirmado. ¿Querés abrir WhatsApp para enviarle su tarjeta y la explicación de uso?`,
+      confirmLabel: "Abrir WhatsApp",
+    });
+    if (accepted) window.open(fidelityWelcomeWhatsAppLink(turn, settings.businessName), "_blank", "noopener,noreferrer");
   };
 
   return (

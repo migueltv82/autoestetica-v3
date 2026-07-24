@@ -46,6 +46,8 @@ using (exists (select 1 from public.fidelity_cards fc join public.clients c on c
 with check (exists (select 1 from public.fidelity_cards fc join public.clients c on c.id=fc.client_id where fc.id=fidelity_card_id and c.organization_id=public.current_organization_id()));
 
 create index if not exists fidelity_cards_client_idx on public.fidelity_cards(client_id, status);
+create unique index if not exists fidelity_cards_one_current_per_client
+on public.fidelity_cards(client_id) where status in ('active','reward_ready');
 create unique index if not exists fidelity_stamps_work_order_unique
 on public.fidelity_stamps(work_order_id) where work_order_id is not null;
 

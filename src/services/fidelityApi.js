@@ -83,6 +83,17 @@ export async function fetchAllFidelityCards() {
   return (data || []).map(mapFidelityCard);
 }
 
+export async function ensureFidelityCardForClient(clientId) {
+  const existingCard = await fetchFidelityCardByClient(clientId);
+  if (existingCard) return { card: existingCard, created: false };
+  const { data, error } = await supabase.from("fidelity_cards").insert({
+    client_id: clientId, stamps_count: 0, total_stamps: 4, status: "active",
+    reward_description: "5° Lavado Premium Gratis",
+  }).select("*, clients(id, name, phone)").single();
+  if (error) throw error;
+  return { card: mapFidelityCard(data), created: true };
+}
+
 /**
  * Otorgar un troquel automáticamente a un cliente al finalizar su vehículo.
  */

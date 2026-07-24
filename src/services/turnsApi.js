@@ -1,5 +1,5 @@
 import { supabase } from "../lib/supabase";
-import { stampFidelityCardForClient } from "./fidelityApi";
+import { ensureFidelityCardForClient, stampFidelityCardForClient } from "./fidelityApi";
 
 export const TURN_REALTIME_TABLES = ["work_orders", "work_order_items"];
 export const FINANCE_TURN_REALTIME_TABLES = ["payments", "cash_movements", "receipts"];
@@ -196,7 +196,7 @@ export async function saveTurnStatus({ turnId, status }) {
   if (error) throw error;
 
   let fidelityResult = null;
-  if (dbStatus === "delivered") {
+  if (["confirmed", "delivered"].includes(dbStatus)) {
     try {
       const { data: order } = await supabase
         .from("work_orders")
@@ -205,7 +205,9 @@ export async function saveTurnStatus({ turnId, status }) {
         .single();
 
       if (order?.client_id) {
-        fidelityResult = await stampFidelityCardForClient(order.client_id, turnId, "Vehículo entregado");
+        fidelityResult = dbStatus === "confirmed"
+          ? { ...await ensureFidelityCardForClient(order.client_id), confirmationReady: true }
+          : await stampFidelityCardForClient(order.client_id, turnId, "Vehículo entregado");
       }
     } catch (err) {
       console.warn("No se pudo estampar troquel Fidelity:", err);
