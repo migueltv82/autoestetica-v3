@@ -11,6 +11,7 @@ import {
   Plus,
   Search,
   Star,
+  Stamp,
   Trash2,
   UserPlus,
   Users,
@@ -25,6 +26,7 @@ import { useFeedback } from "../../hooks/useFeedback";
 import { useSettings } from "../../hooks/useSettings";
 import { usePermissions } from "../../hooks/usePermissions";
 import { clientWhatsAppLink, readyVehicleWhatsAppLink } from "../../utils/whatsapp";
+import { useFidelitySummaries } from "../../hooks/useFidelitySummaries";
 import "./Clients.css";
 
 const EMPTY_CLIENT = { name: "", phone: "", email: "", notes: "", vehicle: "Auto" };
@@ -36,6 +38,7 @@ function Clients() {
   const { confirm, notify } = useFeedback();
   const { settings, updateSettings } = useSettings();
   const { canManageClients, canManageFinance, canManageSettings } = usePermissions();
+  const fidelityCards = useFidelitySummaries();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState(EMPTY_CLIENT);
@@ -44,6 +47,15 @@ function Clients() {
   const [readyMessage, setReadyMessage] = useState("");
   const [savingReadyMessage, setSavingReadyMessage] = useState(false);
   const selectedClient = clients.find((client) => client.id === selectedId);
+  const fidelityCardsByClient = useMemo(
+    () => fidelityCards.reduce((cardsByClient, card) => {
+      if (["active", "reward_ready"].includes(card.status) && !cardsByClient.has(card.clientId)) {
+        cardsByClient.set(card.clientId, card);
+      }
+      return cardsByClient;
+    }, new Map()),
+    [fidelityCards],
+  );
 
   const vipClients = useMemo(() => clients.filter((client) => Number(client.visits) >= 3).length, [clients]);
   const newThisMonth = useMemo(() => {
@@ -198,6 +210,7 @@ function Clients() {
           <section className="clients-directory" aria-label="Directorio de clientes">
             {clients.map((client) => {
               const isVip = Number(client.visits) >= 3;
+              const fidelityCard = fidelityCardsByClient.get(client.id);
               return (
                 <article key={client.id} className={`client-card${selectedId === client.id ? " is-selected" : ""}`}>
                   <header>
@@ -210,6 +223,7 @@ function Clients() {
                   <div className="client-card-facts">
                     <span><small>Vehiculo</small><strong><Car size={14} /> {client.vehicle}</strong></span>
                     <span><small>Trabajos</small><strong>{client.history.length}</strong></span>
+                    <span className={fidelityCard?.status === "reward_ready" ? "fidelity-ready" : ""}><small>Sellos</small><strong><Stamp size={14} /> {fidelityCard ? `${fidelityCard.stampsCount}/${fidelityCard.totalStamps}` : "Sin tarjeta"}</strong></span>
                     {canManageFinance ? <span><small>Facturado</small><strong>{money(client.billed)}</strong></span> : null}
                     {canManageFinance ? <span><small>Saldo</small><strong className={client.balance ? "has-balance" : ""}>{money(client.balance)}</strong></span> : null}
                   </div>
