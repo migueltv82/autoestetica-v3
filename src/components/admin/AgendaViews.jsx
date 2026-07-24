@@ -143,7 +143,7 @@ export function WeekAgenda({ turns, weekOffset, onWeekChange, onStatusChange, on
   );
 }
 
-export function MonthAgenda({ turns, monthOffset, onMonthChange, onEditTurn }) {
+export function MonthAgenda({ turns, monthOffset, onMonthChange, onStatusChange, onEditTurn, onDeleteTurn, settings, canUseOperationalActions = true }) {
   const { days, label } = useMemo(() => {
     const base = new Date();
     const first = new Date(base.getFullYear(), base.getMonth() + monthOffset, 1);
@@ -206,7 +206,11 @@ export function MonthAgenda({ turns, monthOffset, onMonthChange, onEditTurn }) {
               {startingSegments.map(({ turn, lane, startColumn, endColumn }) => {
                 const className = `month-span-turn status-${turn.status.toLowerCase().replaceAll(" ", "-")}`;
                 const style = { "--month-span": endColumn - startColumn, "--month-lane": Math.min(lane, 2) };
-                return onEditTurn ? <button type="button" key={`${turn.id}-${row}`} className={className} style={style} onClick={() => onEditTurn(turn)} title={`${turn.client} · ${turn.service}`}><strong>{turn.client}</strong><small>{turn.vehicle} · {turn.service}</small><span>{turn.date} → {turn.endDate}</span></button> : <div key={`${turn.id}-${row}`} className={className} style={style}><strong>{turn.client}</strong><small>{turn.vehicle} · {turn.service}</small><span>{turn.date} → {turn.endDate}</span></div>;
+                return <article key={`${turn.id}-${row}`} className={className} style={style}>
+                  <div className="month-span-heading"><div className="week-turn-time"><Clock3 size={12} />{turn.date} {turn.time} → {turn.endDate} {turn.endTime}</div><div className="week-turn-actions">{canUseOperationalActions ? <a href={turn.status === "Listo" ? readyTurnWhatsAppLink(turn, settings?.readyMessageTemplate, settings?.openingHours) : turnConfirmationWhatsAppLink(turn, settings?.businessName, settings?.confirmationMessageTemplate)} target="_blank" rel="noreferrer" title="Abrir WhatsApp"><MessageCircle size={13} /></a> : null}{onEditTurn ? <button type="button" onClick={() => onEditTurn(turn)} title="Editar turno"><Pencil size={13} /></button> : null}{onDeleteTurn ? <button type="button" className="danger" onClick={() => onDeleteTurn(turn.id)} title="Eliminar turno"><Trash2 size={13} /></button> : null}</div></div>
+                  <strong>{turn.client}</strong><span>{turn.vehicle} · {turn.service}</span>
+                  {onStatusChange ? <select value={turn.status} onChange={(event) => onStatusChange(turn.id, event.target.value)}>{WEEK_STATUS_OPTIONS.map((status) => <option key={status}>{status}</option>)}</select> : <span className="week-readonly-status">{turn.status}</span>}
+                </article>;
               })}
               <div>
                 {displayTurns.slice(0, 3).map((turn) => {
