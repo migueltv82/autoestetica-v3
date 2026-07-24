@@ -24,6 +24,7 @@ import { useClients } from "../../hooks/useClients";
 import { useCash } from "../../hooks/useCash";
 import { useSettings } from "../../hooks/useSettings";
 import { usePermissions } from "../../hooks/usePermissions";
+import { useAuth } from "../../hooks/useAuth";
 import { getTodayString, shiftDateByDays } from "../../utils/date";
 import "./Dashboard.css";
 
@@ -38,6 +39,7 @@ function Dashboard() {
   const { totalClients, error: clientsError } = useClients();
   const { transactions, receivables, error: cashError } = useCash();
   const { settings } = useSettings();
+  const { user, profile } = useAuth();
   const { canManageFinance, canManageCatalog, canDeleteTurns } = usePermissions();
   const today = getTodayString();
   const yesterday = shiftDateByDays(-1);
@@ -90,6 +92,11 @@ function Dashboard() {
     : 0;
   const currentHour = Number(new Intl.DateTimeFormat("es-AR", { hour: "2-digit", hour12: false, timeZone: "America/Argentina/Tucuman" }).format(new Date()));
   const greeting = currentHour < 12 ? "Buen día" : currentHour < 19 ? "Buenas tardes" : "Buenas noches";
+  const userName = profile?.full_name?.trim()
+    || user?.user_metadata?.full_name?.trim()
+    || user?.user_metadata?.name?.trim()
+    || user?.email?.split("@")[0]
+    || "Usuario";
   const dataError = turnsError || clientsError || (canManageFinance ? cashError : null);
 
   return (
@@ -99,7 +106,7 @@ function Dashboard() {
           <header className="dashboard-header">
             <div>
               <span className="dashboard-eyebrow">Resumen del negocio</span>
-              <h1>{greeting}, {settings.businessName || "Autoestética Tucumán"}</h1>
+              <h1>{greeting}, {userName}</h1>
               <p>
                 {new Date().toLocaleDateString("es-AR", {
                   weekday: "long",

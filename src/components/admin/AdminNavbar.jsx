@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import "./AdminNavbar.css";
 import { useAuth } from "../../hooks/useAuth";
+import { useSettings } from "../../hooks/useSettings";
+import defaultLogo from "../../assets/logo.webp";
 import { useState } from "react";
 import { OWNER_ADMIN_ROLES, OWNER_ROLES, hasRole } from "../../utils/permissions";
 
@@ -29,6 +31,7 @@ const items = [
 
 function AdminNavbar() {
   const { user, profile, signOut } = useAuth();
+  const { settings } = useSettings();
   const navigate = useNavigate();
   const location = useLocation();
   const [showMore, setShowMore] = useState(false);
@@ -48,9 +51,9 @@ function AdminNavbar() {
   return (
     <aside className="admin-sidebar">
       <div className="sidebar-brand">
-        <div className="brand-dot" />
+        <img className="sidebar-brand-logo" src={settings.logoUrl || defaultLogo} alt={`Logo de ${settings.businessName || "Autoestética Tucumán"}`} onError={(event) => { event.currentTarget.src = defaultLogo; }} />
         <div className="brand-copy">
-          <strong>Autoestética</strong>
+          <strong>{settings.businessName || "Autoestética Tucumán"}</strong>
           <span>Panel de Control</span>
         </div>
       </div>
