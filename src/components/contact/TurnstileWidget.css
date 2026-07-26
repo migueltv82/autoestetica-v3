@@ -1,0 +1,19 @@
+.inquiry-honeypot {
+  position: absolute !important;
+  left: -10000px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+}
+
+.inquiry-turnstile {
+  width: 100%;
+  min-height: 65px;
+  margin-top: 1rem;
+}
+
+.inquiry-captcha-error {
+  margin: 1rem 0 0;
+  color: #ffc4cc;
+  font-size: 0.78rem;
+}

@@ -34,11 +34,14 @@ El nombre sigue `AAAAMMDDNNNN_descripcion.sql`. Una migración aplicada no se ed
 | `202607250010`–`202607250012` | Consultas públicas y estado leído/no leído |
 | `202607250013` | Turnos superpuestos sin reemplazar reservas existentes |
 | `202607260001` | Troquel Fidelity transaccional e idempotente por turno |
+| `202607260002` | Escrituras de fidelización cerradas y RPC por rol |
+| `202607260003` | Acceso privado a tarjetas mediante token y código |
+| `202607260004` | Consulta pública con límite de frecuencia y ejecución desde Edge Function |
 
 ## Instalación limpia
 
 1. Crear un proyecto Supabase y esperar a que esté operativo.
-2. Configurar `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` y `VITE_ORGANIZATION_SLUG` en `.env.local`.
+2. Configurar las variables Supabase, `VITE_ORGANIZATION_SLUG` y `VITE_TURNSTILE_SITE_KEY` en `.env.local`.
 3. Iniciar sesión y vincular el CLI:
 
    ```bash
@@ -84,7 +87,9 @@ on conflict (organization_id) do update set business_name = excluded.business_na
 ## Seguridad
 
 - El frontend usa únicamente la clave pública (`anon`).
-- `SUPABASE_SERVICE_ROLE_KEY` vive solo en los secretos de Edge Functions.
+- `SUPABASE_SERVICE_ROLE_KEY` y `TURNSTILE_SECRET_KEY` viven solo en los secretos de Edge Functions.
+- `PUBLIC_SITE_ORIGINS` limita el formulario a los dominios autorizados.
+- Owner y admin deben completar MFA TOTP antes de entrar al panel.
 - Las funciones de equipo validan el JWT y exigen rol `owner` o `admin`.
 - Las políticas RLS y funciones RPC son parte del esquema versionado; no deben mantenerse solo desde el Dashboard.
 - `RESET_DATABASE.sql` elimina datos. Revisar el proyecto seleccionado y disponer de respaldo antes de usarlo.

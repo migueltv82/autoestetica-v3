@@ -283,12 +283,14 @@ export function PuzzleFidelityCard({ card, businessName, logoSrc, stampsCount, i
 
 export default function ClientFidelityCardPage() {
   const [searchParams] = useSearchParams();
+  const tokenParam = searchParams.get("token") || "";
   const phoneParam = searchParams.get("phone") || searchParams.get("telefono") || "";
 
   const [phoneInput, setPhoneInput] = useState(phoneParam);
+  const [accessCode, setAccessCode] = useState("");
   const [card, setCard] = useState(null);
-  const [isLoading, setIsLoading] = useState(Boolean(phoneParam));
-  const [searched, setSearched] = useState(Boolean(phoneParam));
+  const [isLoading, setIsLoading] = useState(Boolean(tokenParam));
+  const [searched, setSearched] = useState(Boolean(tokenParam));
   const [searchError, setSearchError] = useState("");
   const { settings } = useSettings();
 
@@ -299,11 +301,11 @@ export default function ClientFidelityCardPage() {
     let isMounted = true;
 
     async function load() {
-      if (!phoneParam) { setIsLoading(false); return; }
+      if (!tokenParam) { setIsLoading(false); return; }
       setIsLoading(true);
       setSearched(true);
       try {
-        const result = await lookupPublicFidelityCard(phoneParam);
+        const result = await lookupPublicFidelityCard({ token: tokenParam });
         if (isMounted) setCard(result);
       } catch (err) {
         console.error("Error buscando tarjeta fidelity:", err);
@@ -314,7 +316,7 @@ export default function ClientFidelityCardPage() {
 
     load();
     return () => { isMounted = false; };
-  }, [phoneParam]);
+  }, [tokenParam]);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -323,11 +325,15 @@ export default function ClientFidelityCardPage() {
       setSearchError("Ingresá 10 dígitos comenzando con 381. Ejemplo: 3814000000.");
       return;
     }
+    if (!/^[a-fA-F0-9]{8}$/.test(accessCode)) {
+      setSearchError("Ingresá el código de 8 caracteres que recibiste por WhatsApp.");
+      return;
+    }
     setIsLoading(true);
     setSearched(true);
     setSearchError("");
     try {
-      const result = await lookupPublicFidelityCard(normalizedPhone);
+      const result = await lookupPublicFidelityCard({ phone: normalizedPhone, accessCode });
       setCard(result);
     } catch (err) {
       console.error(err);
@@ -368,11 +374,11 @@ export default function ClientFidelityCardPage() {
                 <Sparkles size={14} /> Fidelity Pass VIP
               </span>
               <h1>Ingresá a tu tarjeta</h1>
-              <p>Escribí el teléfono registrado para consultar tus troqueles y beneficios.</p>
+              <p>Ingresá el teléfono registrado y el código privado que recibiste por WhatsApp.</p>
             </header> : null}
 
             {/* Buscador */}
-            {!card && !phoneParam && (
+            {!card && !tokenParam && (
               <form onSubmit={handleSearch} className="fidelity-search-box">
                 <label htmlFor="phone-input"><Search size={15} /> Ingresá tu teléfono:</label>
                 <div className="fidelity-search-input-group">
@@ -384,8 +390,20 @@ export default function ClientFidelityCardPage() {
                     onChange={(e) => { setPhoneInput(e.target.value.replace(/\D/g, "").slice(0, 10)); setSearchError(""); }}
                     required
                   />
-                  <button type="submit" disabled={isLoading}>{isLoading ? "Ingresando…" : "Entrar"}</button>
                 </div>
+                <label htmlFor="access-code-input">Código privado:</label>
+                <input
+                  className="fidelity-access-code-input"
+                  id="access-code-input"
+                  type="text"
+                  inputMode="text"
+                  autoComplete="one-time-code"
+                  placeholder="Ej: A1B2C3D4"
+                  value={accessCode}
+                  onChange={(e) => { setAccessCode(e.target.value.replace(/[^a-fA-F0-9]/g, "").toUpperCase().slice(0, 8)); setSearchError(""); }}
+                  required
+                />
+                <button type="submit" className="fidelity-access-submit" disabled={isLoading}>{isLoading ? "Ingresando…" : "Entrar"}</button>
                 <small>Sin 0, sin 15, sin +54. Ejemplo: 3814000000.</small>
                 {searchError && <p className="fidelity-search-error" role="alert">{searchError}</p>}
               </form>
@@ -400,8 +418,8 @@ export default function ClientFidelityCardPage() {
             ) : searched && !card ? (
               <div className="fidelity-not-found-box">
                 <TicketCheck size={36} />
-                <h3>No encontramos tarjeta para ese número</h3>
-                <p>Al confirmar o retirar tu próximo vehículo en el taller, tu tarjeta se crea automáticamente.</p>
+                <h3>No pudimos abrir la tarjeta</h3>
+                <p>Revisá el teléfono y el código privado del mensaje de WhatsApp, o pedinos un nuevo enlace.</p>
                 <a href={whatsAppLink()} target="_blank" rel="noreferrer" className="fidelity-cta">
                   <MessageCircle size={18} /> Consultar por WhatsApp
                 </a>

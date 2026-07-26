@@ -9,7 +9,8 @@ Aplicación web para gestionar un negocio de detailing automotriz. Reúne el sit
 - Catálogo de servicios y galería de trabajos.
 - Formulario de consultas con seguimiento de leídas/no leídas.
 - Contacto y confirmaciones por WhatsApp.
-- Acceso del cliente a sus tarjetas de fidelización por teléfono.
+- Acceso del cliente a sus tarjetas mediante enlace privado o teléfono más código.
+- Formulario protegido con Turnstile, honeypot y límites de frecuencia.
 - Tarjeta independiente por vehículo y animación al completar el premio.
 
 ### Administración
@@ -45,6 +46,7 @@ Crear `.env.local` en la raíz:
 VITE_SUPABASE_URL=https://TU_PROYECTO.supabase.co
 VITE_SUPABASE_ANON_KEY=TU_CLAVE_PUBLICA
 VITE_ORGANIZATION_SLUG=autoestetica-tucuman
+VITE_TURNSTILE_SITE_KEY=TU_CLAVE_PUBLICA_TURNSTILE
 ```
 
 La clave `service_role` nunca debe incluirse en el frontend ni en archivos versionados.
@@ -64,9 +66,10 @@ npm run dev
 | `npm run test` | Pruebas en modo interactivo |
 | `npm run predeploy` | Controles de entorno y validación completa |
 | `npm run preview` | Vista previa del build |
+| `npm run backup:db` | Dump versionado por fecha con checksums (no incluye archivos de Storage) |
 | `npm run supabase:migrations:list` | Estado de migraciones locales/remotas |
 | `npm run supabase:db:push` | Aplicar migraciones pendientes al proyecto vinculado |
-| `npm run supabase:functions:deploy` | Publicar funciones de administración del equipo |
+| `npm run supabase:functions:deploy` | Publicar funciones del equipo y consulta protegida |
 
 ## Estructura
 
@@ -105,6 +108,8 @@ Guías adicionales:
 - [Despliegue completo](DEPLOYMENT.md)
 - [Despliegue rápido](QUICK_DEPLOY.md)
 - [Seguridad](DEPLOY_SECURITY_CHECKLIST.md)
+- [Política técnica de seguridad](SECURITY.md)
+- [Backups y recuperación](supabase/BACKUP_AND_RECOVERY.md)
 - [Membresías y permisos](DEPLOYMENT_CHECKLIST_MEMBERSHIPS.md)
 - [Modelo de membresías](docs/club-memberships.md)
 

@@ -15,4 +15,7 @@ select table_name, row_count from (
   select 'business_settings', count(*) from public.business_settings union all
   select 'schedule_blocks', count(*) from public.schedule_blocks union all
   select 'cash_closures', count(*) from public.cash_closures
+  union all select 'fidelity_cards', count(*) from public.fidelity_cards
+  union all select 'fidelity_stamps', count(*) from public.fidelity_stamps
+  union all select 'public_inquiry_attempts', count(*) from public.public_inquiry_attempts
 ) counts order by table_name;

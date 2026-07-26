@@ -110,7 +110,7 @@ function Turns() {
           message: `El turno de ${turn.client} quedó confirmado y su tarjeta está lista. ¿Querés abrir WhatsApp para enviarle ambos?`,
           confirmLabel: "Abrir WhatsApp",
         });
-        if (accepted) window.open(fidelityWelcomeWhatsAppLink(turn, settings.businessName), "_blank", "noopener,noreferrer");
+        if (accepted) window.open(fidelityWelcomeWhatsAppLink(turn, fidelityResult.card.publicToken, settings.businessName), "_blank", "noopener,noreferrer");
       }
       if (nextStatus === "Finalizado" && !fidelityResult.alreadyUnlocked) {
         const accepted = await confirm({
@@ -118,7 +118,7 @@ function Turns() {
           message: `El trabajo de ${turn.client} quedó finalizado y se agregó el troquel ${fidelityResult.card.stampsCount}/4. ¿Querés enviarle la tarjeta por WhatsApp?`,
           confirmLabel: "Abrir WhatsApp",
         });
-        if (accepted) window.open(fidelityProgressWhatsAppLink(turn, fidelityResult.card.stampsCount, settings.businessName), "_blank", "noopener,noreferrer");
+        if (accepted) window.open(fidelityProgressWhatsAppLink(turn, fidelityResult.card.stampsCount, fidelityResult.card.publicToken, settings.businessName), "_blank", "noopener,noreferrer");
       }
     } catch (error) {
       notify(error?.message || "No se pudo actualizar el estado del turno.", "error");

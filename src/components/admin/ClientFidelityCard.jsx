@@ -5,6 +5,7 @@ import { useFeedback } from "../../hooks/useFeedback";
 import { useSettings } from "../../hooks/useSettings";
 import { PuzzleFidelityCard } from "../../pages/public/ClientFidelityCardPage";
 import defaultLogo from "../../assets/logo.webp";
+import { fidelityCardUrl } from "../../utils/whatsapp";
 import "../../pages/public/ClientFidelityCardPage.css";
 import "./ClientFidelityCard.css";
 
@@ -51,7 +52,7 @@ export default function ClientFidelityCard({ client }) {
   function whatsappLink(card, reward = false) {
     const phone = client.phone.replace(/\D/g, "");
     const vehicle = vehicleLabel(card);
-    const cardUrl = `${window.location.origin}/tarjeta?phone=${phone}`;
+    const cardUrl = fidelityCardUrl(card.publicToken);
     const message = reward
       ? `¡Hola ${client.name}! Tenés disponible un Lavado Premium GRATIS para tu ${vehicle}. Podés pedir tu turno respondiendo este mensaje.`
       : `¡Hola ${client.name}! Te compartimos la Tarjeta Fidelity de tu ${vehicle}. Llevás ${card.stampsCount} de 4 piezas: ${cardUrl}`;

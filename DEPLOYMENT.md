@@ -6,13 +6,26 @@
 VITE_SUPABASE_URL=https://TU_PROYECTO.supabase.co
 VITE_SUPABASE_ANON_KEY=TU_CLAVE_PUBLICA_ANON
 VITE_ORGANIZATION_SLUG=autoestetica-tucuman
+VITE_TURNSTILE_SITE_KEY=TU_CLAVE_PUBLICA_TURNSTILE
 ```
 
 Usar solamente la clave pública `anon`. Nunca publicar `service_role`.
 
+## Protección del formulario público
+
+1. Crear un widget gratuito en Cloudflare Turnstile para el dominio definitivo y `localhost`.
+2. Cargar la clave pública como `VITE_TURNSTILE_SITE_KEY` en el hosting.
+3. Cargar la clave secreta y los orígenes permitidos en Supabase:
+
+```powershell
+npx supabase secrets set TURNSTILE_SECRET_KEY=TU_CLAVE_SECRETA PUBLIC_SITE_ORIGINS=https://TU_DOMINIO
+```
+
+`PUBLIC_SITE_ORIGINS` admite varios valores separados por coma. La clave secreta nunca va en Vercel ni en archivos del repositorio.
+
 ## Supabase Authentication
 
-En Authentication > URL Configuration configurar el dominio final como `Site URL` y agregar `https://TU_DOMINIO/admin/login` en Redirect URLs. Para uso personal, mantener deshabilitado el registro público y crear manualmente únicamente los usuarios autorizados.
+En Authentication > URL Configuration configurar el dominio final como `Site URL` y agregar `https://TU_DOMINIO/admin/login` en Redirect URLs. En Authentication > Providers > Email, deshabilitar el registro público, exigir confirmación de email y activar la protección de contraseñas filtradas si el plan la ofrece. Owner y admin tienen MFA TOTP obligatorio desde la aplicación.
 
 ## Compilación
 

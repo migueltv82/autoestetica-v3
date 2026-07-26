@@ -34,6 +34,8 @@ function mapClient(client, canManageFinance) {
   const billableHistory = history.filter((order) => !["cancelled", "no_show"].includes(order.status));
   const billed = billableHistory.reduce((sum, order) => sum + order.total, 0);
   const paid = billableHistory.reduce((sum, order) => sum + order.paid, 0);
+  const fidelityCard = vehicles.flatMap((vehicle) => vehicle.fidelity_cards || [])
+    .find((card) => ["active", "reward_ready"].includes(card.status));
   return {
     id: client.id,
     name: client.name,
@@ -45,6 +47,7 @@ function mapClient(client, canManageFinance) {
     vehicle: vehicles[0]?.type || "Sin vehículo",
     vehicleId: vehicles[0]?.id || null,
     vehicles,
+    fidelityPublicToken: fidelityCard?.public_token || null,
     billed, paid, balance: Math.max(billed - paid, 0), amount: formatMoney(billed), history,
     createdAt: client.created_at,
   };
@@ -66,7 +69,7 @@ export function useClients() {
       : "work_orders(id,number,status,scheduled_start,work_order_items(description))";
     const { data, error: queryError } = await supabase
       .from("clients")
-      .select(`id,name,phone,email,notes,tags,created_at,vehicles(id,type,brand,model,license_plate,color,year,notes,deleted_at),${orderSelect}`)
+      .select(`id,name,phone,email,notes,tags,created_at,vehicles(id,type,brand,model,license_plate,color,year,notes,deleted_at,fidelity_cards(public_token,status)),${orderSelect}`)
       .eq("organization_id", organizationId)
       .eq("directory_visible", true)
       .is("deleted_at", null)

@@ -27,6 +27,7 @@ export function mapWorkOrder(order) {
   const clientVehicles = (order.clients?.vehicles || []).filter((vehicle) => !vehicle.deleted_at);
   const fileVehicle = clientVehicles.find((vehicle) => vehicle.id === order.vehicle_id && (vehicle.brand || vehicle.model))
     || clientVehicles.find((vehicle) => vehicle.brand || vehicle.model);
+  const fidelityCard = (order.vehicles?.fidelity_cards || []).find((card) => ["active", "reward_ready"].includes(card.status));
 
   return {
     id: order.id,
@@ -45,6 +46,7 @@ export function mapWorkOrder(order) {
     vehicleBrand: order.vehicles?.brand || fileVehicle?.brand || "",
     vehicleModel: order.vehicles?.model || fileVehicle?.model || "",
     vehicleId: order.vehicle_id,
+    fidelityPublicToken: fidelityCard?.public_token || null,
     service: items.map((item) => item.description).join(", ") || "Sin servicios",
     services: items,
     status: STATUS_FROM_DB[order.status] || "Pendiente",
@@ -105,7 +107,7 @@ async function syncClientDirectoryPreference(orderId, previousClient, saveClient
 
 export async function fetchTurns(organizationId) {
   const { data, error } = await supabase.from("work_orders")
-    .select("id,number,client_id,vehicle_id,status,scheduled_start,scheduled_end,notes,inquiry_read_at,discount,total,clients(name,phone,directory_visible,vehicles(id,brand,model,deleted_at)),vehicles(type,brand,model,license_plate),work_order_items(id,description,quantity,unit_price,total,service_id,services(estimated_minutes))")
+    .select("id,number,client_id,vehicle_id,status,scheduled_start,scheduled_end,notes,inquiry_read_at,discount,total,clients(name,phone,directory_visible,vehicles(id,brand,model,deleted_at)),vehicles(type,brand,model,license_plate,fidelity_cards(public_token,status)),work_order_items(id,description,quantity,unit_price,total,service_id,services(estimated_minutes))")
     .eq("organization_id", organizationId)
     .is("deleted_at", null)
     .order("scheduled_start", { ascending: true, nullsFirst: false });

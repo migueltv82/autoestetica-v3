@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { AlertTriangle, Check, MessageCircle, ShieldCheck, Sparkles } from "lucide-react";
 import { useServices } from "../../hooks/useServices";
 import { useSettings } from "../../hooks/useSettings";
@@ -6,6 +6,7 @@ import { supabase } from "../../lib/supabase";
 import { ORGANIZATION_SLUG } from "../../lib/organization";
 import { Link } from "react-router-dom";
 import "./InquiryForm.css";
+import TurnstileWidget from "./TurnstileWidget";
 
 const VEHICLE_OPTIONS = ["Auto", "Camioneta", "SUV", "Moto", "Bicicleta"];
 
@@ -16,6 +17,9 @@ function InquiryForm() {
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaResetKey, setCaptchaResetKey] = useState(0);
+  const honeypotRef = useRef(null);
 
   const availableServices = useMemo(() => services.map((service) => service.name), [services]);
   const whatsappText = useMemo(() => [
@@ -35,23 +39,27 @@ function InquiryForm() {
   async function handleSubmit(event) {
     event.preventDefault();
     setSubmitAttempted(true);
-    if (!formData.name.trim() || !formData.phone.trim() || !formData.vehicle || !formData.services.length || !formData.acceptedLegal) return;
+    if (!formData.name.trim() || !formData.phone.trim() || !formData.vehicle || !formData.services.length || !formData.acceptedLegal || !captchaToken) return;
+    if (honeypotRef.current?.value) return;
     setIsSubmitting(true);
     setSubmitError("");
     const whatsappWindow = window.open("", "_blank");
-    const { error } = await supabase.rpc("submit_inquiry", {
-      business_slug: ORGANIZATION_SLUG,
-      client_name: formData.name,
-      client_phone: formData.phone,
-      vehicle_type: formData.vehicle,
-      requested_services: formData.services,
-      inquiry_notes: `${formData.message || "Consulta ingresada desde la web."}\nAceptó Política de Privacidad y Condiciones del Servicio (versión 2026-07-16).`,
+    const { error } = await supabase.functions.invoke("submit-public-inquiry", { body: {
+      captchaToken,
+      businessSlug: ORGANIZATION_SLUG,
+      clientName: formData.name,
+      clientPhone: formData.phone,
+      vehicleType: formData.vehicle,
+      requestedServices: formData.services,
+      inquiryNotes: `${formData.message || "Consulta ingresada desde la web."}\nAceptó Política de Privacidad y Condiciones del Servicio (versión 2026-07-16).`,
+    },
     });
     setIsSubmitting(false);
     if (error) {
       whatsappWindow?.close();
       console.error(error);
-      setSubmitError("No pudimos registrar la consulta. Intentá nuevamente.");
+      setSubmitError(error?.context?.error || error?.message || "No pudimos registrar la consulta. Intentá nuevamente.");
+      setCaptchaResetKey((current) => current + 1);
       return;
     }
     const whatsapp = (settings.whatsapp || "5493815448147").replace(/\D/g, "");
@@ -59,10 +67,11 @@ function InquiryForm() {
     if (whatsappWindow) whatsappWindow.location.href = whatsappUrl;
     else window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     setFormData({ name: "", phone: "", vehicle: "", services: [], message: "", acceptedLegal: false });
+    setCaptchaResetKey((current) => current + 1);
     setSubmitAttempted(false);
   }
 
-  const invalid = submitAttempted && (!formData.name.trim() || !formData.phone.trim() || !formData.vehicle || !formData.services.length || !formData.acceptedLegal);
+  const invalid = submitAttempted && (!formData.name.trim() || !formData.phone.trim() || !formData.vehicle || !formData.services.length || !formData.acceptedLegal || !captchaToken);
   return (
     <section className="section inquiry-page">
       <div className="container inquiry-shell">
@@ -78,6 +87,7 @@ function InquiryForm() {
         </div>
 
         <form className="inquiry-form-panel" onSubmit={handleSubmit} noValidate>
+          <input ref={honeypotRef} className="inquiry-honeypot" type="text" name="website" tabIndex="-1" autoComplete="off" aria-hidden="true" />
           <div className="inquiry-form-heading"><span>Consulta rápida</span><strong>Completá los datos principales</strong><p>Los campos marcados son necesarios para poder asesorarte.</p></div>
           {invalid ? <div className="inquiry-error" role="alert"><AlertTriangle size={16} />Completá los datos requeridos y aceptá la Política de Privacidad y las Condiciones del Servicio.</div> : null}
           {submitError ? <div className="inquiry-error" role="alert"><AlertTriangle size={16} />{submitError}</div> : null}
@@ -100,6 +110,7 @@ function InquiryForm() {
           </div>
           <div className="inquiry-form-group"><label>Detalle adicional</label><textarea rows="5" value={formData.message} onChange={(event) => setFormData({ ...formData, message: event.target.value })} placeholder="Contanos el estado del vehículo o el resultado que buscás." /></div>
           <label className={`inquiry-legal-consent${submitAttempted && !formData.acceptedLegal ? " has-error" : ""}`}><input type="checkbox" checked={formData.acceptedLegal} onChange={(event) => setFormData({ ...formData, acceptedLegal: event.target.checked })} /><span>Acepto la <Link to="/privacidad" target="_blank" rel="noreferrer">Política de Privacidad</Link> y las <Link to="/terminos" target="_blank" rel="noreferrer">Condiciones del Servicio</Link>.</span></label>
+          <TurnstileWidget onToken={setCaptchaToken} resetKey={captchaResetKey} />
           <div className="inquiry-submit-row"><p className="inquiry-submit-note">Al enviar, registramos la consulta y abrimos WhatsApp con el resumen listo.</p><button type="submit" className="btn-primary inquiry-submit" disabled={isSubmitting || servicesLoading}><MessageCircle size={18} />{isSubmitting ? "Enviando…" : "Enviar consulta"}</button></div>
         </form>
       </div>

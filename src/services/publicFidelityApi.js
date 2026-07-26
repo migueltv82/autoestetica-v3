@@ -1,13 +1,13 @@
 import { supabase } from "../lib/supabase";
 
 /**
- * Búsqueda pública de tarjeta fidelity por número de teléfono.
- * Usada en la vista pública /clientes?phone=...
+ * Acceso público mediante enlace secreto o teléfono + código de acceso.
  */
-export async function lookupPublicFidelityCard(phone) {
-  const normalizedPhone = String(phone || "").replace(/\D/g, "");
-  const { data, error } = await supabase.rpc("lookup_fidelity_card_by_phone", {
-    p_phone: normalizedPhone,
+export async function lookupPublicFidelityCard({ token = "", phone = "", accessCode = "" } = {}) {
+  const { data, error } = await supabase.rpc("lookup_public_fidelity_card", {
+    p_token: String(token || "").trim() || null,
+    p_phone: String(phone || "").replace(/\D/g, "") || null,
+    p_access_code: String(accessCode || "").replace(/[^a-fA-F0-9]/g, "") || null,
   });
   if (error) throw error;
 

@@ -89,6 +89,16 @@
   font-size: 0.95rem;
 }
 .fidelity-search-input-group input:focus { outline: none; border-color: #38bdf8; }
+.fidelity-access-code-input {
+  width: 100%; margin-bottom: .75rem; padding: .75rem 1rem; border: 1px solid rgba(255,255,255,.15);
+  border-radius: 12px; background: rgba(15,23,42,.8); color: #fff; font-size: .95rem;
+  letter-spacing: .12em; text-transform: uppercase;
+}
+.fidelity-access-code-input:focus { outline: none; border-color: #38bdf8; }
+.fidelity-access-submit {
+  width: 100%; padding: .8rem 1.35rem; border: 0; border-radius: 12px;
+  background: linear-gradient(135deg,#0284c7,#0369a1); color: #fff; font-weight: 750; cursor: pointer;
+}
 .fidelity-search-input-group button {
   background: linear-gradient(135deg, #0284c7, #0369a1);
   color: #fff;

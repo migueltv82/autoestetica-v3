@@ -17,6 +17,7 @@ describe("fidelityApi helper functions", () => {
       status: "active",
       reward_description: "5° Lavado Premium Gratis",
       total_rewards_redeemed: 1,
+      public_token: "12345678-1234-4123-8123-123456789abc",
       created_at: "2026-07-24T00:00:00Z",
       updated_at: "2026-07-24T00:00:00Z",
       clients: {
@@ -37,6 +38,7 @@ describe("fidelityApi helper functions", () => {
       status: "active",
       rewardDescription: "5° Lavado Premium Gratis",
       totalRewardsRedeemed: 1,
+      publicToken: "12345678-1234-4123-8123-123456789abc",
       createdAt: "2026-07-24T00:00:00Z",
       updatedAt: "2026-07-24T00:00:00Z",
       client: {

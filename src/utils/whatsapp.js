@@ -23,11 +23,19 @@ export function getBaseSiteUrl() {
   return "https://www.autoesteticatucuman.com.ar";
 }
 
+export function fidelityCardUrl(publicToken = "") {
+  const baseUrl = `${getBaseSiteUrl()}/tarjeta`;
+  return publicToken ? `${baseUrl}?token=${encodeURIComponent(publicToken)}` : baseUrl;
+}
+
+export function fidelityAccessCode(publicToken = "") {
+  return String(publicToken || "").replace(/-/g, "").slice(0, 8).toUpperCase();
+}
+
 export function appointmentWhatsAppLink(turn, businessName = "Autoestética Tucumán") {
   const phone = normalizeArgentinaPhone(turn.phone);
-  const rawPhone = normalizeStoredArgentinaPhone(turn.phone);
   const schedule = `${displayDate(turn.date)} a las ${turn.time}`;
-  const cardUrl = `${getBaseSiteUrl()}/tarjeta?phone=${rawPhone}`;
+  const cardUrl = fidelityCardUrl(turn.fidelityPublicToken);
 
   let text;
   if (turn.status === "Listo") {
@@ -41,8 +49,7 @@ export function appointmentWhatsAppLink(turn, businessName = "Autoestética Tucu
 }
 
 export function clientWhatsAppLink(client, businessName = "Autoestética Tucumán") {
-  const rawPhone = normalizeStoredArgentinaPhone(client.phone);
-  const cardUrl = `${getBaseSiteUrl()}/tarjeta?phone=${rawPhone}`;
+  const cardUrl = fidelityCardUrl(client.fidelityPublicToken);
   const text = `Hola ${client.name} 👋 Te escribimos de ${businessName}.\n\n💳 Acá podés consultar tu Tarjeta Fidelity Pass digital:\n👉 ${cardUrl}`;
   return `https://wa.me/${normalizeArgentinaPhone(client.phone)}?text=${encodeURIComponent(text)}`;
 }
@@ -52,16 +59,15 @@ export function inquiryReplyWhatsAppLink(turn, businessName = "Autoestética Tuc
   return `https://wa.me/${normalizeArgentinaPhone(turn.phone)}?text=${encodeURIComponent(text)}`;
 }
 
-export function fidelityWelcomeWhatsAppLink(turn, businessName = "Autoestética Tucumán") {
-  const rawPhone = normalizeStoredArgentinaPhone(turn.phone);
-  const cardUrl = `${getBaseSiteUrl()}/clientes?telefono=${rawPhone}`;
-  const text = `Hola ${turn.client} 👋 Tu turno en ${businessName} quedó confirmado y ya tenés tu Tarjeta Fidelity digital.\n\n¿Cómo funciona?\n• Cada vez que retires un trabajo terminado sumás 1 sello.\n• Al completar 4 sellos desbloqueás tu beneficio.\n• Podés consultar tu progreso cuando quieras desde este enlace:\n${cardUrl}`;
+export function fidelityWelcomeWhatsAppLink(turn, publicToken, businessName = "Autoestética Tucumán") {
+  const cardUrl = fidelityCardUrl(publicToken);
+  const accessCode = fidelityAccessCode(publicToken);
+  const text = `Hola ${turn.client} 👋 Tu turno en ${businessName} quedó confirmado y ya tenés tu Tarjeta Fidelity digital.\n\n¿Cómo funciona?\n• Cada vez que retires un trabajo terminado sumás 1 sello.\n• Al completar 4 sellos desbloqueás tu beneficio.\n• Podés consultar tu progreso cuando quieras desde este enlace privado:\n${cardUrl}\n\nTu código de acceso es: ${accessCode}`;
   return `https://wa.me/${normalizeArgentinaPhone(turn.phone)}?text=${encodeURIComponent(text)}`;
 }
 
-export function fidelityProgressWhatsAppLink(turn, stampsCount, businessName = "Autoestética Tucumán") {
-  const rawPhone = normalizeStoredArgentinaPhone(turn.phone);
-  const cardUrl = `${getBaseSiteUrl()}/tarjeta?phone=${rawPhone}`;
+export function fidelityProgressWhatsAppLink(turn, stampsCount, publicToken, businessName = "Autoestética Tucumán") {
+  const cardUrl = fidelityCardUrl(publicToken);
   const pieces = Math.max(0, Math.min(Number(stampsCount) || 0, 4));
   const benefit = pieces >= 4
     ? "¡Completaste las 4 piezas y desbloqueaste tu Lavado Premium GRATIS!"
@@ -73,8 +79,7 @@ export function fidelityProgressWhatsAppLink(turn, stampsCount, businessName = "
 export function turnConfirmationWhatsAppLink(turn, businessName = "Autoestética Tucumán", template = "") {
   const schedule = `${displayDate(turn.date)} a las ${turn.time}`;
   const vehicle = String(turn.vehicle || "vehículo").toLowerCase();
-  const rawPhone = normalizeStoredArgentinaPhone(turn.phone);
-  const cardUrl = `${getBaseSiteUrl()}/tarjeta?phone=${rawPhone}`;
+  const cardUrl = fidelityCardUrl(turn.fidelityPublicToken);
 
   const text = template ? String(template)
     .replaceAll("{cliente}", turn.client || "cliente")
@@ -92,8 +97,7 @@ export function turnConfirmationWhatsAppLink(turn, businessName = "Autoestética
 export function readyVehicleWhatsAppLink(client, template, openingHours) {
   const vehicle = client.vehicles?.[0];
   const vehicleLabel = [vehicle?.brand, vehicle?.model].filter(Boolean).join(" ") || vehicle?.type || client.vehicle || "vehículo";
-  const rawPhone = normalizeStoredArgentinaPhone(client.phone);
-  const cardUrl = `${getBaseSiteUrl()}/tarjeta?phone=${rawPhone}`;
+  const cardUrl = fidelityCardUrl(client.fidelityPublicToken);
 
   const text = String(template || "Hola {cliente}, queremos informarte que tu {vehiculo} ya está listo para retirar en nuestro taller. Nuestro horario es {horario}.\n\n💳 Ver tu Tarjeta Fidelity Pass: {tarjeta}")
     .replaceAll("{cliente}", client.name || "cliente")
@@ -105,8 +109,7 @@ export function readyVehicleWhatsAppLink(client, template, openingHours) {
 }
 
 export function readyTurnWhatsAppLink(turn, template, openingHours) {
-  const rawPhone = normalizeStoredArgentinaPhone(turn.phone);
-  const cardUrl = `${getBaseSiteUrl()}/tarjeta?phone=${rawPhone}`;
+  const cardUrl = fidelityCardUrl(turn.fidelityPublicToken);
 
   const text = String(template || "Hola {cliente}, queremos informarte que tu {vehiculo} ya está listo para retirar en Autoestética Tucumán. Nuestro horario de atención es {horario}.\n\n💳 Ver tu Tarjeta Fidelity Pass: {tarjeta}")
     .replaceAll("{cliente}", turn.client || "cliente")

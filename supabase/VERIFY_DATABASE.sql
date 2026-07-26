@@ -50,7 +50,7 @@ where schemaname = 'public'
   and tablename in ('payments','cash_movements','receipts','receipt_items','cash_closures','organization_subscriptions','audit_logs')
   and policyname = 'member_read'
 union all
-select 'funciones rpc de permisos faltantes', 12 - count(distinct p.proname)
+select 'funciones rpc de permisos faltantes', 16 - count(distinct p.proname)
 from pg_proc p
 join pg_namespace n on n.oid = p.pronamespace
 where n.nspname = 'public'
@@ -66,7 +66,11 @@ where n.nspname = 'public'
     'list_team_members',
     'add_existing_user_to_team',
     'update_team_member',
-    'record_fidelity_stamp'
+    'record_fidelity_stamp',
+    'ensure_fidelity_card',
+    'redeem_fidelity_reward',
+    'lookup_public_fidelity_card',
+    'submit_inquiry'
   )
 union all
 select 'columnas de baja de perfiles faltantes', 3 - count(*)
@@ -103,4 +107,18 @@ select 'storage work_photos con acceso total antiguo', count(*)
 from pg_policies
 where schemaname = 'storage'
   and tablename = 'objects'
-  and policyname = 'work_photos_access';
+  and policyname = 'work_photos_access'
+union all
+select 'fidelizacion con escritura directa', count(*)
+from pg_policies
+where schemaname='public' and tablename in ('fidelity_cards','fidelity_stamps')
+  and cmd in ('INSERT','UPDATE','DELETE','ALL')
+union all
+select 'consulta por telefono antigua expuesta', count(*)
+from information_schema.routine_privileges
+where specific_schema='public' and routine_name='lookup_fidelity_card_by_phone'
+  and grantee in ('anon','authenticated')
+union all
+select 'tabla anti-spam sin RLS', count(*)
+from pg_class c join pg_namespace n on n.oid=c.relnamespace
+where n.nspname='public' and c.relname='public_inquiry_attempts' and not c.relrowsecurity;

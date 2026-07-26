@@ -14,7 +14,7 @@ const fileValues = Object.fromEntries(
 );
 const values = { ...fileValues, ...process.env };
 
-const required = ["VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY", "VITE_ORGANIZATION_SLUG"];
+const required = ["VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY", "VITE_ORGANIZATION_SLUG", "VITE_TURNSTILE_SITE_KEY"];
 const missing = required.filter((key) => !values[key] || /TU_|example|localhost/i.test(values[key]));
 
 if (missing.length) {

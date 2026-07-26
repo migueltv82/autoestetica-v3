@@ -25,9 +25,12 @@ Agregar en Vercel o Netlify, para Producción y Preview:
 VITE_SUPABASE_URL=https://TU_PROYECTO.supabase.co
 VITE_SUPABASE_ANON_KEY=TU_CLAVE_PUBLICA
 VITE_ORGANIZATION_SLUG=autoestetica-tucuman
+VITE_TURNSTILE_SITE_KEY=TU_CLAVE_PUBLICA_TURNSTILE
 ```
 
 No agregar `SUPABASE_SERVICE_ROLE_KEY` al hosting del frontend.
+
+Antes de desplegar las funciones, configurar `TURNSTILE_SECRET_KEY` y `PUBLIC_SITE_ORIGINS` siguiendo `DEPLOYMENT.md`.
 
 En Supabase > Authentication > URL Configuration:
 

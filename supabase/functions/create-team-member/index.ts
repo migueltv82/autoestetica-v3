@@ -94,8 +94,8 @@ Deno.serve(async (request) => {
 
   if (!email || !email.includes("@")) return jsonResponse(400, { error: "Email invalido." });
   if (!["owner", "admin", "employee"].includes(role)) return jsonResponse(400, { error: "Rol invalido." });
-  if (temporaryPassword && temporaryPassword.length < 8) {
-    return jsonResponse(400, { error: "La clave temporal debe tener al menos 8 caracteres." });
+  if (temporaryPassword && temporaryPassword.length < 12) {
+    return jsonResponse(400, { error: "La clave temporal debe tener al menos 12 caracteres." });
   }
 
   try {

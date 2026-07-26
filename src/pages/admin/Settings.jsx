@@ -369,8 +369,8 @@ function TeamSettings() {
       setMessage("Ingresá el email del usuario.");
       return;
     }
-    if (newMember.temporaryPassword && newMember.temporaryPassword.length < 8) {
-      setMessage("La clave temporal debe tener al menos 8 caracteres.");
+    if (newMember.temporaryPassword && newMember.temporaryPassword.length < 12) {
+      setMessage("La clave temporal debe tener al menos 12 caracteres.");
       return;
     }
 
@@ -430,7 +430,7 @@ function TeamSettings() {
             type="password"
             value={newMember.temporaryPassword}
             onChange={(event) => setNewMember((current) => ({ ...current, temporaryPassword: event.target.value }))}
-            placeholder="Mínimo 8 caracteres"
+            placeholder="Mínimo 12 caracteres"
             autoComplete="new-password"
           />
         </div>

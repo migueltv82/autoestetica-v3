@@ -10,6 +10,14 @@ export function getDefaultAdminPath(profile) {
   return profile?.role === "employee" ? "/admin/turnos" : "/admin/dashboard";
 }
 
+export function safeAdminRedirect(value, fallback = "/admin/login") {
+  return typeof value === "string"
+    && /^\/admin(?:\/[a-z0-9-]+)*\/?$/i.test(value)
+    && !value.includes("\\")
+    ? value
+    : fallback;
+}
+
 export function getPermissions(profile) {
   const isOwner = hasRole(profile, OWNER_ROLES);
   const isOwnerAdmin = hasRole(profile, OWNER_ADMIN_ROLES);

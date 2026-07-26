@@ -14,6 +14,7 @@ export function mapFidelityCard(row) {
     status: row.status || "active", // active | reward_ready | redeemed
     rewardDescription: row.reward_description || "5° Lavado Premium Gratis",
     totalRewardsRedeemed: Number(row.total_rewards_redeemed || 0),
+    publicToken: row.public_token || null,
     createdAt: row.created_at || null,
     updatedAt: row.updated_at || null,
     client: row.clients
@@ -106,15 +107,14 @@ export async function fetchAllFidelityCards() {
 }
 
 export async function ensureFidelityCardForClient(clientId, vehicleId = null) {
-  const cards = await fetchFidelityCardsByClient(clientId);
-  const existingCard = cards.find((card) => card.vehicleId === vehicleId);
-  if (existingCard) return { card: existingCard, created: false };
-  const { data, error } = await supabase.from("fidelity_cards").insert({
-    client_id: clientId, vehicle_id: vehicleId, stamps_count: 0, total_stamps: 4, status: "active",
-    reward_description: "5° Lavado Premium Gratis",
-  }).select("*, clients(id, name, phone), vehicles(id, type, brand, model, license_plate)").single();
+  const existingCards = await fetchFidelityCardsByClient(clientId);
+  const existingCard = existingCards.find((card) => card.vehicleId === vehicleId);
+  const { data, error } = await supabase.rpc("ensure_fidelity_card", {
+    p_client_id: clientId,
+    p_vehicle_id: vehicleId,
+  });
   if (error) throw error;
-  return { card: mapFidelityCard(data), created: true };
+  return { card: mapFidelityCard(data), created: !existingCard };
 }
 
 /**
@@ -122,6 +122,7 @@ export async function ensureFidelityCardForClient(clientId, vehicleId = null) {
  */
 export async function stampFidelityCardForClient(clientId, vehicleId = null, workOrderId = null, notes = "Servicio completado") {
   if (!clientId) return null;
+  void vehicleId;
 
   if (workOrderId) {
     const { data, error } = await supabase.rpc("record_fidelity_stamp", {
@@ -136,54 +137,7 @@ export async function stampFidelityCardForClient(clientId, vehicleId = null, wor
     };
   }
 
-  // 1. Buscar tarjeta activa o lista para premio
-  const clientCards = await fetchFidelityCardsByClient(clientId);
-  let card = clientCards.find((item) => item.vehicleId === vehicleId);
-
-  // 2. Si no existe tarjeta activa, crear una nueva (comenzará en 0 sellos)
-  if (!card) {
-    const { data: newCardData, error: createError } = await supabase
-      .from("fidelity_cards")
-      .insert({
-        client_id: clientId,
-        vehicle_id: vehicleId,
-        stamps_count: 0,
-        total_stamps: 4,
-        status: "active",
-        reward_description: "5° Lavado Premium Gratis",
-      })
-      .select("*, clients(id, name, phone), vehicles(id, type, brand, model, license_plate)")
-      .single();
-
-    if (createError) throw createError;
-    card = mapFidelityCard(newCardData);
-  }
-
-  // Si la tarjeta ya estaba en reward_ready (ya completó sus 4 sellos), no agregamos más sellos hasta que la canjee
-  if (card.status === "reward_ready") {
-    return { card, newlyUnlocked: false, alreadyUnlocked: true };
-  }
-
-  const nextStamps = Math.min(4, card.stampsCount + 1);
-  const newlyUnlocked = nextStamps === 4;
-  const nextStatus = newlyUnlocked ? "reward_ready" : "active";
-
-  // 3. Actualizar la tarjeta
-  const { data: updatedCardData, error: updateError } = await supabase
-    .from("fidelity_cards")
-    .update({
-      stamps_count: nextStamps,
-      status: nextStatus,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", card.id)
-    .select("*, clients(id, name, phone), vehicles(id, type, brand, model, license_plate)")
-    .single();
-
-  if (updateError) throw updateError;
-
-  const updatedCard = mapFidelityCard(updatedCardData);
-  return { card: updatedCard, newlyUnlocked };
+  throw new Error("Para asignar un troquel se necesita el turno finalizado.");
 }
 
 /**
@@ -191,45 +145,9 @@ export async function stampFidelityCardForClient(clientId, vehicleId = null, wor
  */
 export async function redeemFidelityReward(cardId) {
   if (!cardId) return null;
-
-  // 1. Obtener la tarjeta actual
-  const { data: card, error: fetchErr } = await supabase
-    .from("fidelity_cards")
-    .select("*")
-    .eq("id", cardId)
-    .single();
-
-  if (fetchErr) throw fetchErr;
-
-  // 2. Marcar como canjeada
-  const { error: redeemErr } = await supabase
-    .from("fidelity_cards")
-    .update({
-      status: "redeemed",
-      total_rewards_redeemed: Number(card.total_rewards_redeemed || 0) + 1,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", cardId);
-
-  if (redeemErr) throw redeemErr;
-
-  // 3. Crear una nueva tarjeta activa limpia (0 sellos)
-  const { data: newCard, error: newCardErr } = await supabase
-    .from("fidelity_cards")
-    .insert({
-      client_id: card.client_id,
-      vehicle_id: card.vehicle_id,
-      stamps_count: 0,
-      total_stamps: 4,
-      status: "active",
-      reward_description: "5° Lavado Premium Gratis",
-      total_rewards_redeemed: Number(card.total_rewards_redeemed || 0) + 1,
-    })
-    .select("*, clients(id, name, phone), vehicles(id, type, brand, model, license_plate)")
-    .single();
-
-  if (newCardErr) throw newCardErr;
-  return mapFidelityCard(newCard);
+  const { data, error } = await supabase.rpc("redeem_fidelity_reward", { p_card_id: cardId });
+  if (error) throw error;
+  return mapFidelityCard(data);
 }
 
 export async function setFidelityCardStamps(cardId, stampsCount) {

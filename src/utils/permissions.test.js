@@ -6,6 +6,7 @@ import {
   OWNER_ADMIN_ROLES,
   OWNER_ROLES,
   STAFF_ROLES,
+  safeAdminRedirect,
 } from "./permissions";
 
 const activeProfile = (role) => ({ id: `${role}-id`, role, active: true });
@@ -85,5 +86,12 @@ describe("permissions", () => {
     expect(hasRole(null, STAFF_ROLES)).toBe(false);
     expect(Object.values(getPermissions({ role: "owner", active: false })).every((value) => value === false)).toBe(true);
     expect(Object.values(getPermissions(null)).every((value) => value === false)).toBe(true);
+  });
+
+  it("only accepts internal admin redirects", () => {
+    expect(safeAdminRedirect("/admin/turnos", "/admin/dashboard")).toBe("/admin/turnos");
+    expect(safeAdminRedirect("//evil.example", "/admin/dashboard")).toBe("/admin/dashboard");
+    expect(safeAdminRedirect("/admin\\evil.example", "/admin/dashboard")).toBe("/admin/dashboard");
+    expect(safeAdminRedirect("https://evil.example", "/admin/dashboard")).toBe("/admin/dashboard");
   });
 });

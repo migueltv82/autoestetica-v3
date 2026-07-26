@@ -24,6 +24,7 @@ function renderProtectedRoute(authState, roles = OWNER_ROLES) {
           )}
         />
         <Route path="/admin/login" element={<div>Login admin</div>} />
+        <Route path="/admin/mfa" element={<div>Segundo factor</div>} />
         <Route path="/admin/dashboard" element={<div>Panel principal</div>} />
         <Route path="/admin/turnos" element={<div>Agenda</div>} />
       </Routes>
@@ -40,10 +41,21 @@ describe("ProtectedRoute", () => {
     renderProtectedRoute({
       user: { id: "owner-id" },
       profile: { role: "owner", active: true },
+      assuranceLevel: "aal2",
       isLoading: false,
     });
 
     expect(screen.getByText("Contenido protegido")).toBeInTheDocument();
+  });
+
+  it("requires a second factor for owner and admin accounts", () => {
+    renderProtectedRoute({
+      user: { id: "owner-id" },
+      profile: { role: "owner", active: true },
+      assuranceLevel: "aal1",
+      isLoading: false,
+    });
+    expect(screen.getByText("Segundo factor")).toBeInTheDocument();
   });
 
   it("redirects unauthenticated users to login", () => {

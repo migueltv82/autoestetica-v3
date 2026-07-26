@@ -8,23 +8,30 @@
 - [ ] El frontend contiene únicamente la clave pública de Supabase.
 - [ ] Las migraciones locales y remotas coinciden.
 - [ ] `supabase db lint --linked --level warning` no devuelve problemas.
-- [ ] Las Edge Functions `create-team-member` y `delete-team-member` están activas.
+- [ ] Las Edge Functions `create-team-member`, `delete-team-member` y `submit-public-inquiry` están activas.
 - [ ] `VERIFY_DATABASE.sql` y `VERIFY_OPERATIONAL_FLOW.sql` devuelven cero problemas.
 - [ ] Existe un respaldo reciente y verificable.
+- [ ] `npm run backup:db` generó esquema, datos, roles y checksums antes de migrar.
+- [ ] Los buckets `portfolio` y `work-photos` tienen copia separada.
+- [ ] Se completó una restauración de prueba durante el último mes.
 
 ## Supabase
 
 - [ ] RLS está habilitado en tablas con datos del negocio.
 - [ ] Las escrituras administrativas exigen rol `owner` o `admin`.
+- [ ] Tarjetas y troqueles no tienen políticas de escritura directa.
 - [ ] Solamente `owner` administra equipo y configuración sensible.
 - [ ] El alta y baja de usuarios se realiza mediante Edge Functions.
 - [ ] `SUPABASE_SERVICE_ROLE_KEY` existe solo como secreto de las Edge Functions.
 - [ ] El registro público de usuarios está deshabilitado si no se utiliza onboarding público.
+- [ ] Confirmación de email y protección de contraseñas filtradas están activas.
+- [ ] Owner y admin completaron el alta de MFA y acceden con `aal2`.
 - [ ] `Site URL` y `Redirect URLs` apuntan al dominio HTTPS definitivo.
 
 ## Hosting
 
-- [ ] Están configuradas `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` y `VITE_ORGANIZATION_SLUG`.
+- [ ] Están configuradas las variables Supabase, organización y `VITE_TURNSTILE_SITE_KEY`.
+- [ ] `TURNSTILE_SECRET_KEY` y `PUBLIC_SITE_ORIGINS` existen solamente como secretos de Supabase.
 - [ ] HTTPS está activo.
 - [ ] Las rutas SPA recargan sin devolver 404.
 - [ ] Los encabezados CSP, anti-iframe, referrer y permissions están presentes.
@@ -33,6 +40,8 @@
 ## Prueba funcional
 
 - [ ] Consulta pública registrada y visible como nueva.
+- [ ] CAPTCHA inválido y envíos repetidos son rechazados.
+- [ ] La tarjeta no abre solo con teléfono; sí abre con enlace secreto o código.
 - [ ] Turno confirmado sin reemplazar otros de la misma franja.
 - [ ] Descuento reflejado en orden, pago, caja y recibo.
 - [ ] Cliente ocasional/promovido conserva el comportamiento esperado.

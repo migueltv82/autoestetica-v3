@@ -12,6 +12,7 @@
     "check": "npm run lint && npm run test:run && npm run build",
     "predeploy": "node scripts/predeploy.mjs && npm run check",
     "preview": "vite preview",
+    "backup:db": "powershell -ExecutionPolicy Bypass -File scripts/backup.ps1",
     "supabase:login": "supabase login",
     "supabase:link": "supabase link",
     "supabase:status": "supabase status",
@@ -19,7 +20,8 @@
     "supabase:db:push": "supabase db push",
     "supabase:function:deploy": "supabase functions deploy create-team-member --no-verify-jwt",
     "supabase:function:delete:deploy": "supabase functions deploy delete-team-member --no-verify-jwt",
-    "supabase:functions:deploy": "npm run supabase:function:deploy && npm run supabase:function:delete:deploy"
+    "supabase:function:inquiry:deploy": "supabase functions deploy submit-public-inquiry --no-verify-jwt",
+    "supabase:functions:deploy": "npm run supabase:function:deploy && npm run supabase:function:delete:deploy && npm run supabase:function:inquiry:deploy"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.101.1",

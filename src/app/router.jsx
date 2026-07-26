@@ -19,6 +19,7 @@ const ClientFidelityCardPage = lazy(() => import("../pages/public/ClientFidelity
 
 // Admin pages
 const Login = lazy(() => import("../pages/admin/Login"));
+const Mfa = lazy(() => import("../pages/admin/Mfa"));
 const Dashboard = lazy(() => import("../pages/admin/Dashboard"));
 const Turns = lazy(() => import("../pages/admin/Turns"));
 const Inquiries = lazy(() => import("../pages/admin/Inquiries"));
@@ -55,6 +56,7 @@ export default function RouterProviderApp() {
           {/* Admin Routes */}
           <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
           <Route path="/admin/login" element={<Login />} />
+          <Route path="/admin/mfa" element={<ProtectedRoute requireMfa={false}><Mfa /></ProtectedRoute>} />
           <Route path="/admin/dashboard" element={protectOwnerAdmin(<Dashboard />)} />
           <Route path="/admin/turnos" element={protect(<Turns />)} />
           <Route path="/admin/consultas" element={protect(<Inquiries />)} />
