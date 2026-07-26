@@ -50,7 +50,7 @@ where schemaname = 'public'
   and tablename in ('payments','cash_movements','receipts','receipt_items','cash_closures','organization_subscriptions','audit_logs')
   and policyname = 'member_read'
 union all
-select 'funciones rpc de permisos faltantes', 11 - count(distinct p.proname)
+select 'funciones rpc de permisos faltantes', 12 - count(distinct p.proname)
 from pg_proc p
 join pg_namespace n on n.oid = p.pronamespace
 where n.nspname = 'public'
@@ -65,7 +65,8 @@ where n.nspname = 'public'
     'create_receipt_for_order',
     'list_team_members',
     'add_existing_user_to_team',
-    'update_team_member'
+    'update_team_member',
+    'record_fidelity_stamp'
   )
 union all
 select 'columnas de baja de perfiles faltantes', 3 - count(*)

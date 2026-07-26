@@ -33,11 +33,12 @@ El nombre sigue `AAAAMMDDNNNN_descripcion.sql`. Una migración aplicada no se ed
 | `202607250009` | Edición manual de troqueles |
 | `202607250010`–`202607250012` | Consultas públicas y estado leído/no leído |
 | `202607250013` | Turnos superpuestos sin reemplazar reservas existentes |
+| `202607260001` | Troquel Fidelity transaccional e idempotente por turno |
 
 ## Instalación limpia
 
 1. Crear un proyecto Supabase y esperar a que esté operativo.
-2. Configurar `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` en `.env.local`.
+2. Configurar `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` y `VITE_ORGANIZATION_SLUG` en `.env.local`.
 3. Iniciar sesión y vincular el CLI:
 
    ```bash

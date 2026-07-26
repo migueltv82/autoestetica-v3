@@ -50,7 +50,7 @@ export default function SimpleAgenda({ turns, selectedDate, onDateChange, search
     </section>
 
     <section className="agenda-card-list">
-      {visibleTurns.map((turn) => <article className={`agenda-mobile-turn is-overlapping ${getServiceTone(turn)} status-${getTurnStatusClass(turn.status)}`} key={turn.id} role="button" tabIndex={0} onClick={(event) => { if (!event.target.closest("a,button,select")) onViewTurn?.(turn); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onViewTurn?.(turn); }}>
+      {visibleTurns.map((turn) => <article className={`agenda-mobile-turn is-overlapping ${getServiceTone(turn)} status-${getTurnStatusClass(turn.status)}`} key={turn.id} role="button" tabIndex={0} onClick={(event) => { if (!event.target.closest("a,button,select")) onViewTurn?.(turn); }} onKeyDown={(event) => { if (!event.target.closest("a,button,select") && (event.key === "Enter" || event.key === " ")) onViewTurn?.(turn); }}>
         <header><div className="agenda-turn-time"><Clock3 size={17} /><strong>{turn.date === selectedDate ? turn.time : "En curso"}</strong><span>{turn.date !== turn.endDate ? `hasta ${turn.endDate} · ${turn.endTime}` : `– ${turn.endTime}`}</span></div>{onStatusChange ? <select value={turn.status} onChange={(event) => onStatusChange(turn.id, event.target.value)} aria-label={`Estado de ${turn.client}`}>{STATUSES.map((status) => <option key={status}>{status}</option>)}</select> : <span className="agenda-readonly-status">{turn.status}</span>}</header>
         <div className="agenda-turn-client"><span><UserRound size={18} /></span><div><h3>{turn.client}</h3><p><Car size={14} /> {getTurnVehicleLabel(turn)}</p></div></div>
         <p className="agenda-turn-service">{turn.service}</p>

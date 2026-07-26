@@ -134,7 +134,7 @@ function Turns() {
           title="Agenda de turnos"
           subtitle="Organizá los trabajos del día y mantené cada cliente al tanto."
           actions={canManageTurns ? (
-            <button className={showForm ? "btn-form-primary" : "btn-primary-admin"} onClick={() => { setEditingTurn(null); setShowForm((current) => !current); }}>
+            <button type="button" className={showForm ? "btn-form-primary" : "btn-primary-admin"} onClick={() => { setEditingTurn(null); setShowForm((current) => !current); }}>
               {showForm ? <X size={18} /> : <Plus size={18} />}
               <span>{showForm ? "Cerrar" : "Nuevo Turno"}</span>
             </button>

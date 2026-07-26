@@ -124,16 +124,16 @@ export async function stampFidelityCardForClient(clientId, vehicleId = null, wor
   if (!clientId) return null;
 
   if (workOrderId) {
-    const { data: existingStamp, error: stampLookupError } = await supabase
-      .from("fidelity_stamps")
-      .select("id")
-      .eq("work_order_id", workOrderId)
-      .maybeSingle();
-    if (stampLookupError) throw stampLookupError;
-    if (existingStamp) {
-      const cards = await fetchFidelityCardsByClient(clientId);
-      return { card: cards.find((card) => card.vehicleId === vehicleId) || null, newlyUnlocked: false, alreadyUnlocked: true };
-    }
+    const { data, error } = await supabase.rpc("record_fidelity_stamp", {
+      p_order_id: workOrderId,
+      p_notes: notes,
+    });
+    if (error) throw error;
+    return {
+      card: mapFidelityCard(data?.card),
+      newlyUnlocked: Boolean(data?.newlyUnlocked),
+      alreadyUnlocked: Boolean(data?.alreadyUnlocked),
+    };
   }
 
   // 1. Buscar tarjeta activa o lista para premio
@@ -181,17 +181,6 @@ export async function stampFidelityCardForClient(clientId, vehicleId = null, wor
     .single();
 
   if (updateError) throw updateError;
-
-  // 4. Guardar registro del troquel en historial
-  try {
-    await supabase.from("fidelity_stamps").insert({
-      fidelity_card_id: card.id,
-      work_order_id: workOrderId,
-      notes,
-    });
-  } catch (err) {
-    console.warn("No se pudo registrar troquel en historial:", err);
-  }
 
   const updatedCard = mapFidelityCard(updatedCardData);
   return { card: updatedCard, newlyUnlocked };

@@ -1,5 +1,10 @@
-import { describe, expect, it } from "vitest";
-import { mapFidelityCard } from "./fidelityApi";
+import { describe, expect, it, vi } from "vitest";
+import { mapFidelityCard, stampFidelityCardForClient } from "./fidelityApi";
+import { supabase } from "../lib/supabase";
+
+vi.mock("../lib/supabase", () => ({
+  supabase: { rpc: vi.fn(), from: vi.fn() },
+}));
 
 describe("fidelityApi helper functions", () => {
   it("mapea correctamente una fila de base de datos a objeto Tarjeta Fidelity", () => {
@@ -45,5 +50,24 @@ describe("fidelityApi helper functions", () => {
 
   it("retorna null si la fila enviada a mapFidelityCard es nula", () => {
     expect(mapFidelityCard(null)).toBeNull();
+  });
+
+  it("registra el troquel automático mediante la operación atómica", async () => {
+    supabase.rpc.mockResolvedValueOnce({
+      data: {
+        card: { id: "card-123", client_id: "client-abc", vehicle_id: "vehicle-xyz", stamps_count: 4, total_stamps: 4, status: "reward_ready" },
+        newlyUnlocked: true,
+        alreadyUnlocked: false,
+      },
+      error: null,
+    });
+
+    const result = await stampFidelityCardForClient("client-abc", "vehicle-xyz", "order-1", "Vehículo entregado");
+
+    expect(supabase.rpc).toHaveBeenCalledWith("record_fidelity_stamp", {
+      p_order_id: "order-1",
+      p_notes: "Vehículo entregado",
+    });
+    expect(result).toMatchObject({ newlyUnlocked: true, alreadyUnlocked: false, card: { id: "card-123", stampsCount: 4 } });
   });
 });

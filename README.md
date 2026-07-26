@@ -44,6 +44,7 @@ Crear `.env.local` en la raíz:
 ```env
 VITE_SUPABASE_URL=https://TU_PROYECTO.supabase.co
 VITE_SUPABASE_ANON_KEY=TU_CLAVE_PUBLICA
+VITE_ORGANIZATION_SLUG=autoestetica-tucuman
 ```
 
 La clave `service_role` nunca debe incluirse en el frontend ni en archivos versionados.

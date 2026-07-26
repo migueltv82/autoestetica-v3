@@ -16,15 +16,26 @@ En Authentication > URL Configuration configurar el dominio final como `Site URL
 
 ## Compilación
 
+Primero sincronizar la infraestructura de Supabase:
+
+```powershell
+npm run supabase:migrations:list
+npm run supabase:db:push
+npm run supabase:functions:deploy
+```
+
+Luego validar el frontend:
+
 ```powershell
 npm install
-npm run lint
-npm run build
+npm run predeploy
 ```
 
 Antes de publicar, también se puede ejecutar `npm run predeploy`. Este control rechaza variables faltantes, valores de ejemplo, URLs inválidas y una clave identificada como `service_role`, y luego ejecuta lint y build.
 
 Publicar el directorio `dist`. El proyecto incluye reglas SPA para Netlify (`public/_redirects`) y Vercel (`vercel.json`).
+
+Si el repositorio está conectado al hosting, publicar con `git push origin main`. Configurar las tres variables obligatorias también en el panel del proveedor antes de iniciar el despliegue.
 
 ## Verificación posterior
 

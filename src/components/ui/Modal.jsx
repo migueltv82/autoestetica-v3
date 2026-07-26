@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import "./Modal.css";
@@ -11,12 +11,21 @@ const MODAL_WIDTH_CLASS = {
 
 function Modal({ isOpen, onClose, title, children, maxWidth = "800px" }) {
   const widthClass = MODAL_WIDTH_CLASS[maxWidth] || "modal-width-default";
+  const closeButtonRef = useRef(null);
 
   useEffect(() => {
     if (!isOpen) return undefined;
+    const previousFocus = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
     const closeOnEscape = (event) => { if (event.key === "Escape") onClose(); };
+    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
+    closeButtonRef.current?.focus();
+    return () => {
+      window.removeEventListener("keydown", closeOnEscape);
+      document.body.style.overflow = previousOverflow;
+      previousFocus?.focus?.();
+    };
   }, [isOpen, onClose]);
 
   return (
@@ -43,7 +52,7 @@ function Modal({ isOpen, onClose, title, children, maxWidth = "800px" }) {
           >
             <div className="modal-header">
               <h3 className="modal-title" id="modal-title">{title}</h3>
-              <button type="button" className="modal-close" onClick={onClose} aria-label="Cerrar ventana">
+              <button ref={closeButtonRef} type="button" className="modal-close" onClick={onClose} aria-label="Cerrar ventana">
                 <X size={20} />
               </button>
             </div>

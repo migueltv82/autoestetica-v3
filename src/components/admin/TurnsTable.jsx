@@ -107,9 +107,9 @@ function TurnsTable({ turns, onStatusChange, onDeleteTurn, onGenerateReceipt, on
               </td>
               {hasActions ? <td className="turn-actions-cell">
                 {canUseOperationalActions && turn.phone && !["Cancelado", "Finalizado"].includes(turn.status) ? <a className="btn-action-confirm" href={appointmentWhatsAppLink(turn)} target="_blank" rel="noreferrer" title={turn.status === "Listo" ? "Avisar por WhatsApp" : "Enviar confirmación por WhatsApp"}><MessageCircle size={16} /><span>{turn.status === "Listo" ? "Avisar listo" : "Confirmar turno"}</span></a> : null}
-                {onEditTurn ? <button className="btn-ghost btn-mini-action" onClick={() => onEditTurn(turn)} title="Editar turno"><Pencil size={16} /></button> : null}
+                {onEditTurn ? <button type="button" className="btn-ghost btn-mini-action" onClick={() => onEditTurn(turn)} title="Editar turno"><Pencil size={16} /></button> : null}
                 {onGenerateReceipt ? (
-                  <button
+                  <button type="button"
                     className="btn-action-receipt"
                     onClick={() => onGenerateReceipt(turn)}
                     title="Generar recibo"
@@ -118,7 +118,7 @@ function TurnsTable({ turns, onStatusChange, onDeleteTurn, onGenerateReceipt, on
                   </button>
                 ) : null}
                 {onDeleteTurn ? (
-                  <button
+                  <button type="button"
                     className="btn-action-danger"
                     onClick={() => onDeleteTurn(turn.id)}
                     title="Eliminar"

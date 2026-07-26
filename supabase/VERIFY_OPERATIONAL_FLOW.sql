@@ -46,5 +46,16 @@ union all
 select 'recibos activos sin turno', count(*)
 from public.receipts receipt
 left join public.work_orders wo on wo.id = receipt.work_order_id
-where receipt.status <> 'voided' and receipt.work_order_id is not null and wo.id is null;
-
+where receipt.status <> 'voided' and receipt.work_order_id is not null and wo.id is null
+union all
+select 'troqueles asociados a turnos no finalizados', count(*)
+from public.fidelity_stamps stamp
+join public.work_orders wo on wo.id = stamp.work_order_id
+where wo.status <> 'delivered' or wo.deleted_at is not null
+union all
+select 'troqueles asociados a otra organizacion', count(*)
+from public.fidelity_stamps stamp
+join public.fidelity_cards card on card.id = stamp.fidelity_card_id
+join public.clients client on client.id = card.client_id
+join public.work_orders wo on wo.id = stamp.work_order_id
+where client.organization_id <> wo.organization_id;

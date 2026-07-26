@@ -124,7 +124,7 @@ export async function ensureTurnScheduleAvailable({ organizationId, start, end }
     .select("reason,starts_at,ends_at")
     .eq("organization_id", organizationId)
     .lt("starts_at", end.toISOString())
-    .gt("ends_at", start)
+    .gt("ends_at", start.toISOString())
     .limit(1);
   if (blockError && blockError.code !== "PGRST205" && blockError.code !== "42P01") throw blockError;
   if (blocks?.length) throw new Error(`Ese horario no está disponible: ${blocks[0].reason || "agenda bloqueada"}.`);

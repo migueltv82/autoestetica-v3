@@ -97,7 +97,7 @@ function AdminGallery() {
           title="Galería de trabajos"
           subtitle="Subí resultados y elegí cuáles querés mostrar en el sitio."
           actions={
-            <button className={showForm ? "btn-ghost" : "btn-premium"} onClick={() => setShowForm((current) => !current)}>
+            <button type="button" className={showForm ? "btn-ghost" : "btn-premium"} onClick={() => setShowForm((current) => !current)}>
               {showForm ? <X size={18} /> : <Plus size={18} />}
               <span>{showForm ? "Cancelar subida" : "Subir nuevo trabajo"}</span>
             </button>
@@ -198,7 +198,7 @@ function AdminGallery() {
                 </div>
 
                 <div className="gallery-card-actions">
-                  <button
+                  <button type="button"
                     className={`btn-action-sm ${image.status === "published" ? "btn-success" : "btn-warning"}`}
                     onClick={() => handleToggleStatus(image.id)}
                     title={image.status === "published" ? "Ocultar de la web" : "Publicar en la web"}
@@ -206,7 +206,7 @@ function AdminGallery() {
                     {image.status === "published" ? <Eye size={16} /> : <EyeOff size={16} />}
                     {image.status === "published" ? "Publico" : "Oculto"}
                   </button>
-                  <button
+                  <button type="button"
                     className="btn-action-sm btn-danger"
                     onClick={() => {
                       handleDeleteImage(image.id);
