@@ -1,12 +1,13 @@
 import { CalendarDays, Car, ChevronLeft, ChevronRight, Clock3, MessageCircle, Pencil, ReceiptText, Search, Trash2, UserRound, X } from "lucide-react";
 import { readyTurnWhatsAppLink, turnConfirmationWhatsAppLink } from "../../utils/whatsapp";
 import { getTodayString, turnOccupiesDate } from "../../utils/date";
+import { getServiceTone } from "../../utils/serviceTone";
+import { getTurnStatusClass, getTurnVehicleLabel } from "../../utils/turnPresentation";
 import "./SimpleAgenda.css";
+import "./ServiceTone.css";
 
 const STATUSES = ["Pendiente", "Confirmado", "En proceso", "Listo", "Finalizado", "Cancelado"];
 const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
-const vehicleLabel = (turn) => [turn.vehicle, turn.vehicleBrand, turn.vehicleModel].filter(Boolean).join(" · ");
-
 function moveDate(value, days) {
   const date = new Date(`${value}T12:00:00`);
   date.setDate(date.getDate() + days);
@@ -21,7 +22,7 @@ function dateLabel(value) {
   return new Date(`${value}T12:00:00`).toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
 }
 
-export default function SimpleAgenda({ turns, selectedDate, onDateChange, search, onSearchChange, statusFilter, onStatusFilterChange, onStatusChange, onEditTurn, onDeleteTurn, onGenerateReceipt, settings, canUseOperationalActions = true }) {
+export default function SimpleAgenda({ turns, selectedDate, onDateChange, search, onSearchChange, statusFilter, onStatusFilterChange, onStatusChange, onEditTurn, onDeleteTurn, onGenerateReceipt, onViewTurn, settings, canUseOperationalActions = true }) {
   const visibleTurns = turns
     .filter((turn) => turnOccupiesDate(turn, selectedDate))
     .filter((turn) => !search.trim() || [turn.client, turn.service, turn.vehicle, turn.vehicleBrand, turn.vehicleModel, turn.phone].some((value) => String(value || "").toLowerCase().includes(search.trim().toLowerCase())))
@@ -49,10 +50,11 @@ export default function SimpleAgenda({ turns, selectedDate, onDateChange, search
     </section>
 
     <section className="agenda-card-list">
-      {visibleTurns.map((turn) => <article className={`agenda-mobile-turn status-${turn.status.toLowerCase().replaceAll(" ", "-")}`} key={turn.id}>
+      {visibleTurns.map((turn) => <article className={`agenda-mobile-turn is-overlapping ${getServiceTone(turn)} status-${getTurnStatusClass(turn.status)}`} key={turn.id} role="button" tabIndex={0} onClick={(event) => { if (!event.target.closest("a,button,select")) onViewTurn?.(turn); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onViewTurn?.(turn); }}>
         <header><div className="agenda-turn-time"><Clock3 size={17} /><strong>{turn.date === selectedDate ? turn.time : "En curso"}</strong><span>{turn.date !== turn.endDate ? `hasta ${turn.endDate} · ${turn.endTime}` : `– ${turn.endTime}`}</span></div>{onStatusChange ? <select value={turn.status} onChange={(event) => onStatusChange(turn.id, event.target.value)} aria-label={`Estado de ${turn.client}`}>{STATUSES.map((status) => <option key={status}>{status}</option>)}</select> : <span className="agenda-readonly-status">{turn.status}</span>}</header>
-        <div className="agenda-turn-client"><span><UserRound size={18} /></span><div><h3>{turn.client}</h3><p><Car size={14} /> {vehicleLabel(turn)}</p></div></div>
+        <div className="agenda-turn-client"><span><UserRound size={18} /></span><div><h3>{turn.client}</h3><p><Car size={14} /> {getTurnVehicleLabel(turn)}</p></div></div>
         <p className="agenda-turn-service">{turn.service}</p>
+        <p className="agenda-compact-vehicle"><Car size={13} />{getTurnVehicleLabel(turn) || "Vehículo sin informar"}</p>
         {turn.amount > 0 ? <strong className="agenda-turn-price">{money.format(turn.amount)}</strong> : null}
         {canUseOperationalActions ? <div className="agenda-primary-action">{turn.phone && !["Cancelado", "Finalizado"].includes(turn.status) ? <a href={turn.status === "Listo" ? readyTurnWhatsAppLink(turn, settings?.readyMessageTemplate, settings?.openingHours) : turnConfirmationWhatsAppLink(turn, settings?.businessName, settings?.confirmationMessageTemplate)} target="_blank" rel="noreferrer"><MessageCircle size={18} /> {turn.status === "Listo" ? "Avisar vehículo listo" : "Confirmar turno"}</a> : <span>Sin acción de WhatsApp</span>}</div> : null}
         {onEditTurn || onGenerateReceipt || onDeleteTurn ? <footer>{onEditTurn ? <button type="button" onClick={() => onEditTurn(turn)}><Pencil size={16} /> Editar</button> : null}{onGenerateReceipt ? <button type="button" onClick={() => onGenerateReceipt(turn)}><ReceiptText size={16} /> Recibo</button> : null}{onDeleteTurn ? <button className="danger" type="button" onClick={() => onDeleteTurn(turn.id)} aria-label="Eliminar turno"><Trash2 size={16} /></button> : null}</footer> : null}

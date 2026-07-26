@@ -1,0 +1,47 @@
+.service-gold {
+  --service-accent: #f5c451;
+  --service-text: #fff1b8;
+  --service-tint: rgba(245, 196, 81, 0.14);
+}
+
+.service-green {
+  --service-accent: #4ade80;
+  --service-text: #bbf7d0;
+  --service-tint: rgba(74, 222, 128, 0.12);
+}
+
+.service-blue {
+  --service-accent: #60a5fa;
+  --service-text: #bfdbfe;
+  --service-tint: rgba(96, 165, 250, 0.13);
+}
+
+.service-gray {
+  --service-accent: #a8b1bd;
+  --service-text: #e2e8f0;
+  --service-tint: rgba(148, 163, 184, 0.13);
+}
+
+.service-combined {
+  --service-accent: #fb5b68;
+  --service-text: #fecdd3;
+  --service-tint: rgba(244, 63, 94, 0.14);
+}
+
+.service-violet {
+  --service-accent: #a78bfa;
+  --service-text: #ddd6fe;
+  --service-tint: rgba(139, 92, 246, 0.15);
+}
+
+.service-neutral {
+  --service-accent: #8b9bad;
+  --service-text: #e5edf6;
+  --service-tint: rgba(100, 116, 139, 0.09);
+}
+
+.service-turquoise {
+  --service-accent: #2dd4bf;
+  --service-text: #99f6e4;
+  --service-tint: rgba(20, 184, 166, 0.14);
+}

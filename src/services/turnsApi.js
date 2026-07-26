@@ -24,6 +24,9 @@ export function mapWorkOrder(order) {
   const scheduled = order.scheduled_start ? new Date(order.scheduled_start) : null;
   const scheduledEnd = order.scheduled_end ? new Date(order.scheduled_end) : null;
   const items = order.work_order_items || [];
+  const clientVehicles = (order.clients?.vehicles || []).filter((vehicle) => !vehicle.deleted_at);
+  const fileVehicle = clientVehicles.find((vehicle) => vehicle.id === order.vehicle_id && (vehicle.brand || vehicle.model))
+    || clientVehicles.find((vehicle) => vehicle.brand || vehicle.model);
 
   return {
     id: order.id,
@@ -39,8 +42,8 @@ export function mapWorkOrder(order) {
     clientDirectoryVisible: order.clients?.directory_visible !== false,
     phone: order.clients?.phone || "",
     vehicle: order.vehicles?.type || "Sin vehículo",
-    vehicleBrand: order.vehicles?.brand || "",
-    vehicleModel: order.vehicles?.model || "",
+    vehicleBrand: order.vehicles?.brand || fileVehicle?.brand || "",
+    vehicleModel: order.vehicles?.model || fileVehicle?.model || "",
     vehicleId: order.vehicle_id,
     service: items.map((item) => item.description).join(", ") || "Sin servicios",
     services: items,
@@ -102,7 +105,7 @@ async function syncClientDirectoryPreference(orderId, previousClient, saveClient
 
 export async function fetchTurns(organizationId) {
   const { data, error } = await supabase.from("work_orders")
-    .select("id,number,client_id,vehicle_id,status,scheduled_start,scheduled_end,notes,inquiry_read_at,discount,total,clients(name,phone,directory_visible),vehicles(type,brand,model,license_plate),work_order_items(id,description,quantity,unit_price,total,service_id,services(estimated_minutes))")
+    .select("id,number,client_id,vehicle_id,status,scheduled_start,scheduled_end,notes,inquiry_read_at,discount,total,clients(name,phone,directory_visible,vehicles(id,brand,model,deleted_at)),vehicles(type,brand,model,license_plate),work_order_items(id,description,quantity,unit_price,total,service_id,services(estimated_minutes))")
     .eq("organization_id", organizationId)
     .is("deleted_at", null)
     .order("scheduled_start", { ascending: true, nullsFirst: false });

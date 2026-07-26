@@ -1,22 +1,63 @@
-# Base de datos de Autoestética Tucumán
+# Supabase — Autoestética Tucumán
 
-La aplicación usa Supabase como única fuente de verdad. El frontend nunca debe guardar claves `service_role` ni secretos.
+Supabase es la única fuente de verdad de la aplicación. Este directorio contiene el historial del esquema, funciones de servidor, verificaciones y procedimientos operativos.
+
+## Contenido
+
+- `migrations/`: cambios de esquema inmutables y ordenados cronológicamente.
+- `functions/`: Edge Functions para administrar usuarios sin exponer secretos.
+- `VERIFY_DATABASE.sql`: controles generales de integridad y seguridad.
+- `VERIFY_OPERATIONAL_FLOW.sql`: controles del flujo de turnos, caja y fidelización.
+- `BACKUP_CHECK.sql`: validación de un respaldo.
+- `BACKUP_AND_RECOVERY.md`: procedimiento de respaldo y recuperación.
+- `RESET_DATABASE.sql`: reinicio destructivo, solo para una instalación descartable.
+
+## Convención de migraciones
+
+El nombre sigue `AAAAMMDDNNNN_descripcion.sql`. Una migración aplicada no se edita, renombra ni elimina: cualquier corrección se agrega como una migración nueva. Cada archivo debe indicar al comienzo su propósito y, cuando corresponda, su impacto sobre datos, permisos o compatibilidad.
+
+### Catálogo funcional
+
+| Serie | Alcance |
+| --- | --- |
+| `20260714*` | Esquema inicial, catálogo público y servicios base |
+| `20260715*` | Precios, integridad, agenda, caja y planes SaaS |
+| `20260716*` | Alta del negocio, recibos, mensajes, realtime, operaciones atómicas y auditoría |
+| `20260717*`–`20260718*` | Roles, permisos y administración segura del equipo |
+| `20260719*` | Planes del club |
+| `20260722*` | Configuración visual de transformaciones |
+| `20260723*` | Unicidad de teléfono de clientes activos |
+| `20260724*`–`202607250002` | Fidelización y tarjetas por vehículo |
+| `202607250003` | Descuentos en órdenes de trabajo |
+| `202607250004`–`202607250008` | Alta opcional, promoción, baja e historial de clientes |
+| `202607250009` | Edición manual de troqueles |
+| `202607250010`–`202607250012` | Consultas públicas y estado leído/no leído |
+| `202607250013` | Turnos superpuestos sin reemplazar reservas existentes |
 
 ## Instalación limpia
 
-1. Crear un proyecto nuevo en Supabase y esperar a que figure `Healthy`.
-2. Copiar `Project URL` y la clave pública en `.env.local`.
-3. Si el proyecto contiene tablas descartables, ejecutar `RESET_DATABASE.sql` en SQL Editor.
-4. Ejecutar todos los archivos de `migrations/` en orden por nombre.
-5. Crear el usuario propietario en Authentication > Users.
-6. Ejecutar el bloque de vinculación incluido abajo.
-7. Ejecutar `VERIFY_DATABASE.sql`: todos los controles de integridad deben devolver `0`.
-8. Desplegar las Edge Functions de equipo para poder crear/invitar/eliminar usuarios desde Ajustes > Equipo y permisos.
-9. Aplicar el procedimiento de respaldo documentado en `BACKUP_AND_RECOVERY.md`.
+1. Crear un proyecto Supabase y esperar a que esté operativo.
+2. Configurar `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` en `.env.local`.
+3. Iniciar sesión y vincular el CLI:
+
+   ```bash
+   npm run supabase:login
+   npm run supabase:link -- --project-ref TU_PROJECT_REF
+   ```
+
+4. Aplicar las migraciones:
+
+   ```bash
+   npm run supabase:db:push
+   ```
+
+5. Crear el usuario propietario en Authentication > Users y vincularlo a la organización.
+6. Desplegar las Edge Functions con `npm run supabase:functions:deploy`.
+7. Ejecutar `VERIFY_DATABASE.sql` y `VERIFY_OPERATIONAL_FLOW.sql` desde SQL Editor.
 
 ## Vincular el propietario
 
-Reemplazar el email antes de ejecutar:
+Reemplazar el correo antes de ejecutar:
 
 ```sql
 with selected_org as (
@@ -30,7 +71,8 @@ with selected_org as (
 insert into public.profiles (id, organization_id, full_name, role, active)
 select selected_user.id, selected_org.id, 'Propietario', 'owner', true
 from selected_user cross join selected_org
-on conflict (id) do update set organization_id = excluded.organization_id, role = 'owner', active = true;
+on conflict (id) do update
+set organization_id = excluded.organization_id, role = 'owner', active = true;
 
 insert into public.business_settings (organization_id, business_name, address, whatsapp)
 select id, 'Autoestética Tucumán', 'Tucumán, Argentina', '+54 9 381 5448147'
@@ -38,31 +80,21 @@ from public.organizations where slug = 'autoestetica-tucuman'
 on conflict (organization_id) do update set business_name = excluded.business_name;
 ```
 
-## Desplegar creación segura de usuarios
+## Seguridad
 
-La sección Ajustes > Equipo y permisos usa Edge Functions para crear/invitar/eliminar usuarios en Supabase Auth sin exponer la `service_role` en el navegador.
+- El frontend usa únicamente la clave pública (`anon`).
+- `SUPABASE_SERVICE_ROLE_KEY` vive solo en los secretos de Edge Functions.
+- Las funciones de equipo validan el JWT y exigen rol `owner` o `admin`.
+- Las políticas RLS y funciones RPC son parte del esquema versionado; no deben mantenerse solo desde el Dashboard.
+- `RESET_DATABASE.sql` elimina datos. Revisar el proyecto seleccionado y disponer de respaldo antes de usarlo.
+
+## Flujo de publicación
 
 ```bash
+npm run supabase:migrations:list
+npm run supabase:db:push
 npm run supabase:functions:deploy
+npm run check
 ```
 
-Antes del primer despliegue, iniciar sesión y vincular el proyecto:
-
-```bash
-npm run supabase:login
-npm run supabase:link -- --project-ref TU_PROJECT_REF
-```
-
-La función valida manualmente el JWT del usuario que llama, exige rol `owner/admin`, y usa `SUPABASE_SERVICE_ROLE_KEY` solo dentro del entorno seguro de Supabase.
-
-Si tu proyecto no tiene configurada la variable `SUPABASE_SERVICE_ROLE_KEY` en Edge Functions, agregala desde Supabase Dashboard > Edge Functions > Secrets.
-
-En Ajustes > Equipo y permisos:
-
-- Si completás `Clave temporal`, el usuario entra con email + esa clave.
-- Si dejás `Clave temporal` vacía, Supabase envía una invitación por email.
-- La clave temporal debe tener al menos 8 caracteres.
-
-## Modelo
-
-`organización → cliente → vehículos → órdenes de trabajo → servicios/pagos/fotos/recibos`
+Después del despliegue, ejecutar ambas verificaciones SQL y probar consulta → turno → confirmación → tarjeta → finalización → troquel.

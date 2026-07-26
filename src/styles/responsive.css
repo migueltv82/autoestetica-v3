@@ -1,0 +1,384 @@
+/* Capa responsive transversal: tablet, móvil y pantallas angostas. */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+}
+
+:is(button, a, input, select, textarea) {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 1024px) {
+  .container {
+    width: min(100% - 2rem, var(--container-max, 1200px));
+  }
+
+  .admin-main {
+    padding-inline: clamp(.85rem, 2.2vw, 1.35rem);
+  }
+
+  .admin-container,
+  .admin-page-header,
+  .admin-page-header-content,
+  .admin-form-shell,
+  .dashboard-panel {
+    min-width: 0;
+  }
+
+  .admin-shell :is(input, select, textarea) {
+    min-height: 44px;
+  }
+
+  .admin-shell :is(.btn-premium, .btn-primary-admin, .btn-form-primary, .btn-ghost) {
+    min-height: 44px;
+  }
+
+  .admin-table-wrap,
+  .simple-table-container,
+  .board-scroll,
+  .month-agenda,
+  .agenda-view-content:has(.week-grid) {
+    max-width: 100%;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-overlay {
+    padding: 1rem;
+  }
+
+  .modal-container {
+    max-width: min(94vw, 1000px);
+    max-height: 92dvh;
+  }
+
+  .modal-body {
+    max-height: calc(92dvh - 74px);
+    padding: 1.35rem;
+  }
+
+  .modal-header {
+    padding: 1.15rem 1.35rem;
+  }
+
+  .client-profile--modal .client-profile-grid,
+  .cash-operation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inquiry-shell,
+  .club-membership-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --mobile-inline: clamp(.85rem, 4vw, 1.1rem);
+  }
+
+  .container {
+    width: 100%;
+    padding-inline: var(--mobile-inline);
+  }
+
+  .admin-main {
+    padding: .9rem var(--mobile-inline) 1.4rem;
+  }
+
+  .admin-page-header {
+    align-items: stretch;
+    flex-direction: column;
+    margin-bottom: 1rem;
+  }
+
+  .admin-page-header-title {
+    font-size: clamp(1.3rem, 5.2vw, 1.65rem) !important;
+  }
+
+  .admin-page-header-text {
+    max-width: 100%;
+    font-size: .78rem !important;
+    line-height: 1.5;
+  }
+
+  .admin-page-header-actions,
+  .admin-page-header-actions > :is(button, a) {
+    width: 100%;
+  }
+
+  .admin-page-header-actions > :is(button, a) {
+    min-height: 46px;
+    justify-content: center;
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: .55rem !important;
+  }
+
+  .admin-form-grid,
+  .admin-form-grid.wide,
+  .inquiry-form-grid,
+  .options-grid-services,
+  .client-profile-grid,
+  .receipt-client-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-form-shell,
+  .dashboard-panel {
+    padding: .9rem;
+    border-radius: 14px;
+  }
+
+  .admin-form-group label,
+  .inquiry-form-group label {
+    font-size: .78rem;
+  }
+
+  .admin-shell :is(input, select, textarea),
+  .inquiry-form-group :is(input, textarea) {
+    min-height: 46px;
+    font-size: 16px !important;
+  }
+
+  .admin-form-actions {
+    gap: .55rem;
+  }
+
+  .admin-form-actions > :is(button, a) {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .clients-directory,
+  .catalog-grid,
+  .showcase-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .client-card-actions {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 44px 44px;
+  }
+
+  .client-card-actions :is(button, a) {
+    min-height: 44px;
+  }
+
+  .client-profile-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .client-ready {
+    grid-template-columns: 1fr;
+  }
+
+  .turn-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .turn-detail-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .turn-detail-actions :is(a, button) {
+    min-height: 46px;
+  }
+
+  .simple-agenda-view-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .35rem;
+  }
+
+  .simple-agenda-view-tabs button {
+    min-width: 0;
+    min-height: 46px;
+    padding-inline: .4rem;
+  }
+
+  .week-controls {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    width: 100%;
+  }
+
+  .week-controls button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .week-controls strong {
+    min-width: 0;
+    font-size: .76rem;
+  }
+
+  .week-controls .week-today {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 40px;
+  }
+
+  .inquiry-page,
+  .catalog-header {
+    padding-top: clamp(5.5rem, 16vw, 6.5rem);
+  }
+
+  .inquiry-form-panel {
+    padding: 1rem;
+    border-radius: 18px;
+  }
+
+  .inquiry-submit-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .inquiry-submit {
+    width: 100%;
+    min-width: 0;
+    min-height: 50px;
+  }
+
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-container {
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100dvh - env(safe-area-inset-top));
+    border-radius: 22px 22px 0 0;
+  }
+
+  .modal-header {
+    padding: 1rem var(--mobile-inline);
+  }
+
+  .modal-title {
+    font-size: 1.12rem;
+  }
+
+  .modal-close {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+  }
+
+  .modal-body {
+    max-height: calc(100dvh - 69px - env(safe-area-inset-top));
+    padding: .9rem var(--mobile-inline) calc(1rem + env(safe-area-inset-bottom));
+  }
+
+  .feedback-toasts {
+    right: var(--mobile-inline);
+    left: var(--mobile-inline);
+    width: auto;
+  }
+
+  .feedback-toast {
+    padding: .75rem;
+    font-size: .75rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .admin-main {
+    padding-inline: .7rem;
+  }
+
+  .admin-stats-grid {
+    gap: .42rem !important;
+  }
+
+  .admin-stats-grid > * {
+    padding: .72rem !important;
+  }
+
+  .client-card {
+    padding: .72rem;
+  }
+
+  .client-card-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .client-card-actions {
+    grid-template-columns: minmax(0, 1fr) 44px 44px;
+  }
+
+  .client-card-actions .client-ready {
+    display: none;
+  }
+
+  .agenda-quick-summary {
+    gap: .35rem;
+  }
+
+  .agenda-quick-summary span {
+    padding-inline: .25rem;
+    font-size: .57rem;
+  }
+
+  .agenda-compact-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .agenda-mobile-turn.is-overlapping > footer button {
+    min-height: 42px;
+  }
+
+  .turn-detail-hero {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .turn-detail-hero span {
+    align-self: flex-start;
+    order: 0;
+  }
+
+  .turn-detail-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .receipt-item {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 44px;
+  }
+
+  .receipt-description {
+    grid-column: 1 / -1;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .admin-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .simple-agenda-view-tabs button {
+    flex-direction: column;
+    gap: .15rem;
+    font-size: .61rem;
+  }
+
+  .turn-detail-actions,
+  .feedback-confirm-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .client-card-actions {
+    grid-template-columns: 1fr 44px 44px;
+  }
+}

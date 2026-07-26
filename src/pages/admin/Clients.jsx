@@ -27,8 +27,10 @@ import { useSettings } from "../../hooks/useSettings";
 import { usePermissions } from "../../hooks/usePermissions";
 import { clientWhatsAppLink, readyVehicleWhatsAppLink } from "../../utils/whatsapp";
 import ClientFidelityCard from "../../components/admin/ClientFidelityCard";
+import Modal from "../../components/ui/Modal";
 import { useFidelitySummaries } from "../../hooks/useFidelitySummaries";
 import "./Clients.css";
+import "./ClientProfileModal.css";
 
 const EMPTY_CLIENT = { name: "", phone: "", email: "", notes: "", vehicle: "Auto" };
 const EMPTY_VEHICLE = { type: "Auto", brand: "", model: "", licensePlate: "", color: "", year: "" };
@@ -245,10 +247,11 @@ function Clients() {
         {!isLoading && !clients.length ? <div className="clients-empty"><Users size={34} /><strong>{search ? "No encontramos coincidencias" : "Todavia no hay clientes"}</strong><span>{search ? "Proba con otro nombre, telefono o patente." : "Los clientes se guardan al crear un turno o desde Nuevo cliente."}</span></div> : null}
 
         {selectedClient ? (
-          <section className="client-profile">
+          <Modal isOpen onClose={() => setSelectedId(null)} title={`Ficha de ${selectedClient.name}`} maxWidth="1000px">
+          <section className="client-profile client-profile--modal">
             <header>
               <div><span className="admin-form-kicker">Ficha del cliente</span><h2>{selectedClient.name}</h2><p><Phone size={13} /> {selectedClient.phone}{selectedClient.email ? <><Mail size={13} /> {selectedClient.email}</> : null}</p></div>
-              <div>{canManageClients ? <a href={clientWhatsAppLink(selectedClient, settings.businessName)} target="_blank" rel="noreferrer"><MessageCircle size={16} /> WhatsApp</a> : null}<button type="button" onClick={() => setSelectedId(null)} aria-label="Cerrar ficha"><X size={17} /></button></div>
+              <div>{canManageClients ? <a href={clientWhatsAppLink(selectedClient, settings.businessName)} target="_blank" rel="noreferrer"><MessageCircle size={16} /> WhatsApp</a> : null}</div>
             </header>
 
             <div className="client-profile-stats">
@@ -306,6 +309,7 @@ function Clients() {
             </div>
             {selectedClient.notes ? <p className="client-notes">{selectedClient.notes}</p> : null}
           </section>
+          </Modal>
         ) : null}
       </AdminLayout>
     </PageTransition>

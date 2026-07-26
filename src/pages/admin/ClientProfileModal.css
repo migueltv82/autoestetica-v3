@@ -1,0 +1,70 @@
+.client-profile--modal {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.client-profile--modal > header {
+  padding-top: 0;
+}
+
+.modal-container:has(.client-profile--modal) {
+  max-height: 94vh;
+}
+
+.modal-container:has(.client-profile--modal) .modal-header {
+  padding: 1rem 1.5rem;
+}
+
+.modal-container:has(.client-profile--modal) .modal-body {
+  max-height: calc(94vh - 70px);
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.client-profile--modal > header {
+  padding-bottom: .7rem;
+}
+
+.client-profile--modal .client-profile-stats {
+  margin: .65rem 0;
+}
+
+.client-profile--modal .client-profile-stats span,
+.client-profile--modal .client-profile-grid > section {
+  padding: .6rem;
+}
+
+.client-profile--modal .client-ready {
+  margin-bottom: .6rem;
+  padding: .65rem;
+}
+
+.client-profile--modal .client-ready textarea {
+  min-height: 68px;
+}
+
+.client-profile--modal .client-profile-grid {
+  gap: .6rem;
+}
+
+.client-profile--modal .client-vehicle-list article,
+.client-profile--modal .client-history-list article {
+  padding: .48rem .55rem;
+}
+
+@media (max-width: 640px) {
+  .modal-container:has(.client-profile--modal) {
+    max-height: calc(100dvh - env(safe-area-inset-top));
+  }
+
+  .modal-container:has(.client-profile--modal) .modal-body {
+    max-height: calc(100dvh - 68px - env(safe-area-inset-top));
+    padding: .8rem .75rem calc(.9rem + env(safe-area-inset-bottom));
+  }
+
+  .client-profile--modal {
+    padding: 0;
+  }
+}

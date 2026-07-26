@@ -9,10 +9,14 @@
     "lint": "eslint .",
     "test": "vitest",
     "test:run": "vitest run",
-    "predeploy": "node scripts/predeploy.mjs && npm run lint && npm run test:run && npm run build",
+    "check": "npm run lint && npm run test:run && npm run build",
+    "predeploy": "node scripts/predeploy.mjs && npm run check",
     "preview": "vite preview",
     "supabase:login": "supabase login",
     "supabase:link": "supabase link",
+    "supabase:status": "supabase status",
+    "supabase:migrations:list": "supabase migration list",
+    "supabase:db:push": "supabase db push",
     "supabase:function:deploy": "supabase functions deploy create-team-member --no-verify-jwt",
     "supabase:function:delete:deploy": "supabase functions deploy delete-team-member --no-verify-jwt",
     "supabase:functions:deploy": "npm run supabase:function:deploy && npm run supabase:function:delete:deploy"
@@ -27,7 +31,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
-    "@tailwindcss/vite": "^4.3.3",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -40,7 +43,6 @@
     "globals": "^17.4.0",
     "jsdom": "^29.1.1",
     "supabase": "^2.109.1",
-    "tailwindcss": "^4.3.3",
     "vite": "^8.0.1",
     "vitest": "^4.1.10"
   }
