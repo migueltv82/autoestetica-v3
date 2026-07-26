@@ -36,6 +36,7 @@ export function mapWorkOrder(order) {
     durationMinutes: scheduled && scheduledEnd ? Math.max(15, Math.round((scheduledEnd - scheduled) / 60000)) : 120,
     client: order.clients?.name || "Sin cliente",
     clientId: order.client_id,
+    clientDirectoryVisible: order.clients?.directory_visible !== false,
     phone: order.clients?.phone || "",
     vehicle: order.vehicles?.type || "Sin vehículo",
     vehicleBrand: order.vehicles?.brand || "",
@@ -45,6 +46,8 @@ export function mapWorkOrder(order) {
     services: items,
     status: STATUS_FROM_DB[order.status] || "Pendiente",
     notes: order.notes || "",
+    inquiryReadAt: order.inquiry_read_at || null,
+    discount: Number(order.discount || 0),
     amount: Number(order.total || 0),
   };
 }
@@ -87,9 +90,19 @@ async function saveVehicleDetails(orderId, formData) {
   if (vehicleError) throw vehicleError;
 }
 
+async function syncClientDirectoryPreference(orderId, previousClient, saveClient) {
+  if (previousClient?.directory_visible && !saveClient) return;
+  if (previousClient && !saveClient) return;
+  const { error } = await supabase.rpc("set_order_client_directory_visibility", {
+    p_order_id: orderId,
+    p_visible: Boolean(saveClient),
+  });
+  if (error) throw error;
+}
+
 export async function fetchTurns(organizationId) {
   const { data, error } = await supabase.from("work_orders")
-    .select("id,number,client_id,vehicle_id,status,scheduled_start,scheduled_end,notes,total,clients(name,phone),vehicles(type,brand,model,license_plate),work_order_items(id,description,quantity,unit_price,total,service_id,services(estimated_minutes))")
+    .select("id,number,client_id,vehicle_id,status,scheduled_start,scheduled_end,notes,inquiry_read_at,discount,total,clients(name,phone,directory_visible),vehicles(type,brand,model,license_plate),work_order_items(id,description,quantity,unit_price,total,service_id,services(estimated_minutes))")
     .eq("organization_id", organizationId)
     .is("deleted_at", null)
     .order("scheduled_start", { ascending: true, nullsFirst: false });
@@ -98,7 +111,12 @@ export async function fetchTurns(organizationId) {
   return (data || []).map(mapWorkOrder);
 }
 
-export async function ensureTurnScheduleAvailable({ organizationId, start, end, excludedTurnId = null }) {
+export async function markInquiryAsRead(turnId) {
+  const { error } = await supabase.rpc("mark_inquiry_read", { p_order_id: turnId });
+  if (error) throw error;
+}
+
+export async function ensureTurnScheduleAvailable({ organizationId, start, end }) {
   const { data: blocks, error: blockError } = await supabase.from("schedule_blocks")
     .select("reason,starts_at,ends_at")
     .eq("organization_id", organizationId)
@@ -107,32 +125,21 @@ export async function ensureTurnScheduleAvailable({ organizationId, start, end, 
     .limit(1);
   if (blockError && blockError.code !== "PGRST205" && blockError.code !== "42P01") throw blockError;
   if (blocks?.length) throw new Error(`Ese horario no está disponible: ${blocks[0].reason || "agenda bloqueada"}.`);
-
-  let query = supabase.from("work_orders")
-    .select("id,scheduled_start,scheduled_end,clients(name)")
-    .eq("organization_id", organizationId)
-    .is("deleted_at", null)
-    .neq("status", "cancelled")
-    .lt("scheduled_start", end.toISOString())
-    .gt("scheduled_end", start);
-
-  if (excludedTurnId) query = query.neq("id", excludedTurnId);
-
-  const { data, error } = await query.limit(1);
-  if (error) throw error;
-  if (data?.length) {
-    const occupied = data[0];
-    const options = { hour: "2-digit", minute: "2-digit", timeZone: "America/Argentina/Tucuman" };
-    const from = new Date(occupied.scheduled_start).toLocaleTimeString("es-AR", options);
-    const to = new Date(occupied.scheduled_end).toLocaleTimeString("es-AR", options);
-    throw new Error(`Horario ocupado por ${occupied.clients?.name || "otro cliente"} (${from} a ${to}).`);
-  }
 }
 
 export async function createScheduledTurn({ formData, phone }) {
   const { start, end } = buildTurnSchedule(formData);
   const orderItems = buildTurnItems(formData);
-  const total = orderItems.reduce((sum, item) => sum + item.price, 0);
+  const subtotal = orderItems.reduce((sum, item) => sum + item.price, 0);
+  const discount = Math.min(Math.max(Number(formData.discount || 0), 0), subtotal);
+  const total = Math.max(subtotal - discount, 0);
+  const { data: previousClient, error: clientLookupError } = await supabase
+    .from("clients")
+    .select("id,directory_visible")
+    .eq("phone", phone)
+    .is("deleted_at", null)
+    .maybeSingle();
+  if (clientLookupError) throw clientLookupError;
 
   const { data: orderId, error } = await supabase.rpc("create_scheduled_work_order", {
     p_client_name: formData.client.trim(),
@@ -148,6 +155,13 @@ export async function createScheduledTurn({ formData, phone }) {
     p_cash_method: formData.paymentMethod,
   });
   if (error) throw error;
+  const { error: discountError } = await supabase.rpc("set_work_order_discount", {
+    p_order_id: orderId,
+    p_discount: discount,
+    p_adjust_initial_payment: Boolean(formData.registerPayment),
+  });
+  if (discountError) throw discountError;
+  await syncClientDirectoryPreference(orderId, previousClient, formData.saveClient !== false);
   await saveVehicleDetails(orderId, formData);
 
   return {
@@ -165,6 +179,7 @@ export async function createScheduledTurn({ formData, phone }) {
     services: orderItems,
     status: formData.status,
     amount: total,
+    discount,
   };
 }
 
@@ -184,7 +199,21 @@ export async function updateScheduledTurn({ turnId, formData, phone }) {
     p_services: items,
   });
   if (error) throw error;
+  const subtotal = items.reduce((sum, item) => sum + item.price, 0);
+  const { error: discountError } = await supabase.rpc("set_work_order_discount", {
+    p_order_id: turnId,
+    p_discount: Math.min(Math.max(Number(formData.discount || 0), 0), subtotal),
+    p_adjust_initial_payment: false,
+  });
+  if (discountError) throw discountError;
   await saveVehicleDetails(turnId, formData);
+  if (formData.saveClient) {
+    const { error: promotionError } = await supabase.rpc("promote_order_client_with_fidelity", {
+      p_order_id: turnId,
+      p_generate_card: formData.status === "Confirmado",
+    });
+    if (promotionError) throw promotionError;
+  }
 }
 
 export async function saveTurnStatus({ turnId, status }) {
@@ -200,14 +229,14 @@ export async function saveTurnStatus({ turnId, status }) {
     try {
       const { data: order } = await supabase
         .from("work_orders")
-        .select("client_id")
+        .select("client_id,vehicle_id")
         .eq("id", turnId)
         .single();
 
       if (order?.client_id) {
         fidelityResult = dbStatus === "confirmed"
-          ? { ...await ensureFidelityCardForClient(order.client_id), confirmationReady: true }
-          : await stampFidelityCardForClient(order.client_id, turnId, "Vehículo entregado");
+          ? { ...await ensureFidelityCardForClient(order.client_id, order.vehicle_id), confirmationReady: true }
+          : await stampFidelityCardForClient(order.client_id, order.vehicle_id, turnId, "Vehículo entregado");
       }
     } catch (err) {
       console.warn("No se pudo estampar troquel Fidelity:", err);

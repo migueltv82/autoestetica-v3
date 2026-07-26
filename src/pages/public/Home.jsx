@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle2, MapPin, MessageCircle, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, MessageCircle, ShieldCheck, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import PublicLayout from "../../components/layout/PublicLayout";
 import PageTransition from "../../components/ui/PageTransition";
@@ -12,6 +12,7 @@ import BeforeAfterSlider from "../../components/ui/BeforeAfterSlider";
 import fallbackBefore from "../../assets/hero-polishing.webp";
 import fallbackAfter from "../../assets/result-interior.webp";
 import ServiceSalesCard from "../../components/services/ServiceSalesCard";
+import ClubMembershipSection from "../../components/public/ClubMembershipSection";
 import "./Home.css";
 
 const FADE_UP = {
@@ -43,7 +44,16 @@ function Home() {
   const featuredServices = Array.isArray(services) ? [...services.filter((service) => service.featured), ...services.filter((service) => !service.featured)].slice(0, 3) : [];
   const whatsappNumber = (settings.whatsapp || "5493815448147").replace(/\D/g, "");
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Hola, quiero consultar por un servicio de detailing para mi vehículo.")}`;
-  const comparison = publishedImages.find((item) => item.beforeUrl && item.afterUrl) || { beforeUrl: fallbackBefore, afterUrl: fallbackAfter, title: "Transformación profesional", service: "Resultado de detailing" };
+  const configuredComparison = settings.transformationBeforeUrl && settings.transformationAfterUrl ? {
+    beforeUrl: settings.transformationBeforeUrl,
+    afterUrl: settings.transformationAfterUrl,
+    title: settings.transformationTitle || "Deslizá y descubrí la diferencia",
+    service: settings.transformationServiceLabel || "Resultado real de detailing",
+  } : null;
+  const galleryComparison = publishedImages.find((item) => item.beforeUrl && item.afterUrl);
+  const comparison = configuredComparison || galleryComparison || { beforeUrl: fallbackBefore, afterUrl: fallbackAfter, title: "Transformación profesional", service: "Resultado de detailing" };
+  const transformationTitle = settings.transformationTitle || "Deslizá y descubrí la diferencia";
+  const transformationSubtitle = settings.transformationSubtitle || "No maquillamos el vehículo: trabajamos cada superficie con un proceso pensado para recuperar su apariencia y proteger el resultado.";
 
   return (
     <PageTransition>
@@ -90,19 +100,28 @@ function Home() {
                   transition={{ duration: 0.56, delay: 0.24 }}
                 >
                   <a href={whatsappLink} target="_blank" rel="noreferrer" className="home-btn home-btn-primary"><MessageCircle size={18} /> Consultar por WhatsApp</a>
-                  <Link to="/servicios" className="home-btn home-btn-secondary">
-                    Ver tratamientos <ArrowRight size={16} />
-                  </Link>
                 </motion.div>
-                <motion.div className="home-hero-proof" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .5, delay: .32 }}><span><ShieldCheck size={16} /> Atención personalizada</span><span><Sparkles size={16} /> Terminación profesional</span><span><MapPin size={16} /> Tucumán</span></motion.div>
+                <motion.div className="home-hero-proof" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .5, delay: .32 }}><span><ShieldCheck size={16} /> Diagnóstico personalizado</span><span><Sparkles size={16} /> Terminación profesional</span></motion.div>
               </div>
-              <motion.aside className="home-brand-card" initial={{ opacity: 0, x: 22 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .65, delay: .2 }}><div className="home-brand-glow" /><img src={settings.logoUrl || defaultLogo} alt={`Logo de ${settings.businessName || "Autoestética Tucumán"}`} /><span>Detailing studio</span><h2>{settings.businessName || "Autoestética Tucumán"}</h2><p><CheckCircle2 size={15} /> Evaluación previa para recomendar el tratamiento correcto.</p><a href={whatsappLink} target="_blank" rel="noreferrer">Reservar una consulta <ArrowRight size={15} /></a></motion.aside>
+              <motion.aside className="home-brand-card" initial={{ opacity: 0, x: 22 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .65, delay: .2 }}><div className="home-brand-glow" /><img src={settings.logoUrl || defaultLogo} alt={`Logo de ${settings.businessName || "Autoestética Tucumán"}`} /><span>Detailing studio</span><h2>{settings.businessName || "Autoestética Tucumán"}</h2><p><CheckCircle2 size={15} /> Evaluación previa para recomendar el tratamiento correcto según el estado real del vehículo.</p><div className="home-brand-note"><strong>Respuesta directa por WhatsApp</strong><small>Contanos qué vehículo tenés y qué resultado buscás.</small></div></motion.aside>
             </div>
           </section>
 
+          <ClubMembershipSection />
+
           <section className="home-transformation" aria-labelledby="home-transformation-title">
-            <div className="container home-transformation-grid">
-              <motion.div {...FADE_UP} className="home-transformation-copy"><span className="home-kicker">El resultado habla</span><h2 id="home-transformation-title">Deslizá y descubrí la diferencia</h2><p>No maquillamos el vehículo: trabajamos cada superficie con un proceso pensado para recuperar su apariencia y proteger el resultado.</p><div><span><CheckCircle2 size={16} /> Trabajo documentado</span><span><CheckCircle2 size={16} /> Resultado real</span></div><Link to="/galeria">Ver todos los trabajos <ArrowRight size={15} /></Link></motion.div>
+            <div className="container home-transformation-shell">
+              <motion.div {...FADE_UP} className="home-transformation-copy">
+                <span className="home-kicker">El resultado habla</span>
+                <h2 id="home-transformation-title">{transformationTitle}</h2>
+                <p>{transformationSubtitle}</p>
+                <div className="home-transformation-proof">
+                  <span><CheckCircle2 size={16} /> Trabajo documentado</span>
+                  <span><CheckCircle2 size={16} /> Resultado real</span>
+                  <span><CheckCircle2 size={16} /> Comparación honesta</span>
+                </div>
+                <Link to="/galeria">Ver todos los trabajos <ArrowRight size={15} /></Link>
+              </motion.div>
               <motion.div {...FADE_UP} className="home-transformation-slider"><BeforeAfterSlider beforeUrl={comparison.beforeUrl} afterUrl={comparison.afterUrl} title={comparison.title} service={comparison.service} /></motion.div>
             </div>
           </section>

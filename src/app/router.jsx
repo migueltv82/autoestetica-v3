@@ -21,10 +21,12 @@ const ClientFidelityCardPage = lazy(() => import("../pages/public/ClientFidelity
 const Login = lazy(() => import("../pages/admin/Login"));
 const Dashboard = lazy(() => import("../pages/admin/Dashboard"));
 const Turns = lazy(() => import("../pages/admin/Turns"));
+const Inquiries = lazy(() => import("../pages/admin/Inquiries"));
 const Cash = lazy(() => import("../pages/admin/Cash"));
 const Clients = lazy(() => import("../pages/admin/Clients"));
 const AdminServices = lazy(() => import("../pages/admin/AdminServices"));
 const GalleryAdmin = lazy(() => import("../pages/admin/Gallery"));
+const ClubSettings = lazy(() => import("../pages/admin/ClubSettings"));
 const Settings = lazy(() => import("../pages/admin/Settings"));
 
 export default function RouterProviderApp() {
@@ -55,10 +57,13 @@ export default function RouterProviderApp() {
           <Route path="/admin/login" element={<Login />} />
           <Route path="/admin/dashboard" element={protectOwnerAdmin(<Dashboard />)} />
           <Route path="/admin/turnos" element={protect(<Turns />)} />
+          <Route path="/admin/consultas" element={protect(<Inquiries />)} />
           <Route path="/admin/caja" element={protectOwnerAdmin(<Cash />)} />
           <Route path="/admin/clientes" element={protect(<Clients />)} />
           <Route path="/admin/servicios" element={protectOwnerAdmin(<AdminServices />)} />
           <Route path="/admin/galeria" element={protectOwnerAdmin(<GalleryAdmin />)} />
+          <Route path="/admin/club" element={protectOwnerAdmin(<ClubSettings />)} />
+          <Route path="/admin/membresias" element={<Navigate to="/admin/club" replace />} />
           <Route path="/admin/configuracion" element={protectOwner(<Settings />)} />
 
           {/* Fallback */}

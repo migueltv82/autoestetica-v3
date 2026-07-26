@@ -5,6 +5,7 @@ import "./styles/variables.css";
 import "./styles/globals.css";
 import "./styles/utilities.css";
 import "./styles/accessibility.css";
+import "./styles/tailwind.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

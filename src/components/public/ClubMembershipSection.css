@@ -1,0 +1,643 @@
+.club-public-section {
+  padding: clamp(3.5rem, 6vw, 5.5rem) 0;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(87, 199, 255, 0.08), transparent 28%),
+    radial-gradient(circle at 86% 42%, rgba(255, 255, 255, 0.035), transparent 30%),
+    #05070a;
+}
+
+.club-public-section-compact {
+  padding: clamp(2.3rem, 4vw, 3.4rem) 0;
+}
+
+.club-public-shell {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.1rem, 2.8vw, 2rem);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: clamp(22px, 3vw, 34px);
+  background:
+    linear-gradient(180deg, rgba(12, 18, 26, 0.92), rgba(6, 10, 15, 0.96)),
+    #080d13;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.32);
+}
+
+.club-public-shell::before {
+  position: absolute;
+  top: 0;
+  right: 8%;
+  left: 8%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(113, 208, 255, 0.52), transparent);
+  content: "";
+}
+
+.club-public-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-bottom: clamp(1.1rem, 2.5vw, 1.7rem);
+}
+
+.club-public-header > div {
+  max-width: 720px;
+}
+
+.club-public-header h2 {
+  max-width: 720px;
+  margin: 0.85rem 0 0;
+  color: var(--home-text, #f2f0eb);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 620;
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+}
+
+.club-public-header p {
+  max-width: 610px;
+  margin: 0.85rem 0 0;
+  color: var(--home-text-soft, rgba(242, 240, 235, 0.72));
+  font-size: 0.98rem;
+  line-height: 1.65;
+}
+
+.club-public-badge,
+.club-limited-chip,
+.club-payment-chip {
+  display: inline-flex;
+  width: max-content;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.club-public-badge {
+  padding: 0.45rem 0.72rem;
+  border: 1px solid rgba(113, 208, 255, 0.22);
+  background: rgba(87, 199, 255, 0.08);
+  color: #b9e8ff;
+}
+
+.club-public-badge.accent {
+  border-color: rgba(251, 191, 36, 0.24);
+  background: rgba(251, 191, 36, 0.08);
+  color: #f8d478;
+}
+
+.club-limited-chip,
+.club-payment-chip {
+  padding: 0.5rem 0.78rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.045);
+  color: rgba(242, 240, 235, 0.58);
+}
+
+.club-payment-chip {
+  flex: 0 0 auto;
+  color: #dff6ff;
+}
+
+.club-public-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1rem;
+}
+
+.club-public-grid.with-fidelity {
+  grid-template-columns: minmax(0, 1.12fr) minmax(300px, 0.72fr);
+  align-items: start;
+}
+
+.club-public-grid.only-plans {
+  grid-template-columns: minmax(0, 860px);
+}
+
+.club-plan-stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.club-public-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.105);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 14% 0%, rgba(87, 199, 255, 0.1), transparent 34%),
+    linear-gradient(145deg, rgba(17, 27, 38, 0.94), rgba(6, 10, 15, 0.98));
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+}
+
+.club-plan-card-public {
+  padding: clamp(0.9rem, 2vw, 1.25rem);
+}
+
+.club-card-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.club-card-topline > small {
+  color: rgba(242, 240, 235, 0.48);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.club-plan-image {
+  position: relative;
+  height: clamp(180px, 26vw, 260px);
+  margin-bottom: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 21px;
+  background: #090e14;
+}
+
+.club-plan-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  filter: brightness(0.74) saturate(0.85) contrast(1.12);
+  transition: opacity 360ms ease, transform 400ms ease;
+}
+
+.club-plan-image img.is-loaded {
+  opacity: 1;
+}
+
+.club-plan-card-public:hover .club-plan-image img {
+  transform: scale(1.025);
+}
+
+.club-plan-image::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 44%, rgba(5, 7, 10, 0.22));
+  content: "";
+}
+
+.club-plan-image-placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: rgba(242, 240, 235, 0.32);
+}
+
+.club-plan-public-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(190px, auto);
+  gap: 1.1rem;
+  align-items: end;
+  margin-top: 1.15rem;
+}
+
+.club-plan-public-head h2 {
+  margin: 0;
+  color: var(--home-text, #f2f0eb);
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, 3.2vw, 2.85rem);
+  font-weight: 620;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
+}
+
+.club-plan-public-head p {
+  max-width: 620px;
+  margin: 0.72rem 0 0;
+  color: rgba(242, 240, 235, 0.68);
+  font-size: 0.94rem;
+  line-height: 1.62;
+}
+
+.club-plan-price {
+  padding: 1rem;
+  border: 1px solid rgba(113, 208, 255, 0.15);
+  border-radius: 20px;
+  background: rgba(87, 199, 255, 0.06);
+}
+
+.club-plan-price small {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: rgba(242, 240, 235, 0.45);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.club-plan-price strong {
+  display: block;
+  color: #f8fbff;
+  font-size: clamp(1.65rem, 3vw, 2.25rem);
+  font-weight: 850;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.club-includes {
+  margin-top: 1.25rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.club-includes-title {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: #dff6ff;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.club-includes-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.club-includes-list li {
+  display: flex;
+  gap: 0.58rem;
+  min-height: 52px;
+  align-items: flex-start;
+  padding: 0.78rem;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(242, 240, 235, 0.82);
+  font-size: 0.86rem;
+  line-height: 1.42;
+}
+
+.club-includes-list svg {
+  flex: 0 0 auto;
+  margin-top: 0.08rem;
+  color: #71d0ff;
+}
+
+.club-public-cta {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  padding: 0.86rem 1.2rem;
+  border: 1px solid rgba(148, 222, 255, 0.72);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #dff6ff, #57c7ff 52%, #249fe5);
+  color: #03111a;
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-transform: uppercase;
+  box-shadow: 0 14px 34px rgba(36, 159, 229, 0.22);
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.club-public-cta:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #fff, #7bd7ff 55%, #32aceb);
+  box-shadow: 0 18px 44px rgba(36, 159, 229, 0.3);
+}
+
+.club-public-cta.secondary {
+  width: 100%;
+  border-color: rgba(74, 222, 128, 0.5);
+  background: #35d58b;
+  color: #041a10;
+  box-shadow: 0 14px 34px rgba(52, 211, 153, 0.16);
+}
+
+.club-public-cta.secondary:hover {
+  background: #69e6a9;
+  box-shadow: 0 18px 44px rgba(52, 211, 153, 0.22);
+}
+
+.club-public-cta.disabled,
+.club-public-cta:disabled {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: #273241;
+  color: rgba(242, 240, 235, 0.42);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.club-public-cta.disabled:hover,
+.club-public-cta:disabled:hover {
+  transform: none;
+}
+
+.club-fidelity-card {
+  padding: 1.1rem;
+}
+
+.club-fidelity-pass {
+  margin-top: 1rem;
+  padding: 1.15rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(226, 232, 240, 0.13), rgba(15, 23, 42, 0.84)),
+    #111827;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.club-fidelity-pass-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.club-fidelity-pass-header small {
+  color: rgba(242, 240, 235, 0.48);
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.club-fidelity-pass-header h3 {
+  margin: 0.45rem 0 0;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 650;
+}
+
+.club-fidelity-pass-header svg {
+  color: #71d0ff;
+}
+
+.club-stamps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.55rem;
+  margin-top: 1.7rem;
+}
+
+.club-stamp {
+  display: grid;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.club-stamp.done {
+  border: 1px solid #71d0ff;
+  background: #71d0ff;
+  color: #04131d;
+  box-shadow: 0 0 26px rgba(87, 199, 255, 0.22);
+}
+
+.club-stamp.pending {
+  border: 1px dashed rgba(242, 240, 235, 0.35);
+  background: rgba(5, 7, 10, 0.55);
+  color: rgba(242, 240, 235, 0.36);
+}
+
+.club-fidelity-copy {
+  margin: 1rem 0 0;
+}
+
+.club-fidelity-copy h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.club-fidelity-copy p {
+  margin: 0.5rem 0 0;
+  color: rgba(242, 240, 235, 0.62);
+  font-size: 0.83rem;
+  line-height: 1.6;
+}
+
+.club-coming-soon {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: clamp(1rem, 2.5vw, 1.4rem);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 12% 15%, rgba(251, 191, 36, 0.12), transparent 28%),
+    rgba(255, 255, 255, 0.045);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(14px);
+}
+
+.club-coming-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 50px;
+  height: 50px;
+  place-items: center;
+  border: 1px solid rgba(251, 191, 36, 0.24);
+  border-radius: 16px;
+  background: rgba(251, 191, 36, 0.08);
+  color: #f8d478;
+}
+
+.club-coming-soon h2 {
+  margin: 0.8rem 0 0;
+  color: var(--home-text, #f2f0eb);
+  font-family: var(--font-display);
+  font-size: clamp(1.28rem, 2.4vw, 1.9rem);
+  font-weight: 620;
+  line-height: 1.15;
+}
+
+.club-coming-soon p,
+.club-error-banner {
+  color: rgba(242, 240, 235, 0.66);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.club-coming-soon p {
+  max-width: 720px;
+  margin: 0.45rem 0 0;
+}
+
+.club-error-banner {
+  padding: 1rem;
+  border: 1px solid rgba(251, 113, 133, 0.26);
+  border-radius: 20px;
+  background: rgba(244, 63, 94, 0.08);
+  color: #fecdd3;
+}
+
+.club-public-loading {
+  min-height: 420px;
+}
+
+.club-skeleton-line,
+.club-skeleton-grid > div {
+  position: relative;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.club-skeleton-line {
+  width: min(520px, 70%);
+  height: 22px;
+  margin-top: 0.85rem;
+}
+
+.club-skeleton-line.short {
+  width: 160px;
+  height: 12px;
+  margin-top: 0;
+}
+
+.club-skeleton-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.72fr;
+  gap: 1rem;
+  margin-top: 1.4rem;
+}
+
+.club-skeleton-grid > div {
+  height: 260px;
+  border-radius: 24px;
+}
+
+.club-skeleton-line::after,
+.club-skeleton-grid > div::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  content: "";
+  animation: club-public-shimmer 1.2s infinite;
+  transform: translateX(-100%);
+}
+
+@keyframes club-public-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (max-width: 980px) {
+  .club-public-header,
+  .club-coming-soon {
+    flex-direction: column;
+  }
+
+  .club-public-grid.with-fidelity,
+  .club-public-grid.only-plans,
+  .club-skeleton-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .club-plan-public-head {
+    grid-template-columns: 1fr;
+  }
+
+  .club-plan-price {
+    width: min(100%, 320px);
+  }
+}
+
+@media (max-width: 640px) {
+  .club-public-section {
+    padding: 3rem 0;
+  }
+
+  .club-public-shell {
+    padding: 0.78rem;
+    border-radius: 20px;
+  }
+
+  .club-public-header {
+    align-items: stretch;
+    gap: 0.9rem;
+  }
+
+  .club-public-header h2 {
+    font-size: clamp(1.68rem, 8vw, 2.25rem);
+  }
+
+  .club-public-header p {
+    font-size: 0.9rem;
+  }
+
+  .club-payment-chip,
+  .club-limited-chip,
+  .club-public-badge {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .club-public-card {
+    border-radius: 19px;
+  }
+
+  .club-card-topline {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .club-plan-image {
+    height: 180px;
+    border-radius: 16px;
+  }
+
+  .club-plan-public-head h2 {
+    font-size: clamp(1.52rem, 7vw, 2rem);
+  }
+
+  .club-plan-public-head p,
+  .club-includes-list li,
+  .club-fidelity-copy p {
+    font-size: 0.84rem;
+  }
+
+  .club-plan-price {
+    width: 100%;
+  }
+
+  .club-includes-list {
+    grid-template-columns: 1fr;
+  }
+
+  .club-public-cta {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  .club-fidelity-card,
+  .club-fidelity-pass {
+    padding: 0.88rem;
+  }
+
+  .club-stamps {
+    gap: 0.42rem;
+  }
+}

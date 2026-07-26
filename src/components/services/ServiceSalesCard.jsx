@@ -8,7 +8,7 @@ import { serviceSlug } from "../../utils/serviceSlug";
 const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
 
 function Price({ service }) {
-  if (service.priceOnRequest || (!Number(service.carPrice) && !Number(service.truckPrice))) return <div className="sales-card-prices consult"><small>Evaluación previa</small><strong>Consultar precio</strong></div>;
+  if (service.display?.price === false || service.priceOnRequest || (!Number(service.carPrice) && !Number(service.truckPrice))) return <div className="sales-card-prices consult"><small>Evaluación previa</small><strong>Consultar precio</strong></div>;
   if (isTwoWheelService(service)) return <div className="sales-card-prices"><small>Precio del servicio</small><strong>{money.format(service.carPrice || 0)}</strong></div>;
   return <div className="sales-card-prices two"><span><small>Auto</small><strong>{money.format(service.carPrice || 0)}</strong></span><span><small>Camioneta</small><strong>{money.format(service.truckPrice || 0)}</strong></span></div>;
 }

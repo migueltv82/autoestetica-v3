@@ -190,6 +190,11 @@ function AdminServices() {
       return;
     }
 
+    if ((Number.parseFloat(form.carPrice) || 0) <= 0 || (!usesSinglePrice && (Number.parseFloat(form.truckPrice) || 0) <= 0)) {
+      notify("Ingresá los valores internos del servicio para que los turnos y Caja calculen el total.", "error");
+      return;
+    }
+
     const payload = {
       ...form,
       display: formDisplay,
@@ -377,7 +382,7 @@ function AdminServices() {
                         <Clock size={12} />
                         <span>{service.duration}</span>
                       </div>
-                      <div className="svc-price-pro">{service.priceOnRequest ? "Consultar" : isTwoWheelService(service) ? <small>Precio {formatMoney(service.carPrice)}</small> : <><small>Auto {formatMoney(service.carPrice)}</small><small>Camioneta {formatMoney(service.truckPrice)}</small></>}</div>
+                      <div className="svc-price-pro">{isTwoWheelService(service) ? <small>Precio interno {formatMoney(service.carPrice)}</small> : <><small>Auto {formatMoney(service.carPrice)}</small><small>Camioneta {formatMoney(service.truckPrice)}</small></>}</div>
                     </div>
                   </motion.div>
                 );
@@ -461,13 +466,17 @@ function AdminServices() {
 
               <div className="svc-price-mode">
                 <label className="svc-consult-toggle">
-                  <input type="checkbox" checked={form.priceOnRequest} onChange={(event) => setForm((previous) => ({ ...previous, priceOnRequest: event.target.checked }))} />
-                  <span><strong>Precio a consultar</strong><small>Usalo cuando el valor dependa del estado del vehiculo.</small></span>
+                  <input type="checkbox" checked={formDisplay.price && !form.priceOnRequest} onChange={(event) => {
+                    const publishPrice = event.target.checked;
+                    setForm((previous) => ({ ...previous, priceOnRequest: !publishPrice, display: { ...previous.display, price: publishPrice } }));
+                  }} />
+                  <span><strong>Publicar precios en el sitio</strong><small>Si lo desactivás, el público verá “Consultar precio”; los valores internos seguirán activos para turnos y Caja.</small></span>
                 </label>
-                {!form.priceOnRequest ? <div className={`svc-vehicle-prices ${usesSinglePrice ? "single" : ""}`}>
+                <div className={`svc-vehicle-prices ${usesSinglePrice ? "single" : ""}`}>
                   <div className="admin-form-group"><label>{usesSinglePrice ? "Precio del servicio ($)" : "Precio Auto ($)"}</label><input type="number" min="0" className="admin-input" value={form.carPrice} onChange={(event) => setForm((previous) => ({ ...previous, carPrice: event.target.value }))} placeholder="15000" /></div>
                   {!usesSinglePrice ? <div className="admin-form-group"><label>Precio Camioneta ($)</label><input type="number" min="0" className="admin-input" value={form.truckPrice} onChange={(event) => setForm((previous) => ({ ...previous, truckPrice: event.target.value }))} placeholder="20000" /></div> : null}
-                </div> : <div className="svc-consult-note">La tarjeta publica mostrara “Consultar” en lugar de un valor fijo.</div>}
+                </div>
+                <div className="svc-consult-note">Estos valores se usan siempre dentro del panel al agendar, aunque no los publiques.</div>
               </div>
 
               <div className="admin-form-group">

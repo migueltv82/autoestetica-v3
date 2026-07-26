@@ -20,13 +20,16 @@ const buildInitialForm = (canManageFinance) => ({
   vehicleBrand: "",
   vehicleModel: "",
   services: [],
-  status: "Confirmado",
+  discount: 0,
+  status: "Pendiente",
   notes: "",
   paymentMethod: "Efectivo",
   registerPayment: canManageFinance,
+  saveClient: true,
 });
 
 function mapInitialData(initialData) {
+  const isInquiry = initialData.status === "Consulta";
   return {
     date: initialData.date || "",
     time: initialData.time || "",
@@ -43,10 +46,12 @@ function mapInitialData(initialData) {
       price: Number(service.unit_price || 0),
       durationMinutes: Number(service.services?.estimated_minutes || 0),
     })),
-    status: initialData.status || "Confirmado",
+    discount: Number(initialData.discount || 0),
+    status: isInquiry ? "Pendiente" : (initialData.status || "Pendiente"),
     notes: initialData.notes || "",
     paymentMethod: "Efectivo",
     registerPayment: false,
+    saveClient: isInquiry || initialData.clientDirectoryVisible !== false,
   };
 }
 
@@ -56,7 +61,9 @@ function TurnForm({ onAddTurn, initialData = null }) {
   const { notify } = useFeedback();
   const [formData, setFormData] = useState(() => initialData ? mapInitialData(initialData) : buildInitialForm(canManageFinance));
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const total = useMemo(() => formData.services.reduce((sum, service) => sum + Number(service.price || 0), 0), [formData.services]);
+  const subtotal = useMemo(() => formData.services.reduce((sum, service) => sum + Number(service.price || 0), 0), [formData.services]);
+  const discount = Math.min(Math.max(Number(formData.discount || 0), 0), subtotal);
+  const total = Math.max(subtotal - discount, 0);
   const durationMinutes = useMemo(() => formData.services.reduce((sum, service) => sum + Number(service.durationMinutes || 0), 0) || initialData?.durationMinutes || 120, [formData.services, initialData]);
   const isEditing = Boolean(initialData);
 
@@ -69,7 +76,7 @@ function TurnForm({ onAddTurn, initialData = null }) {
         vehicle: value,
         services: current.services.map((selected) => {
           const catalogService = services.find((service) => service.id === selected.serviceId);
-          if (!catalogService || catalogService.priceOnRequest) return selected;
+          if (!catalogService) return selected;
           return { ...selected, price: getServicePriceForVehicle(catalogService, value) };
         }),
       };
@@ -87,7 +94,7 @@ function TurnForm({ onAddTurn, initialData = null }) {
           : [...current.services, {
             serviceId: service.id,
             name: service.name,
-            price: service.priceOnRequest ? 0 : Number(vehiclePrice || 0),
+            price: Number(vehiclePrice || 0),
             priceOnRequest: service.priceOnRequest,
             durationMinutes: service.durationMinutes,
           }],
@@ -112,6 +119,10 @@ function TurnForm({ onAddTurn, initialData = null }) {
       notify("Ingresá el valor de los servicios para registrar el cobro en Caja.", "error");
       return;
     }
+    if (Number(formData.discount || 0) > subtotal) {
+      notify("El descuento no puede superar el subtotal de los servicios.", "error");
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -132,7 +143,7 @@ function TurnForm({ onAddTurn, initialData = null }) {
     <div className="admin-form-shell turn-form-shell">
       <div className="admin-form-header">
         <div>
-          <span className="admin-form-kicker"><Calendar size={14} /> Nuevo turno</span>
+          <span className="admin-form-kicker"><Calendar size={14} />{initialData?.status === "Consulta" ? " Agendar consulta" : isEditing ? " Editar turno" : " Nuevo turno"}</span>
           <h3 className="admin-form-title">Datos del cliente y del trabajo</h3>
           <p className="admin-form-description">
             {canManageFinance
@@ -197,7 +208,7 @@ function TurnForm({ onAddTurn, initialData = null }) {
                   <button type="button" key={service.id} className={`turn-service-option ${selected ? "selected" : ""}`} onClick={() => toggleService(service)}>
                     <span className="turn-service-check">{selected ? <Check size={14} /> : null}</span>
                     <span><strong>{service.name}</strong><small>{service.duration}</small></span>
-                    <b>{service.priceOnRequest ? "Consultar" : vehiclePrice > 0 ? money.format(vehiclePrice) : "Definir precio"}</b>
+                    <b>{vehiclePrice > 0 ? money.format(vehiclePrice) : "Definir precio"}</b>
                   </button>
                 );
               })}
@@ -216,6 +227,11 @@ function TurnForm({ onAddTurn, initialData = null }) {
                   <label>Precio<input type="number" min="0" value={service.price} onChange={(event) => updatePrice(service.serviceId, event.target.value)} /></label>
                 </div>
               ))}
+              <div className="turn-selected-row turn-discount-row">
+                <span>Descuento general</span>
+                <label>Descuento<input type="number" min="0" max={subtotal} value={formData.discount} onChange={(event) => setFormData((current) => ({ ...current, discount: event.target.value }))} /></label>
+              </div>
+              <div className="turn-discount-summary"><span>Subtotal <strong>{money.format(subtotal)}</strong></span><span>Descuento <strong>- {money.format(discount)}</strong></span></div>
             </div>
           ) : null}
 
@@ -237,6 +253,13 @@ function TurnForm({ onAddTurn, initialData = null }) {
             </>
           ) : null}
 
+          {(
+            <label className="turn-payment-toggle turn-save-client-toggle">
+              <input type="checkbox" checked={formData.saveClient} onChange={(event) => setFormData((current) => ({ ...current, saveClient: event.target.checked }))} />
+              <span><User size={17} /><strong>{isEditing ? "Guardar cliente en Clientes" : "Agregar al directorio de clientes"}</strong><small>{isEditing ? "La tarjeta de este vehículo se generará recién cuando confirmes el turno." : "Desmarcalo si es un cliente ocasional que no querés guardar en la sección Clientes."}</small></span>
+            </label>
+          )}
+
           <div className="admin-form-group full-width">
             <label><ClipboardList size={14} /> Notas</label>
             <textarea name="notes" rows="2" value={formData.notes} onChange={handleChange} placeholder="Detalles adicionales del trabajo..." />
@@ -245,7 +268,7 @@ function TurnForm({ onAddTurn, initialData = null }) {
 
         <div className="admin-form-actions">
           <div className="turn-form-total"><span>Total del turno</span><strong>{money.format(total)}</strong></div>
-          <button type="submit" className="btn-primary-admin" disabled={isSubmitting}><CheckCircle2 size={18} />{isSubmitting ? "Guardando…" : "Confirmar turno"}</button>
+          <button type="submit" className="btn-primary-admin" disabled={isSubmitting}><CheckCircle2 size={18} />{isSubmitting ? "Guardando…" : initialData?.status === "Consulta" ? "Agregar a la agenda" : "Guardar turno"}</button>
         </div>
       </form>
     </div>

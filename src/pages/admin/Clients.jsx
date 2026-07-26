@@ -26,6 +26,7 @@ import { useFeedback } from "../../hooks/useFeedback";
 import { useSettings } from "../../hooks/useSettings";
 import { usePermissions } from "../../hooks/usePermissions";
 import { clientWhatsAppLink, readyVehicleWhatsAppLink } from "../../utils/whatsapp";
+import ClientFidelityCard from "../../components/admin/ClientFidelityCard";
 import { useFidelitySummaries } from "../../hooks/useFidelitySummaries";
 import "./Clients.css";
 
@@ -49,8 +50,9 @@ function Clients() {
   const selectedClient = clients.find((client) => client.id === selectedId);
   const fidelityCardsByClient = useMemo(
     () => fidelityCards.reduce((cardsByClient, card) => {
-      if (["active", "reward_ready"].includes(card.status) && !cardsByClient.has(card.clientId)) {
-        cardsByClient.set(card.clientId, card);
+      if (["active", "reward_ready"].includes(card.status)) {
+        const summary = cardsByClient.get(card.clientId) || { count: 0, rewardReady: false };
+        cardsByClient.set(card.clientId, { count: summary.count + 1, rewardReady: summary.rewardReady || card.status === "reward_ready" });
       }
       return cardsByClient;
     }, new Map()),
@@ -99,8 +101,8 @@ function Clients() {
   async function handleDelete(id) {
     const accepted = await confirm({
       title: "Eliminar cliente",
-      message: "El cliente dejara de aparecer en el directorio. Su historial relacionado puede impedir la eliminacion.",
-      confirmLabel: "Eliminar",
+      message: "Se eliminarán definitivamente el cliente, sus vehículos, turnos, tarjetas, pagos y recibos. Los movimientos históricos de Caja se conservarán.",
+      confirmLabel: "Eliminar cliente y datos",
     });
     if (!accepted) return;
     try {
@@ -223,7 +225,7 @@ function Clients() {
                   <div className="client-card-facts">
                     <span><small>Vehiculo</small><strong><Car size={14} /> {client.vehicle}</strong></span>
                     <span><small>Trabajos</small><strong>{client.history.length}</strong></span>
-                    <span className={fidelityCard?.status === "reward_ready" ? "fidelity-ready" : ""}><small>Sellos</small><strong><Stamp size={14} /> {fidelityCard ? `${fidelityCard.stampsCount}/${fidelityCard.totalStamps}` : "Sin tarjeta"}</strong></span>
+                    <span className={fidelityCard?.rewardReady ? "fidelity-ready" : ""}><small>Fidelity</small><strong><Stamp size={14} /> {fidelityCard ? `${fidelityCard.count} ${fidelityCard.count === 1 ? "tarjeta" : "tarjetas"}` : "Sin tarjeta"}</strong></span>
                     {canManageFinance ? <span><small>Facturado</small><strong>{money(client.billed)}</strong></span> : null}
                     {canManageFinance ? <span><small>Saldo</small><strong className={client.balance ? "has-balance" : ""}>{money(client.balance)}</strong></span> : null}
                   </div>
@@ -255,6 +257,8 @@ function Clients() {
               {canManageFinance ? <span><small>Saldo</small><strong className={selectedClient.balance ? "has-balance" : ""}>{money(selectedClient.balance)}</strong></span> : null}
               <span><small>Trabajos</small><strong>{selectedClient.history.length}</strong></span>
             </div>
+
+            <ClientFidelityCard client={selectedClient} />
 
             {canManageClients ? <section className="client-ready">
               <div><span className="admin-form-kicker">Aviso de retiro</span><h3>Mensaje vehiculo listo</h3><p>Podes ajustar el texto y enviarlo directamente.</p></div>

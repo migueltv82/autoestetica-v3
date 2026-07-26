@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   Check,
   Clock3,
@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   Store,
   Trash2,
+  UploadCloud,
   UserPlus,
   Users,
 } from "lucide-react";
@@ -24,6 +25,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useFeedback } from "../../hooks/useFeedback";
 import { useSettings } from "../../hooks/useSettings";
 import { useTeamMembers } from "../../hooks/useTeamMembers";
+import { compressImageFile } from "../../utils/imageUpload";
 import "./Settings.css";
 
 const ROLE_LABELS = {
@@ -71,13 +73,83 @@ function Field({ label, hint, children, full = false }) {
   );
 }
 
+function blobToDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+}
+
+function TransformationImagePicker({ label, hint, imageUrl, inputRef, onPick, onRemove, isProcessing }) {
+  return (
+    <div className="settings-transform-uploader">
+      <span>{label}</span>
+      {imageUrl ? (
+        <div className="settings-transform-preview">
+          <img src={imageUrl} alt={label} />
+          <button type="button" onClick={onRemove} disabled={isProcessing} aria-label={`Quitar ${label}`}>
+            <Trash2 size={16} />
+          </button>
+        </div>
+      ) : (
+        <button type="button" className="settings-transform-placeholder" onClick={() => inputRef.current?.click()} disabled={isProcessing}>
+          <UploadCloud size={28} />
+          <strong>Cargar imagen</strong>
+          <small>{hint}</small>
+        </button>
+      )}
+      <input type="file" accept="image/*" ref={inputRef} className="settings-file-input" onChange={onPick} />
+    </div>
+  );
+}
+
 function SettingsForm({ initialSettings, onSave }) {
   const [form, setForm] = useState(initialSettings);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [isProcessingImage, setIsProcessingImage] = useState(false);
   const [error, setError] = useState("");
+  const beforeInputRef = useRef(null);
+  const afterInputRef = useRef(null);
   const isDirty = useMemo(() => JSON.stringify(form) !== JSON.stringify(initialSettings), [form, initialSettings]);
   const change = (event) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
+
+  async function handleTransformationImage(event, target) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    if (file.size > 20 * 1024 * 1024) {
+      setError("La imagen supera los 20 MB. Elegí una imagen más liviana.");
+      return;
+    }
+
+    setIsProcessingImage(true);
+    setError("");
+    try {
+      const compressed = await compressImageFile(file, { maxWidth: 1800, maxHeight: 1350, quality: 0.86 });
+      const dataUrl = await blobToDataUrl(compressed);
+      setForm((current) => ({
+        ...current,
+        [target === "before" ? "transformationBeforeUrl" : "transformationAfterUrl"]: dataUrl,
+      }));
+    } catch (imageError) {
+      console.error(imageError);
+      setError(imageError.message || "No se pudo procesar la imagen.");
+    } finally {
+      setIsProcessingImage(false);
+    }
+  }
+
+  function removeTransformationImage(target) {
+    setForm((current) => ({
+      ...current,
+      [target === "before" ? "transformationBeforeUrl" : "transformationAfterUrl"]: "",
+      [target === "before" ? "transformationBeforePath" : "transformationAfterPath"]: "",
+    }));
+  }
 
   async function submit(event) {
     event.preventDefault();
@@ -89,7 +161,8 @@ function SettingsForm({ initialSettings, onSave }) {
     setIsSaving(true);
     setError("");
     try {
-      await onSave(form);
+      const savedSettings = await onSave(form);
+      if (savedSettings) setForm(savedSettings);
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 2500);
     } catch (saveError) {
@@ -116,6 +189,41 @@ function SettingsForm({ initialSettings, onSave }) {
             <Field label="URL del logo" hint="Se usa en el encabezado, footer y recibos." full>
               <div className="settings-input-icon"><Image size={15} /><input type="url" name="logoUrl" value={form.logoUrl} onChange={change} placeholder="https://…" /></div>
             </Field>
+          </SettingsSection>
+
+          <SettingsSection icon={<Image size={20} />} title="Deslizá y descubrí" text="Controlá el antes y después principal que aparece en la página de inicio." badge="Inicio">
+            <Field label="Título" full>
+              <input name="transformationTitle" value={form.transformationTitle} onChange={change} placeholder="Deslizá y descubrí la diferencia" />
+            </Field>
+            <Field label="Texto de apoyo" full>
+              <textarea name="transformationSubtitle" rows="3" value={form.transformationSubtitle} onChange={change} placeholder="Explicá brevemente qué muestra esta comparación." />
+            </Field>
+            <Field label="Etiqueta del resultado" hint="Aparece debajo de la imagen. Ej: Lavado premium, Interior recuperado, Abrillantado." full>
+              <input name="transformationServiceLabel" value={form.transformationServiceLabel} onChange={change} placeholder="Resultado real de detailing" />
+            </Field>
+            <div className="settings-transform-grid">
+              <TransformationImagePicker
+                label="Foto del antes"
+                hint="Ideal: mismo encuadre que el después."
+                imageUrl={form.transformationBeforeUrl}
+                inputRef={beforeInputRef}
+                onPick={(event) => handleTransformationImage(event, "before")}
+                onRemove={() => removeTransformationImage("before")}
+                isProcessing={isProcessingImage || isSaving}
+              />
+              <TransformationImagePicker
+                label="Foto del después"
+                hint="Mostrá el resultado final limpio y atractivo."
+                imageUrl={form.transformationAfterUrl}
+                inputRef={afterInputRef}
+                onPick={(event) => handleTransformationImage(event, "after")}
+                onRemove={() => removeTransformationImage("after")}
+                isProcessing={isProcessingImage || isSaving}
+              />
+            </div>
+            <p className="settings-transform-helper">
+              Si no cargás ambas imágenes, el inicio usará una comparación publicada de Galería o una imagen de respaldo.
+            </p>
           </SettingsSection>
 
           <SettingsSection icon={<Phone size={20} />} title="Contacto y redes" text="Dejá vacío cualquier canal que no quieras mostrar." badge="Sitio público">
@@ -157,8 +265,8 @@ function SettingsForm({ initialSettings, onSave }) {
       </div>
 
       <div className="settings-save-bar">
-        <div>{error ? <span className="settings-error">{error}</span> : isDirty ? <span>Tenés cambios sin guardar.</span> : <span>La configuración está actualizada.</span>}</div>
-        <button type="submit" className={`btn-premium settings-save-btn ${isSaved ? "success" : ""}`} disabled={isSaving || !isDirty}>
+        <div>{error ? <span className="settings-error">{error}</span> : isProcessingImage ? <span>Procesando imagen…</span> : isDirty ? <span>Tenés cambios sin guardar.</span> : <span>La configuración está actualizada.</span>}</div>
+        <button type="submit" className={`btn-premium settings-save-btn ${isSaved ? "success" : ""}`} disabled={isSaving || isProcessingImage || !isDirty}>
           {isSaved ? <Check size={18} /> : <Save size={18} />}
           <span>{isSaving ? "Guardando…" : isSaved ? "Cambios guardados" : "Guardar cambios"}</span>
         </button>

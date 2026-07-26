@@ -8,21 +8,32 @@ import { usePermissions } from "./usePermissions";
 const CLIENT_REALTIME_TABLES = ["clients", "vehicles", "work_orders", "work_order_items"];
 const FINANCE_CLIENT_REALTIME_TABLES = ["payments"];
 
+function clientWriteError(error, phone, currentClientId = null, clients = []) {
+  const constraint = String(error?.message || "");
+  const isDuplicatePhone = constraint.includes("clients_organization_id_phone_key")
+    || constraint.includes("clients_org_active_phone_unique");
+  if (error?.code !== "23505" || !isDuplicatePhone) return error;
+  const duplicate = clients.find((client) => client.id !== currentClientId && client.phone === phone);
+  const detail = duplicate?.name ? ` Ya pertenece a ${duplicate.name}.` : "";
+  return new Error(`Ya existe un cliente activo con ese numero de WhatsApp.${detail}`);
+}
+
 const formatMoney = (value) => new Intl.NumberFormat("es-AR", {
   style: "currency", currency: "ARS", maximumFractionDigits: 0,
 }).format(value || 0);
 
 function mapClient(client, canManageFinance) {
   const vehicles = (client.vehicles || []).filter((vehicle) => !vehicle.deleted_at);
-  const activeOrders = (client.work_orders || []).filter((order) => order.status !== "cancelled");
-  const history = activeOrders.map((order) => {
+  const allOrders = client.work_orders || [];
+  const history = allOrders.map((order) => {
     const itemsTotal = canManageFinance ? (order.work_order_items || []).reduce((sum, item) => sum + Number(item.total || 0), 0) : 0;
     const total = canManageFinance ? Number(order.total || 0) || itemsTotal : 0;
     const paid = canManageFinance ? (order.payments || []).filter((payment) => !payment.voided_at).reduce((sum, payment) => sum + (payment.kind === "refund" ? -Number(payment.amount) : Number(payment.amount)), 0) : 0;
     return { id: order.id, number: order.number, date: order.scheduled_start ? new Date(order.scheduled_start).toLocaleDateString("en-CA", { timeZone: "America/Argentina/Tucuman" }) : "", status: order.status, services: (order.work_order_items || []).map((item) => item.description).join(", "), total, paid, balance: Math.max(total - paid, 0) };
   });
-  const billed = history.reduce((sum, order) => sum + order.total, 0);
-  const paid = history.reduce((sum, order) => sum + order.paid, 0);
+  const billableHistory = history.filter((order) => !["cancelled", "no_show"].includes(order.status));
+  const billed = billableHistory.reduce((sum, order) => sum + order.total, 0);
+  const paid = billableHistory.reduce((sum, order) => sum + order.paid, 0);
   return {
     id: client.id,
     name: client.name,
@@ -30,7 +41,7 @@ function mapClient(client, canManageFinance) {
     email: client.email || "",
     notes: client.notes || "",
     tags: client.tags || [],
-    visits: activeOrders.filter((order) => order.status === "delivered").length,
+    visits: allOrders.filter((order) => order.status === "delivered").length,
     vehicle: vehicles[0]?.type || "Sin vehículo",
     vehicleId: vehicles[0]?.id || null,
     vehicles,
@@ -57,6 +68,7 @@ export function useClients() {
       .from("clients")
       .select(`id,name,phone,email,notes,tags,created_at,vehicles(id,type,brand,model,license_plate,color,year,notes,deleted_at),${orderSelect}`)
       .eq("organization_id", organizationId)
+      .eq("directory_visible", true)
       .is("deleted_at", null)
       .order("created_at", { ascending: false });
     if (queryError) setError(queryError.message);
@@ -88,7 +100,7 @@ export function useClients() {
       email: newClient.email || null,
       notes: newClient.notes || null,
     }).select().single();
-    if (clientError) throw clientError;
+    if (clientError) throw clientWriteError(clientError, normalizedPhone, null, allClients);
     if (newClient.vehicle) {
       const { error: vehicleError } = await supabase.from("vehicles").insert({
         organization_id: organizationId, client_id: client.id, type: newClient.vehicle,
@@ -107,7 +119,7 @@ export function useClients() {
       name: updatedData.name.trim(), phone: normalizedPhone,
       email: updatedData.email?.trim() || null, notes: updatedData.notes?.trim() || null,
     }).eq("id", id).eq("organization_id", organizationId);
-    if (clientError) throw clientError;
+    if (clientError) throw clientWriteError(clientError, normalizedPhone, id, allClients);
     const existing = allClients.find((client) => client.id === id);
     if (existing?.vehicleId) {
       const { error: vehicleError } = await supabase.from("vehicles").update({ type: updatedData.vehicle })
@@ -124,8 +136,7 @@ export function useClients() {
 
   async function deleteClient(id) {
     if (!canManageClients) throw new Error("No tenes permiso para eliminar clientes.");
-    const { error: deleteError } = await supabase.from("clients")
-      .update({ deleted_at: new Date().toISOString() }).eq("id", id).eq("organization_id", organizationId);
+    const { error: deleteError } = await supabase.rpc("delete_client_completely", { p_client_id: id });
     if (deleteError) throw deleteError;
     await refresh();
   }

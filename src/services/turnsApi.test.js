@@ -54,6 +54,7 @@ describe("turnsApi", () => {
       scheduled_start: "2026-07-18T12:30:00.000Z",
       scheduled_end: "2026-07-18T15:00:00.000Z",
       notes: "Sin perfume",
+      discount: "3000",
       total: "20000",
       clients: { name: "Carlos", phone: "5493811234567" },
       vehicles: { type: "Camioneta" },
@@ -69,6 +70,7 @@ describe("turnsApi", () => {
       service: "Lavado premium",
       status: "Confirmado",
       notes: "Sin perfume",
+      discount: 3000,
       amount: 20000,
       durationMinutes: 150,
     });

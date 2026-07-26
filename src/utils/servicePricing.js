@@ -4,7 +4,7 @@ export function isTwoWheelService(serviceOrName) {
 }
 
 export function getServicePriceForVehicle(service, vehicle) {
-  if (!service || service.priceOnRequest) return 0;
+  if (!service) return 0;
   if (isTwoWheelService(service)) return Number(service.carPrice || 0);
   return ["Camioneta", "SUV"].includes(vehicle)
     ? Number(service.truckPrice || 0)

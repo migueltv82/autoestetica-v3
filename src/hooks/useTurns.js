@@ -109,8 +109,8 @@ export function useTurns() {
 
     const accepted = await confirm({
       title: "Eliminar turno definitivamente",
-      message: "Se eliminarán el turno, sus ingresos, pagos y recibo. El cliente y su vehículo se conservarán. Esta acción no se puede deshacer.",
-      confirmLabel: "Eliminar todo",
+      message: "Se eliminará solamente el turno y su detalle operativo. El cliente, vehículo, pagos, recibos y movimientos de Caja se conservarán. Para registrar una cancelación o inasistencia, cambiá el estado en lugar de eliminarlo.",
+      confirmLabel: "Eliminar turno",
     });
     if (!accepted) return;
 

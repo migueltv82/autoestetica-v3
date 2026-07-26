@@ -47,10 +47,26 @@ export function clientWhatsAppLink(client, businessName = "Autoestética Tucumá
   return `https://wa.me/${normalizeArgentinaPhone(client.phone)}?text=${encodeURIComponent(text)}`;
 }
 
+export function inquiryReplyWhatsAppLink(turn, businessName = "Autoestética Tucumán") {
+  const text = `Hola ${turn.client} 👋 Recibimos tu consulta en ${businessName} por ${turn.service} para tu ${String(turn.vehicle || "vehículo").toLowerCase()}. Te escribimos para asesorarte y coordinar el turno.`;
+  return `https://wa.me/${normalizeArgentinaPhone(turn.phone)}?text=${encodeURIComponent(text)}`;
+}
+
 export function fidelityWelcomeWhatsAppLink(turn, businessName = "Autoestética Tucumán") {
   const rawPhone = normalizeStoredArgentinaPhone(turn.phone);
   const cardUrl = `${getBaseSiteUrl()}/clientes?telefono=${rawPhone}`;
   const text = `Hola ${turn.client} 👋 Tu turno en ${businessName} quedó confirmado y ya tenés tu Tarjeta Fidelity digital.\n\n¿Cómo funciona?\n• Cada vez que retires un trabajo terminado sumás 1 sello.\n• Al completar 4 sellos desbloqueás tu beneficio.\n• Podés consultar tu progreso cuando quieras desde este enlace:\n${cardUrl}`;
+  return `https://wa.me/${normalizeArgentinaPhone(turn.phone)}?text=${encodeURIComponent(text)}`;
+}
+
+export function fidelityProgressWhatsAppLink(turn, stampsCount, businessName = "Autoestética Tucumán") {
+  const rawPhone = normalizeStoredArgentinaPhone(turn.phone);
+  const cardUrl = `${getBaseSiteUrl()}/tarjeta?phone=${rawPhone}`;
+  const pieces = Math.max(0, Math.min(Number(stampsCount) || 0, 4));
+  const benefit = pieces >= 4
+    ? "¡Completaste las 4 piezas y desbloqueaste tu Lavado Premium GRATIS!"
+    : `Tu tarjeta ahora tiene ${pieces} de 4 piezas.`;
+  const text = `Hola ${turn.client} 👋 Finalizamos el trabajo de tu ${String(turn.vehicle || "vehículo").toLowerCase()} en ${businessName}.\n\nSumamos un nuevo troquel a tu Tarjeta Fidelity. ${benefit}\n\nPodés verla actualizada acá:\n${cardUrl}`;
   return `https://wa.me/${normalizeArgentinaPhone(turn.phone)}?text=${encodeURIComponent(text)}`;
 }
 

@@ -9,11 +9,12 @@ import { useServices } from "../../hooks/useServices";
 import { useSettings } from "../../hooks/useSettings";
 import { usePermissions } from "../../hooks/usePermissions";
 import { Calendar, CalendarDays, CalendarRange, ListChecks, Plus, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import SimpleAgenda from "../../components/admin/SimpleAgenda";
 import { useFeedback } from "../../hooks/useFeedback";
 import { getTodayString } from "../../utils/date";
-import { fidelityWelcomeWhatsAppLink } from "../../utils/whatsapp";
+import { fidelityProgressWhatsAppLink, fidelityWelcomeWhatsAppLink } from "../../utils/whatsapp";
 import { MonthAgenda, WeekAgenda } from "../../components/admin/AgendaViews";
 import "./Turns.css";
 
@@ -41,6 +42,22 @@ function Turns() {
   const [agendaView, setAgendaView] = useState("day");
   const [weekOffset, setWeekOffset] = useState(0);
   const [monthOffset, setMonthOffset] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const inquiryId = searchParams.get("agendar");
+    if (!inquiryId || !turns.length) return;
+    const inquiry = turns.find((turn) => turn.id === inquiryId && turn.status === "Consulta");
+    const timer = setTimeout(() => {
+      if (inquiry) {
+        setEditingTurn(inquiry);
+        setShowForm(true);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      setSearchParams({}, { replace: true });
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [searchParams, setSearchParams, turns]);
 
   const handleCreateTurn = async (formData) => {
     try {
@@ -58,10 +75,15 @@ function Turns() {
 
   const handleUpdateTurn = async (formData) => {
     try {
+      const wasInquiry = editingTurn.status === "Consulta";
       await updateTurn(editingTurn.id, formData);
       setEditingTurn(null);
       setShowForm(false);
-      notify("Cambios del turno guardados.", "success");
+      if (wasInquiry) {
+        setSelectedDate(formData.date);
+        setAgendaView("day");
+      }
+      notify(wasInquiry ? "Consulta agregada a la agenda. Ya podés preparar la confirmación." : "Cambios del turno guardados.", "success");
     } catch (error) {
       console.error(error);
       notify(error?.message || "No se pudieron guardar los cambios del turno.", "error");
@@ -77,14 +99,28 @@ function Turns() {
 
   const updateTurnStatus = async (turnId, nextStatus) => {
     const turn = turns.find((item) => item.id === turnId);
-    const fidelityResult = await saveTurnStatus(turnId, nextStatus);
-    if (nextStatus !== "Confirmado" || !turn?.phone || !fidelityResult?.card) return;
-    const accepted = await confirm({
-      title: "Enviar Tarjeta Fidelity",
-      message: `El turno de ${turn.client} quedó confirmado. ¿Querés abrir WhatsApp para enviarle su tarjeta y la explicación de uso?`,
-      confirmLabel: "Abrir WhatsApp",
-    });
-    if (accepted) window.open(fidelityWelcomeWhatsAppLink(turn, settings.businessName), "_blank", "noopener,noreferrer");
+    try {
+      const fidelityResult = await saveTurnStatus(turnId, nextStatus);
+      if (!turn?.phone || !fidelityResult?.card) return;
+      if (nextStatus === "Confirmado") {
+        const accepted = await confirm({
+          title: "Enviar confirmación y tarjeta",
+          message: `El turno de ${turn.client} quedó confirmado y su tarjeta está lista. ¿Querés abrir WhatsApp para enviarle ambos?`,
+          confirmLabel: "Abrir WhatsApp",
+        });
+        if (accepted) window.open(fidelityWelcomeWhatsAppLink(turn, settings.businessName), "_blank", "noopener,noreferrer");
+      }
+      if (nextStatus === "Finalizado" && !fidelityResult.alreadyUnlocked) {
+        const accepted = await confirm({
+          title: "Enviar tarjeta actualizada",
+          message: `El trabajo de ${turn.client} quedó finalizado y se agregó el troquel ${fidelityResult.card.stampsCount}/4. ¿Querés enviarle la tarjeta por WhatsApp?`,
+          confirmLabel: "Abrir WhatsApp",
+        });
+        if (accepted) window.open(fidelityProgressWhatsAppLink(turn, fidelityResult.card.stampsCount, settings.businessName), "_blank", "noopener,noreferrer");
+      }
+    } catch (error) {
+      notify(error?.message || "No se pudo actualizar el estado del turno.", "error");
+    }
   };
 
   return (

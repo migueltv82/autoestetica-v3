@@ -38,6 +38,7 @@ function InquiryForm() {
     if (!formData.name.trim() || !formData.phone.trim() || !formData.vehicle || !formData.services.length || !formData.acceptedLegal) return;
     setIsSubmitting(true);
     setSubmitError("");
+    const whatsappWindow = window.open("", "_blank");
     const { error } = await supabase.rpc("submit_inquiry", {
       business_slug: ORGANIZATION_SLUG,
       client_name: formData.name,
@@ -48,12 +49,15 @@ function InquiryForm() {
     });
     setIsSubmitting(false);
     if (error) {
+      whatsappWindow?.close();
       console.error(error);
       setSubmitError("No pudimos registrar la consulta. Intentá nuevamente.");
       return;
     }
     const whatsapp = (settings.whatsapp || "5493815448147").replace(/\D/g, "");
-    window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(whatsappText)}`, "_blank", "noopener,noreferrer");
+    const whatsappUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent(whatsappText)}`;
+    if (whatsappWindow) whatsappWindow.location.href = whatsappUrl;
+    else window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     setFormData({ name: "", phone: "", vehicle: "", services: [], message: "", acceptedLegal: false });
     setSubmitAttempted(false);
   }
@@ -96,7 +100,7 @@ function InquiryForm() {
           </div>
           <div className="inquiry-form-group"><label>Detalle adicional</label><textarea rows="5" value={formData.message} onChange={(event) => setFormData({ ...formData, message: event.target.value })} placeholder="Contanos el estado del vehículo o el resultado que buscás." /></div>
           <label className={`inquiry-legal-consent${submitAttempted && !formData.acceptedLegal ? " has-error" : ""}`}><input type="checkbox" checked={formData.acceptedLegal} onChange={(event) => setFormData({ ...formData, acceptedLegal: event.target.checked })} /><span>Acepto la <Link to="/privacidad" target="_blank">Política de Privacidad</Link> y las <Link to="/terminos" target="_blank">Condiciones del Servicio</Link>.</span></label>
-          <div className="inquiry-submit-row"><p className="inquiry-submit-note">Al enviar, registramos la consulta y abrimos WhatsApp con el resumen listo.</p><button type="submit" className="btn-primary inquiry-submit" disabled={isSubmitting || servicesLoading}><MessageCircle size={18} />{isSubmitting ? "Registrando…" : "Continuar por WhatsApp"}</button></div>
+          <div className="inquiry-submit-row"><p className="inquiry-submit-note">Al enviar, registramos la consulta y abrimos WhatsApp con el resumen listo.</p><button type="submit" className="btn-primary inquiry-submit" disabled={isSubmitting || servicesLoading}><MessageCircle size={18} />{isSubmitting ? "Enviando…" : "Enviar consulta"}</button></div>
         </form>
       </div>
     </section>

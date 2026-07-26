@@ -5,11 +5,13 @@ import {
   Wallet,
   Users,
   Wrench,
+  Crown,
   Settings,
   LogIn,
   Globe,
   Image as ImageIcon,
   MoreHorizontal,
+  MessageSquareText,
   X,
 } from "lucide-react";
 import "./AdminNavbar.css";
@@ -21,11 +23,13 @@ import { OWNER_ADMIN_ROLES, OWNER_ROLES, hasRole } from "../../utils/permissions
 
 const items = [
   { to: "/admin/dashboard", label: "Inicio", icon: <LayoutDashboard size={20} />, roles: OWNER_ADMIN_ROLES },
+  { to: "/admin/consultas", label: "Consultas", icon: <MessageSquareText size={20} /> },
   { to: "/admin/turnos", label: "Agenda", icon: <CalendarDays size={20} /> },
   { to: "/admin/caja", label: "Caja", icon: <Wallet size={20} />, roles: OWNER_ADMIN_ROLES },
   { to: "/admin/clientes", label: "Clientes", icon: <Users size={20} /> },
   { to: "/admin/servicios", label: "Servicios", icon: <Wrench size={20} />, roles: OWNER_ADMIN_ROLES },
   { to: "/admin/galeria", label: "Galeria", icon: <ImageIcon size={20} />, roles: OWNER_ADMIN_ROLES },
+  { to: "/admin/club", label: "Club", icon: <Crown size={20} />, roles: OWNER_ADMIN_ROLES },
   { to: "/admin/configuracion", label: "Ajustes", icon: <Settings size={20} />, roles: OWNER_ROLES },
 ];
 

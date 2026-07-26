@@ -8,6 +8,7 @@ export function mapFidelityCard(row) {
   return {
     id: row.id,
     clientId: row.client_id,
+    vehicleId: row.vehicle_id,
     stampsCount: Number(row.stamps_count || 0),
     totalStamps: Number(row.total_stamps || 4),
     status: row.status || "active", // active | reward_ready | redeemed
@@ -22,6 +23,15 @@ export function mapFidelityCard(row) {
           phone: row.clients.phone,
         }
       : null,
+    vehicle: row.vehicles
+      ? {
+          id: row.vehicles.id,
+          type: row.vehicles.type,
+          brand: row.vehicles.brand,
+          model: row.vehicles.model,
+          licensePlate: row.vehicles.license_plate,
+        }
+      : null,
   };
 }
 
@@ -33,7 +43,7 @@ export async function fetchFidelityCardByClient(clientId) {
 
   const { data, error } = await supabase
     .from("fidelity_cards")
-    .select("*, clients(id, name, phone)")
+    .select("*, clients(id, name, phone), vehicles(id, type, brand, model, license_plate)")
     .eq("client_id", clientId)
     .in("status", ["active", "reward_ready"])
     .order("created_at", { ascending: false })
@@ -46,6 +56,18 @@ export async function fetchFidelityCardByClient(clientId) {
   }
 
   return data ? mapFidelityCard(data) : null;
+}
+
+export async function fetchFidelityCardsByClient(clientId) {
+  if (!clientId) return [];
+  const { data, error } = await supabase
+    .from("fidelity_cards")
+    .select("*, clients(id, name, phone), vehicles(id, type, brand, model, license_plate)")
+    .eq("client_id", clientId)
+    .in("status", ["active", "reward_ready"])
+    .order("updated_at", { ascending: false });
+  if (error) throw error;
+  return (data || []).map(mapFidelityCard);
 }
 
 /**
@@ -72,7 +94,7 @@ export async function fetchFidelityCardByPhone(phoneInput) {
 export async function fetchAllFidelityCards() {
   const { data, error } = await supabase
     .from("fidelity_cards")
-    .select("*, clients(id, name, phone)")
+    .select("*, clients(id, name, phone), vehicles(id, type, brand, model, license_plate)")
     .order("updated_at", { ascending: false });
 
   if (error) {
@@ -83,13 +105,14 @@ export async function fetchAllFidelityCards() {
   return (data || []).map(mapFidelityCard);
 }
 
-export async function ensureFidelityCardForClient(clientId) {
-  const existingCard = await fetchFidelityCardByClient(clientId);
+export async function ensureFidelityCardForClient(clientId, vehicleId = null) {
+  const cards = await fetchFidelityCardsByClient(clientId);
+  const existingCard = cards.find((card) => card.vehicleId === vehicleId);
   if (existingCard) return { card: existingCard, created: false };
   const { data, error } = await supabase.from("fidelity_cards").insert({
-    client_id: clientId, stamps_count: 0, total_stamps: 4, status: "active",
+    client_id: clientId, vehicle_id: vehicleId, stamps_count: 0, total_stamps: 4, status: "active",
     reward_description: "5° Lavado Premium Gratis",
-  }).select("*, clients(id, name, phone)").single();
+  }).select("*, clients(id, name, phone), vehicles(id, type, brand, model, license_plate)").single();
   if (error) throw error;
   return { card: mapFidelityCard(data), created: true };
 }
@@ -97,7 +120,7 @@ export async function ensureFidelityCardForClient(clientId) {
 /**
  * Otorgar un troquel automáticamente a un cliente al finalizar su vehículo.
  */
-export async function stampFidelityCardForClient(clientId, workOrderId = null, notes = "Servicio completado") {
+export async function stampFidelityCardForClient(clientId, vehicleId = null, workOrderId = null, notes = "Servicio completado") {
   if (!clientId) return null;
 
   if (workOrderId) {
@@ -108,12 +131,14 @@ export async function stampFidelityCardForClient(clientId, workOrderId = null, n
       .maybeSingle();
     if (stampLookupError) throw stampLookupError;
     if (existingStamp) {
-      return { card: await fetchFidelityCardByClient(clientId), newlyUnlocked: false, alreadyUnlocked: true };
+      const cards = await fetchFidelityCardsByClient(clientId);
+      return { card: cards.find((card) => card.vehicleId === vehicleId) || null, newlyUnlocked: false, alreadyUnlocked: true };
     }
   }
 
   // 1. Buscar tarjeta activa o lista para premio
-  let card = await fetchFidelityCardByClient(clientId);
+  const clientCards = await fetchFidelityCardsByClient(clientId);
+  let card = clientCards.find((item) => item.vehicleId === vehicleId);
 
   // 2. Si no existe tarjeta activa, crear una nueva (comenzará en 0 sellos)
   if (!card) {
@@ -121,12 +146,13 @@ export async function stampFidelityCardForClient(clientId, workOrderId = null, n
       .from("fidelity_cards")
       .insert({
         client_id: clientId,
+        vehicle_id: vehicleId,
         stamps_count: 0,
         total_stamps: 4,
         status: "active",
         reward_description: "5° Lavado Premium Gratis",
       })
-      .select("*, clients(id, name, phone)")
+      .select("*, clients(id, name, phone), vehicles(id, type, brand, model, license_plate)")
       .single();
 
     if (createError) throw createError;
@@ -151,7 +177,7 @@ export async function stampFidelityCardForClient(clientId, workOrderId = null, n
       updated_at: new Date().toISOString(),
     })
     .eq("id", card.id)
-    .select("*, clients(id, name, phone)")
+    .select("*, clients(id, name, phone), vehicles(id, type, brand, model, license_plate)")
     .single();
 
   if (updateError) throw updateError;
@@ -203,17 +229,27 @@ export async function redeemFidelityReward(cardId) {
     .from("fidelity_cards")
     .insert({
       client_id: card.client_id,
+      vehicle_id: card.vehicle_id,
       stamps_count: 0,
       total_stamps: 4,
       status: "active",
       reward_description: "5° Lavado Premium Gratis",
       total_rewards_redeemed: Number(card.total_rewards_redeemed || 0) + 1,
     })
-    .select("*, clients(id, name, phone)")
+    .select("*, clients(id, name, phone), vehicles(id, type, brand, model, license_plate)")
     .single();
 
   if (newCardErr) throw newCardErr;
   return mapFidelityCard(newCard);
+}
+
+export async function setFidelityCardStamps(cardId, stampsCount) {
+  const { data, error } = await supabase.rpc("set_fidelity_card_stamps", {
+    p_card_id: cardId,
+    p_stamps: Math.max(0, Math.min(Number(stampsCount) || 0, 4)),
+  });
+  if (error) throw error;
+  return mapFidelityCard(data);
 }
 
 /**
