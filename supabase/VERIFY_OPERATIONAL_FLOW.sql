@@ -2,7 +2,7 @@
 -- Todos los valores de "problemas" deben ser 0.
 
 with active_orders as (
-  select wo.id, wo.organization_id, wo.total
+  select wo.id, wo.organization_id, wo.subtotal, wo.discount, wo.surcharge, wo.total
   from public.work_orders wo
   where wo.deleted_at is null
 ),
@@ -19,19 +19,20 @@ receipt_totals as (
   where r.status <> 'voided'
   group by r.id, r.work_order_id, r.total
 )
-select 'total del turno distinto a sus servicios' as control, count(*) as problemas
+select 'subtotal del turno distinto a sus servicios' as control, count(*) as problemas
 from active_orders wo
 left join item_totals items on items.work_order_id = wo.id
-where wo.total <> coalesce(items.total, 0)
+where wo.subtotal <> coalesce(items.total, 0)
 union all
 select 'total del recibo distinto al turno', count(*)
 from receipt_totals receipt
 join active_orders wo on wo.id = receipt.work_order_id
 where receipt.total <> wo.total
 union all
-select 'detalle del recibo distinto a su total', count(*)
+select 'detalle del recibo distinto al subtotal del turno', count(*)
 from receipt_totals receipt
-where receipt.total <> receipt.items_total
+join active_orders wo on wo.id = receipt.work_order_id
+where wo.subtotal <> receipt.items_total
 union all
 select 'pagos activos sin turno', count(*)
 from public.payments payment
