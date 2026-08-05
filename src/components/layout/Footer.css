@@ -79,11 +79,26 @@
   z-index: 1;
 }
 
+.footer-social-btn-instagram,
+.footer-social-btn-facebook {
+  color: var(--signature-champagne, #d8b86a);
+}
+
+.footer-social-btn-instagram svg,
+.footer-social-btn-facebook svg {
+  filter: drop-shadow(0 0 5px rgba(216, 184, 106, 0.22));
+}
+
 .footer-social-btn:hover {
   border-color: var(--color-border-strong);
   background: rgba(243, 240, 234, 0.07);
   color: var(--color-primary);
   transform: translateY(-1px);
+}
+
+.footer-social-btn-instagram:hover,
+.footer-social-btn-facebook:hover {
+  color: #f2d995;
 }
 
 .footer-nav,

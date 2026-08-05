@@ -44,7 +44,7 @@ function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={label}
-                    className="footer-social-btn"
+                    className={`footer-social-btn footer-social-btn-${key}`}
                   >
                     <Icon size={18} />
                   </a>
