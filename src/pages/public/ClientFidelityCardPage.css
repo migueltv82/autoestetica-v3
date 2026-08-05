@@ -1266,3 +1266,31 @@
   .cc-card--back.is-revealed .cc-dust-cloud i,
   .cc-automotive-logo-halo { animation: none; }
 }
+
+/* Jerarquia premium: la tarjeta es la protagonista de la experiencia. */
+.fidelity-main-wrapper { max-width:680px;gap:1.35rem; }
+.fidelity-client-welcome { max-width:620px;width:100%;margin:0 auto;padding:.35rem .15rem 1rem;border:0;border-bottom:1px solid rgba(148,163,184,.14);border-radius:0;background:transparent;box-shadow:none; }
+.fidelity-client-welcome img { width:52px;height:52px;flex-basis:52px;border-radius:50%;box-shadow:0 8px 22px rgba(0,0,0,.28),0 0 22px rgba(56,189,248,.08); }
+.fidelity-client-welcome h1 { margin:.18rem 0 .1rem;font-size:1.28rem;letter-spacing:-.02em; }
+.fidelity-card-focus { position:relative;display:grid;gap:.75rem;padding:1.15rem 0 0;isolation:isolate; }
+.fidelity-card-focus::before { content:"";position:absolute;z-index:-1;top:3.5rem;left:50%;width:86%;height:72%;translate:-50% 0;border-radius:50%;background:radial-gradient(ellipse,rgba(14,165,233,.16),rgba(37,99,235,.055) 48%,transparent 72%);filter:blur(28px);pointer-events:none; }
+.fidelity-card-focus-heading { display:flex;align-items:end;justify-content:space-between;gap:1rem;padding:0 .25rem; }
+.fidelity-card-focus-heading>div { display:grid;gap:.15rem;min-width:0; }
+.fidelity-card-focus-heading span { color:#7dd3fc;font-size:.62rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase; }
+.fidelity-card-focus-heading strong { overflow:hidden;color:#f8fafc;font-size:1.02rem;font-weight:780;text-overflow:ellipsis;white-space:nowrap; }
+.fidelity-card-focus-heading small { flex:0 0 auto;padding:.32rem .62rem;border:1px solid rgba(125,211,252,.2);border-radius:999px;color:#cbd5e1;background:rgba(15,23,42,.75);font-size:.68rem;font-weight:760; }
+.fidelity-card-focus-heading small.is-reward { border-color:rgba(250,204,21,.45);color:#fef08a;background:rgba(250,204,21,.09);box-shadow:0 0 18px rgba(250,204,21,.08); }
+.fidelity-card-hint { display:flex;align-items:center;justify-content:center;gap:.4rem;margin:.15rem 0 0;color:#718096;font-size:.7rem;font-weight:650;letter-spacing:.02em; }
+.fidelity-card-hint svg { color:#7dd3fc; }
+.fidelity-main-wrapper>.fidelity-cta,.fidelity-main-wrapper>.fidelity-reward-alert,.fidelity-main-wrapper>.fidelity-explanation-card { max-width:560px;width:100%;margin-inline:auto; }
+.fidelity-explanation-card { opacity:.86; }
+
+@media (max-width:520px) {
+  .fidelity-main-wrapper { gap:1.1rem; }
+  .fidelity-client-welcome { align-items:center;padding:.2rem .1rem .85rem; }
+  .fidelity-client-welcome img { width:46px;height:46px;flex-basis:46px; }
+  .fidelity-card-focus { gap:.6rem;padding-top:.8rem; }
+  .fidelity-card-focus-heading { padding:0 .15rem; }
+  .fidelity-card-focus-heading strong { font-size:.9rem; }
+  .fidelity-card-focus-heading small { font-size:.62rem; }
+}

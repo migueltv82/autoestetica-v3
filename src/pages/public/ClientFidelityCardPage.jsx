@@ -491,13 +491,25 @@ export default function ClientFidelityCardPage() {
                 ) : null}
 
                 {/* ── Tarjeta estilo crédito ── */}
-                <PuzzleFidelityCard
-                  card={card}
-                  businessName={businessName}
-                  logoSrc={logoSrc}
-                  stampsCount={stampsCount}
-                  isUnlocked={isUnlocked}
-                />
+                <section className="fidelity-card-focus" aria-label="Tu tarjeta Fidelity">
+                  <div className="fidelity-card-focus-heading">
+                    <div>
+                      <span>Tu Fidelity Pass</span>
+                      <strong>{card.vehicle || "Vehiculo registrado"}</strong>
+                    </div>
+                    <small className={isUnlocked ? "is-reward" : ""}>
+                      {isUnlocked ? "Premio disponible" : `${stampsCount} de 4 troqueles`}
+                    </small>
+                  </div>
+                  <PuzzleFidelityCard
+                    card={card}
+                    businessName={businessName}
+                    logoSrc={logoSrc}
+                    stampsCount={stampsCount}
+                    isUnlocked={isUnlocked}
+                  />
+                  <p className="fidelity-card-hint"><RotateCw size={14} /> Toca la tarjeta para ver el reverso</p>
+                </section>
 
                 {/* Banner de premio */}
                 {isUnlocked && (
