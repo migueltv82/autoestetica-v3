@@ -2,32 +2,32 @@
   --font-main: "Inter", system-ui, -apple-system, sans-serif;
   --font-display: "Outfit", system-ui, sans-serif;
 
-  /* Premium detailing - deep neutral palette */
-  --color-bg: #05070a;
-  --color-bg-soft: #080d13;
-  --color-surface: #0c121a;
-  --color-surface-soft: #111a25;
-  --color-surface-elevated: #182432;
+  /* Autoestetica Signature: verde ingles, marfil y champagne */
+  --color-bg: #04110e;
+  --color-bg-soft: #071a15;
+  --color-surface: #0a241d;
+  --color-surface-soft: #0e3027;
+  --color-surface-elevated: #17483a;
   
-  --color-text: #f2f0eb;
-  --color-text-soft: rgba(242, 240, 235, 0.78);
-  --color-text-muted: rgba(242, 240, 235, 0.62);
+  --color-text: #fff8e8;
+  --color-text-soft: rgba(255, 248, 232, 0.78);
+  --color-text-muted: rgba(239, 224, 190, 0.6);
   
-  --color-primary: #57c7ff;
-  --color-primary-soft: rgba(87, 199, 255, 0.11);
-  --color-accent: #b9e8ff;
+  --color-primary: #d8b86a;
+  --color-primary-soft: rgba(216, 184, 106, 0.12);
+  --color-accent: #f0d99f;
   
-  --rgb-primary: 87, 199, 255;
-  --rgb-accent: 185, 232, 255;
+  --rgb-primary: 216, 184, 106;
+  --rgb-accent: 240, 217, 159;
   
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-strong: rgba(255, 255, 255, 0.18);
-  --color-white: #ffffff;
+  --color-border: rgba(224, 198, 139, 0.14);
+  --color-border-strong: rgba(232, 210, 164, 0.38);
+  --color-white: #fffaf0;
 
   --gradient-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.012) 100%);
   --gradient-overlay: linear-gradient(0deg, var(--color-bg) 0%, rgba(5, 5, 5, 0.4) 100%);
-  --gradient-primary: linear-gradient(135deg, #dff6ff 0%, #57c7ff 48%, #249fe5 100%);
-  --gradient-accent: linear-gradient(135deg, #ffffff 0%, #a8def7 100%);
+  --gradient-primary: linear-gradient(135deg, #fff3cf 0%, #d8b86a 48%, #a98236 100%);
+  --gradient-accent: linear-gradient(135deg, #fffaf0 0%, #e4c984 100%);
 
   --shadow-premium: 0 30px 60px rgba(0, 0, 0, 0.9);
   --shadow-soft: 0 20px 40px rgba(0, 0, 0, 0.5);

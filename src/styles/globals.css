@@ -31,7 +31,7 @@ body::before {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background: radial-gradient(circle at 72% -15%, rgba(87,199,255,.08), transparent 38%),radial-gradient(circle at 10% 35%,rgba(36,159,229,.035),transparent 28%);
+  background: radial-gradient(circle at 72% -15%, rgba(216,184,106,.09), transparent 38%),radial-gradient(circle at 10% 35%,rgba(30,96,77,.1),transparent 30%);
 }
 
 #root {
@@ -56,7 +56,7 @@ button {
   border: none;
 }
 
-:focus-visible{outline:3px solid #5eead4;outline-offset:3px}.skip-link{position:fixed;top:.75rem;left:.75rem;z-index:9999;padding:.65rem .85rem;border-radius:8px;background:#f8fafc;color:#07111e;font-weight:800;transform:translateY(-150%);transition:transform .2s}.skip-link:focus{transform:translateY(0)}
+:focus-visible{outline:3px solid #d8b86a;outline-offset:3px}.skip-link{position:fixed;top:.75rem;left:.75rem;z-index:9999;padding:.65rem .85rem;border-radius:8px;background:#fff3cf;color:#071a15;font-weight:800;transform:translateY(-150%);transition:transform .2s}.skip-link:focus{transform:translateY(0)}
 
 @media(max-width:640px){.admin-shell input,.admin-shell select,.admin-shell textarea{font-size:16px}.admin-shell button,.admin-shell a{touch-action:manipulation}.admin-form-actions{align-items:stretch;flex-direction:column}.admin-form-actions button{width:100%;min-height:46px}.admin-table-wrap,.simple-table-container{border-radius:14px}}
 
