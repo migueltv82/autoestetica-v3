@@ -1049,22 +1049,22 @@ body {
   }
 }
 
-/* Panel administrador: base grafito neutra; champagne sólo como acento. */
+/* Panel administrador: verde gris profundo con contornos champagne suaves. */
 .admin-shell,
 .admin-main {
-  background-color: #0a1110 !important;
+  background-color: #09110f !important;
 }
 
 .admin-shell :where(.admin-navbar, .admin-sidebar, .admin-mobile-nav) {
-  border-color: rgba(148, 163, 157, .16) !important;
-  background-color: rgba(14, 23, 21, .97) !important;
+  border-color: rgba(210, 187, 135, .2) !important;
+  background-color: rgba(13, 23, 20, .97) !important;
   box-shadow: none;
 }
 
 .admin-shell *,
 .admin-shell *::before,
 .admin-shell *::after {
-  border-color: rgba(148, 163, 157, .16) !important;
+  border-color: rgba(210, 187, 135, .18) !important;
 }
 
 .admin-shell :where(
@@ -1084,20 +1084,55 @@ body {
   .turn-mobile-card,
   .simple-table-container,
   .admin-table-wrap,
+  .month-grid,
+  .week-grid,
+  .day-agenda,
+  .agenda-board,
+  .board-column,
+  .board-card,
   .modal-content,
   .receipt-modal
 ) {
-  border-color: rgba(148, 163, 157, .16) !important;
-  background: #131c1a !important;
+  border-color: rgba(210, 187, 135, .18) !important;
+  background: #131d1a !important;
   box-shadow: 0 10px 26px rgba(0, 0, 0, .15) !important;
 }
 
 .admin-shell :where(input, textarea, select) {
-  border-color: rgba(148, 163, 157, .18) !important;
-  background: #0e1715 !important;
+  border-color: rgba(210, 187, 135, .2) !important;
+  background: #0d1714 !important;
 }
 
 .admin-shell :where(input, textarea, select, button, a):focus-visible,
 .admin-shell :where(.active, .is-active, .is-selected, [aria-selected="true"]) {
   border-color: rgba(201, 174, 114, .48) !important;
+}
+
+.admin-shell :where(
+  .simple-admin-table thead,
+  .admin-table thead,
+  .week-header,
+  .month-header,
+  .board-column > header
+) {
+  background-color: rgba(25, 37, 33, .72);
+}
+
+.admin-shell :where(
+  .simple-admin-table tbody tr,
+  .admin-table tbody tr,
+  .movement-row,
+  .upcoming-row,
+  .priority-item
+) {
+  border-color: rgba(210, 187, 135, .13) !important;
+}
+
+.admin-shell :where(
+  .simple-admin-table tbody tr,
+  .admin-table tbody tr,
+  .board-card,
+  .quick-actions a
+):hover {
+  background-color: rgba(201, 174, 114, .055) !important;
 }
