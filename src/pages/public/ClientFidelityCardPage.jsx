@@ -230,6 +230,10 @@ export function PuzzleFidelityCard({ card, businessName, logoSrc, stampsCount, i
                   <stop offset=".45" stopColor="#38bdf8" stopOpacity=".5" />
                   <stop offset="1" stopColor="#020617" stopOpacity=".9" />
                 </linearGradient>
+                <pattern id="cc-puzzle-texture" width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(32)">
+                  <rect width="18" height="18" fill="transparent" />
+                  <path d="M0 2H18M0 11H18" stroke="#bae6fd" strokeOpacity=".045" strokeWidth="1" />
+                </pattern>
               </defs>
               <motion.image
                 className="cc-puzzle-logo-image"
@@ -255,6 +259,7 @@ export function PuzzleFidelityCard({ card, businessName, logoSrc, stampsCount, i
                   style={{ transformBox: "fill-box", transformOrigin: "center" }}
                 >
                   <path className="cc-svg-piece-cover" d={path} />
+                  <path className="cc-svg-piece-texture" d={path} />
                   <path className="cc-svg-piece-bevel" d={path} />
                   <path className="cc-svg-piece-cut" d={path} />
                 </motion.g>

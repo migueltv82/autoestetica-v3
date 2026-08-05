@@ -1382,6 +1382,27 @@
   .cc-card-flipper { transition-duration:.01ms; }
 }
 
+/* Piezas pendientes: el emblema permanece latente bajo una piel tecnica. */
+.cc-svg-piece:not(.is-earned) .cc-svg-piece-cover { opacity:.76; }
+.cc-svg-piece-texture { fill:url(#cc-puzzle-texture);opacity:.58;transition:opacity .45s ease; }
+.cc-svg-piece.is-earned .cc-svg-piece-texture { opacity:0; }
+.cc-svg-piece:not(.is-earned) { filter:drop-shadow(0 5px 6px rgba(0,0,0,.58)) saturate(.45); }
+.cc-svg-piece:not(.is-earned) .cc-svg-piece-cut { stroke:rgba(103,151,175,.48);filter:drop-shadow(0 0 2px rgba(56,189,248,.16)); }
+.cc-svg-piece:nth-of-type(1):not(.is-earned) .cc-svg-piece-cover { filter:brightness(1.12); }
+.cc-svg-piece:nth-of-type(2):not(.is-earned) .cc-svg-piece-cover { filter:brightness(.9); }
+.cc-svg-piece:nth-of-type(3):not(.is-earned) .cc-svg-piece-cover { filter:brightness(.82); }
+.cc-svg-piece:nth-of-type(4):not(.is-earned) .cc-svg-piece-cover { filter:brightness(.7); }
+.cc-card--back:not(.is-celebrating) .cc-svg-piece:not(.is-earned) .cc-svg-piece-texture { animation:ccPendingMaterialShift 7s ease-in-out infinite alternate; }
+
+@keyframes ccPendingMaterialShift {
+  from { opacity:.42; }
+  to { opacity:.68; }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .cc-card--back:not(.is-celebrating) .cc-svg-piece:not(.is-earned) .cc-svg-piece-texture { animation:none; }
+}
+
 /* Progreso editorial: lectura inmediata del camino al beneficio. */
 .fidelity-progress-panel { position:relative;display:grid;gap:1.05rem;max-width:600px;width:100%;margin:.15rem auto 0;padding:1.2rem 1.25rem 1.1rem;border:1px solid rgba(125,211,252,.16);border-radius:20px;background:linear-gradient(145deg,rgba(15,27,45,.92),rgba(7,15,28,.94));box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 18px 36px rgba(0,0,0,.2);overflow:hidden; }
 .fidelity-progress-panel::after { content:"";position:absolute;top:-55px;right:-45px;width:150px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.13),transparent 70%);pointer-events:none; }
