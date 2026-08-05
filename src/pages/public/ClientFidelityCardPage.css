@@ -1446,6 +1446,55 @@
   .fidelity-reward-seal i { animation:none;display:none; }
 }
 
+/* Signature Series: rediseño visible del frente de la tarjeta. */
+.cc-card-stage .cc-card--front.cc-signature-card { padding:1.55rem 1.7rem 1.25rem;border:1px solid rgba(186,230,253,.42);border-radius:23px;background:linear-gradient(118deg,#02050a 0%,#081522 38%,#10273a 62%,#030811 100%);box-shadow:0 30px 70px rgba(0,0,0,.72),0 0 0 1px rgba(255,255,255,.07) inset,0 0 0 5px rgba(2,8,18,.8) inset,0 0 45px rgba(14,165,233,.14);isolation:isolate; }
+.cc-card-stage .cc-card--front.cc-signature-card::before { content:"";position:absolute;z-index:0;inset:0;border-radius:inherit;background:repeating-linear-gradient(112deg,transparent 0 3px,rgba(255,255,255,.012) 3px 4px),linear-gradient(105deg,transparent 12%,rgba(125,211,252,.1) 42%,transparent 55%);mix-blend-mode:screen;pointer-events:none; }
+.cc-card-stage .cc-card--front.cc-signature-card::after { content:"";position:absolute;z-index:0;top:-55%;left:-18%;width:42%;height:220%;transform:rotate(18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),rgba(125,211,252,.13),transparent);filter:blur(2px);pointer-events:none; }
+.cc-signature-frame { position:absolute;z-index:3;inset:9px;border:1px solid rgba(125,211,252,.2);border-radius:16px;pointer-events:none; }
+.cc-signature-frame::before,.cc-signature-frame::after { content:"";position:absolute;width:26%;height:2px;background:linear-gradient(90deg,#38bdf8,transparent);box-shadow:0 0 8px rgba(56,189,248,.55); }
+.cc-signature-frame::before { top:-1px;left:8%; }
+.cc-signature-frame::after { right:8%;bottom:-1px;rotate:180deg; }
+.cc-signature-frame i { position:absolute;width:4px;height:4px;border-radius:50%;background:#bae6fd;box-shadow:0 0 6px #38bdf8; }
+.cc-signature-frame i:nth-child(1){top:-2px;left:-2px}.cc-signature-frame i:nth-child(2){top:-2px;right:-2px}.cc-signature-frame i:nth-child(3){right:-2px;bottom:-2px}.cc-signature-frame i:nth-child(4){bottom:-2px;left:-2px}
+.cc-signature-beam { position:absolute;z-index:1;right:-12%;bottom:-38%;width:75%;height:95%;border-radius:50%;border:1px solid rgba(56,189,248,.22);box-shadow:0 0 45px rgba(14,165,233,.09),inset 0 0 50px rgba(14,165,233,.055);transform:rotate(-14deg);pointer-events:none; }
+.cc-card-stage .cc-signature-card .cc-logo-watermark { top:50%;left:70%;width:58%;height:auto;opacity:.17;transform:translate(-50%,-50%);filter:grayscale(.15) contrast(1.12) brightness(1.18) drop-shadow(0 0 25px rgba(56,189,248,.2));mix-blend-mode:screen; }
+.cc-card-stage .cc-signature-card .cc-row--top { position:relative;z-index:5; }
+.cc-card-stage .cc-signature-card .cc-logo { width:42px;height:42px;border:1px solid rgba(186,230,253,.38);border-radius:50%;box-shadow:0 0 0 3px rgba(56,189,248,.06),0 8px 18px rgba(0,0,0,.4); }
+.cc-card-stage .cc-signature-card .cc-brand-name { color:#f8fafc;font-size:.68rem;font-weight:900;letter-spacing:.065em;text-transform:uppercase; }
+.cc-card-stage .cc-signature-card .cc-plan-label { margin-top:.18rem;color:#7dd3fc;font-size:.5rem;font-weight:850;letter-spacing:.22em;text-transform:uppercase; }
+.cc-card-stage .cc-signature-card .cc-chip--vip { border-color:rgba(125,211,252,.34);color:#dff6ff;background:linear-gradient(135deg,rgba(14,116,144,.25),rgba(15,23,42,.72));box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 15px rgba(56,189,248,.08); }
+.cc-card-stage .cc-signature-card .cc-credit-center { position:relative;z-index:5;align-items:center;margin:auto 0; }
+.cc-card-stage .cc-signature-card .cc-metal-chip { width:54px;height:40px;border-color:#6d5520;background:linear-gradient(145deg,#fff1a8,#b98725 42%,#f7da75 72%,#6f4c13);box-shadow:inset 0 0 0 1px rgba(255,255,255,.55),0 8px 14px rgba(0,0,0,.38),0 0 16px rgba(250,204,21,.12); }
+.cc-card-stage .cc-signature-card .cc-front-vehicle { padding-left:.25rem; }
+.cc-card-stage .cc-signature-card .cc-front-vehicle span { color:rgba(125,211,252,.72);font-size:.5rem;letter-spacing:.24em; }
+.cc-card-stage .cc-signature-card .cc-front-vehicle strong { max-width:100%;color:#edf7ff;font-family:Inter,system-ui,sans-serif;font-size:clamp(1.35rem,4.8vw,2.15rem);font-weight:950;letter-spacing:.025em;text-shadow:0 2px 0 #020617,0 5px 15px rgba(0,0,0,.72),0 0 20px rgba(56,189,248,.11); }
+.cc-card-stage .cc-signature-card .cc-row--bottom { position:relative;z-index:5;padding-top:.55rem;border-top:1px solid rgba(125,211,252,.12); }
+.cc-card-stage .cc-signature-card .cc-holder-label { color:rgba(125,211,252,.55);font-size:.43rem;letter-spacing:.22em; }
+.cc-card-stage .cc-signature-card .cc-holder-name { color:#eef6fb;font-family:Inter,system-ui,sans-serif;font-size:.78rem;font-weight:850;letter-spacing:.09em;text-shadow:0 2px 3px #000; }
+.cc-card-stage .cc-signature-card .cc-front-pass { color:rgba(186,230,253,.6);font-size:.44rem;line-height:1.45; }
+.cc-member-serial { position:absolute;z-index:5;right:1.7rem;top:50%;translate:0 -50%;writing-mode:vertical-rl;color:rgba(125,211,252,.35);font-family:'Courier New',monospace;font-size:.42rem;font-weight:800;letter-spacing:.14em; }
+.cc-card-stage .cc-signature-card .cc-front-identity-meta { z-index:6;right:2.65rem;bottom:3.6rem; }
+.cc-card-stage .cc-signature-card.cc-card--unlocked { border-color:rgba(250,204,21,.65);background:linear-gradient(118deg,#050401,#171005 38%,#2c210a 62%,#060501 100%);box-shadow:0 30px 70px rgba(0,0,0,.72),0 0 0 1px rgba(254,240,138,.12) inset,0 0 0 5px rgba(15,10,2,.84) inset,0 0 55px rgba(250,204,21,.2); }
+.cc-card-stage .cc-signature-card.cc-card--unlocked .cc-signature-frame { border-color:rgba(250,204,21,.3); }
+
+@media (max-width:520px) {
+  .cc-card-stage .cc-card--front.cc-signature-card { padding:1rem 1.05rem .82rem;border-radius:17px; }
+  .cc-signature-frame { inset:6px;border-radius:12px; }
+  .cc-card-stage .cc-signature-card .cc-logo { width:31px;height:31px; }
+  .cc-card-stage .cc-signature-card .cc-brand-name { font-size:.5rem; }
+  .cc-card-stage .cc-signature-card .cc-plan-label { font-size:.38rem; }
+  .cc-card-stage .cc-signature-card .cc-metal-chip { width:42px;height:31px; }
+  .cc-card-stage .cc-signature-card .cc-front-vehicle strong { font-size:1.08rem; }
+  .cc-member-serial { right:1rem;font-size:.32rem; }
+  .cc-card-stage .cc-signature-card .cc-front-identity-meta { right:1.75rem;bottom:2.55rem; }
+}
+
+@media (max-width:380px) {
+  .cc-card-stage .cc-signature-card .cc-front-vehicle strong { font-size:.9rem; }
+  .cc-card-stage .cc-signature-card .cc-holder-name { font-size:.6rem; }
+  .cc-member-serial { display:none; }
+}
+
 /* Progreso editorial: lectura inmediata del camino al beneficio. */
 .fidelity-progress-panel { position:relative;display:grid;gap:1.05rem;max-width:600px;width:100%;margin:.15rem auto 0;padding:1.2rem 1.25rem 1.1rem;border:1px solid rgba(125,211,252,.16);border-radius:20px;background:linear-gradient(145deg,rgba(15,27,45,.92),rgba(7,15,28,.94));box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 18px 36px rgba(0,0,0,.2);overflow:hidden; }
 .fidelity-progress-panel::after { content:"";position:absolute;top:-55px;right:-45px;width:150px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.13),transparent 70%);pointer-events:none; }

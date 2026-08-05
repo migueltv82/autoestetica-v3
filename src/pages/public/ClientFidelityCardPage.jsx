@@ -140,6 +140,7 @@ export function PuzzleFidelityCard({ card, businessName, logoSrc, stampsCount, i
   const vehicleType = (card.vehicleType || "Vehiculo").toUpperCase();
   const licensePlate = card.licensePlate?.toUpperCase() || null;
   const activatedYear = card.activatedAt ? new Date(card.activatedAt).getFullYear() : null;
+  const memberSerial = String(card.publicToken || card.id || "FIDELITY").replaceAll("-", "").slice(-8).toUpperCase();
   const puzzlePieces = [
     "M0 0H500V105C500 128 535 120 558 128C625 151 625 244 558 267C535 275 500 267 500 290V315H365C342 315 350 350 342 373C319 440 226 440 203 373C195 350 203 315 180 315H0Z",
     "M500 0H1000V315H820C797 315 805 350 797 373C774 440 681 440 658 373C650 350 658 315 635 315H500V290C500 267 535 275 558 267C625 244 625 151 558 128C535 120 500 128 500 105Z",
@@ -195,11 +196,14 @@ export function PuzzleFidelityCard({ card, businessName, logoSrc, stampsCount, i
           }
         }}
       >
-        <article className={`cc-card cc-card--front ${isUnlocked ? "cc-card--unlocked" : ""}`} aria-label={`Frente de la tarjeta Fidelity de ${clientName}`}>
+        <article className={`cc-card cc-card--front cc-signature-card ${isUnlocked ? "cc-card--unlocked" : ""}`} aria-label={`Frente de la tarjeta Fidelity de ${clientName}`}>
           <div className="cc-bg-layer cc-bg-layer--1" />
           <div className="cc-bg-layer cc-bg-layer--2" />
           <div className="cc-bg-hologram" />
+          <div className="cc-signature-frame" aria-hidden="true"><i /><i /><i /><i /></div>
+          <div className="cc-signature-beam" aria-hidden="true" />
           <img src={logoSrc} alt="" className="cc-logo-watermark" onError={(event) => { event.currentTarget.src = defaultLogo; }} />
+          <span className="cc-member-serial">MEMBER&nbsp;&nbsp;{memberSerial}</span>
           <div className="cc-front-identity-meta" aria-label="Identidad del vehiculo">
             <span><small>CLASE</small><strong>{vehicleType}</strong></span>
             {licensePlate ? <span className="cc-front-plate"><small>PATENTE</small><strong>{licensePlate}</strong></span> : null}
