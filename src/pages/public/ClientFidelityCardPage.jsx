@@ -207,6 +207,18 @@ export function PuzzleFidelityCard({ card, businessName, logoSrc, stampsCount, i
         <article className={`cc-card cc-card--back ${isUnlocked ? "cc-card--unlocked" : ""} ${isCelebrating ? "is-celebrating" : ""} ${celebrationComplete ? "is-revealed" : ""}`} aria-label={`Reverso de la tarjeta, ${stampsCount} de 4 piezas`}>
           <div className={`cc-puzzle ${isUnlocked ? "is-complete" : ""}`}>
             <svg className="cc-puzzle-svg" viewBox="0 0 1000 630" preserveAspectRatio="none" role="img" aria-label={`${stampsCount} de 4 piezas completadas`}>
+              <defs>
+                <linearGradient id="cc-puzzle-pending" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stopColor="#0e1c2d" stopOpacity=".86" />
+                  <stop offset=".48" stopColor="#06101d" stopOpacity=".76" />
+                  <stop offset="1" stopColor="#020813" stopOpacity=".92" />
+                </linearGradient>
+                <linearGradient id="cc-puzzle-edge" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#e0f2fe" stopOpacity=".82" />
+                  <stop offset=".45" stopColor="#38bdf8" stopOpacity=".5" />
+                  <stop offset="1" stopColor="#020617" stopOpacity=".9" />
+                </linearGradient>
+              </defs>
               <motion.image
                 className="cc-puzzle-logo-image"
                 href={logoSrc}
@@ -231,6 +243,7 @@ export function PuzzleFidelityCard({ card, businessName, logoSrc, stampsCount, i
                   style={{ transformBox: "fill-box", transformOrigin: "center" }}
                 >
                   <path className="cc-svg-piece-cover" d={path} />
+                  <path className="cc-svg-piece-bevel" d={path} />
                   <path className="cc-svg-piece-cut" d={path} />
                 </motion.g>
               ))}

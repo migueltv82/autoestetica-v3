@@ -1316,6 +1316,31 @@
   .cc-front-identity-meta>span:first-child { display:none; }
 }
 
+/* Reverso material: encastres profundos y piezas con acabado fisico. */
+.cc-card-stage .cc-card--back { background:radial-gradient(circle at 48% 42%,#172a40 0,#0a1727 43%,#030a13 100%);box-shadow:0 28px 62px rgba(0,0,0,.68),inset 0 0 0 1px rgba(255,255,255,.045),inset 0 0 70px rgba(0,0,0,.48); }
+.cc-card--back .cc-puzzle::before { content:"";position:absolute;z-index:1;inset:0;background:linear-gradient(118deg,transparent 20%,rgba(255,255,255,.055) 38%,transparent 52%),radial-gradient(circle at 50% 48%,transparent 36%,rgba(1,5,12,.5) 100%);pointer-events:none; }
+.cc-card--back .cc-puzzle-logo-image { filter:saturate(.86) contrast(1.06) brightness(.82) drop-shadow(0 16px 22px rgba(0,0,0,.44)); }
+.cc-svg-piece { filter:drop-shadow(0 5px 5px rgba(0,0,0,.5)); }
+.cc-svg-piece-cover { fill:url(#cc-puzzle-pending);opacity:.9; }
+.cc-svg-piece.is-earned { filter:drop-shadow(0 8px 7px rgba(0,0,0,.48)) drop-shadow(0 0 5px rgba(56,189,248,.14)); }
+.cc-svg-piece.is-earned .cc-svg-piece-cover { opacity:.025; }
+.cc-svg-piece-bevel { fill:none;stroke:rgba(0,4,10,.82);stroke-width:12;stroke-linejoin:round;vector-effect:non-scaling-stroke;filter:drop-shadow(0 -1px 0 rgba(255,255,255,.13)) drop-shadow(0 3px 2px rgba(0,0,0,.75)); }
+.cc-svg-piece-cut { stroke:url(#cc-puzzle-edge);stroke-width:2.2;filter:drop-shadow(0 0 2px rgba(56,189,248,.26)); }
+.cc-svg-piece.is-earned .cc-svg-piece-bevel { stroke:rgba(3,10,18,.68);filter:drop-shadow(0 -1px 0 rgba(224,242,254,.22)) drop-shadow(0 4px 3px rgba(0,0,0,.72)); }
+.cc-svg-piece.is-earned .cc-svg-piece-cut { stroke:rgba(186,230,253,.76);filter:drop-shadow(0 0 3px rgba(56,189,248,.38)); }
+.cc-puzzle.is-complete .cc-svg-piece-bevel { stroke:rgba(55,38,5,.72);filter:drop-shadow(0 -1px 0 rgba(254,240,138,.3)) drop-shadow(0 4px 3px rgba(0,0,0,.68)); }
+.cc-puzzle.is-complete .cc-svg-piece-cut { stroke:rgba(250,204,21,.82);filter:drop-shadow(0 0 4px rgba(250,204,21,.4)); }
+.cc-card--back:not(.is-celebrating):not(.is-revealed) .cc-svg-piece.is-earned { animation:ccPieceBreathingLight 4.8s ease-in-out infinite; }
+
+@keyframes ccPieceBreathingLight {
+  0%,100% { filter:drop-shadow(0 8px 7px rgba(0,0,0,.48)) drop-shadow(0 0 3px rgba(56,189,248,.1)); }
+  50% { filter:drop-shadow(0 9px 8px rgba(0,0,0,.5)) drop-shadow(0 0 7px rgba(56,189,248,.22)); }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .cc-card--back:not(.is-celebrating):not(.is-revealed) .cc-svg-piece.is-earned { animation:none; }
+}
+
 /* Progreso editorial: lectura inmediata del camino al beneficio. */
 .fidelity-progress-panel { position:relative;display:grid;gap:1.05rem;max-width:600px;width:100%;margin:.15rem auto 0;padding:1.2rem 1.25rem 1.1rem;border:1px solid rgba(125,211,252,.16);border-radius:20px;background:linear-gradient(145deg,rgba(15,27,45,.92),rgba(7,15,28,.94));box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 18px 36px rgba(0,0,0,.2);overflow:hidden; }
 .fidelity-progress-panel::after { content:"";position:absolute;top:-55px;right:-45px;width:150px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.13),transparent 70%);pointer-events:none; }
