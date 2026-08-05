@@ -6,6 +6,7 @@ import "./styles/globals.css";
 import "./styles/utilities.css";
 import "./styles/accessibility.css";
 import "./styles/responsive.css";
+import "./styles/signature-theme.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

@@ -1,0 +1,204 @@
+/*
+ * Autoestetica Signature
+ * Capa final de identidad visual para componentes publicos y administrativos.
+ * Los colores semanticos (error, exito, WhatsApp, servicios y estados) se conservan.
+ */
+:root {
+  --signature-bg: #04110e;
+  --signature-bg-deep: #020c0a;
+  --signature-surface: #0a241d;
+  --signature-surface-soft: #0e3027;
+  --signature-surface-raised: #164538;
+  --signature-champagne: #d8b86a;
+  --signature-champagne-light: #f0d99f;
+  --signature-border: rgba(224, 198, 139, .24);
+  --signature-border-soft: rgba(224, 198, 139, .15);
+  --signature-border-strong: rgba(240, 217, 159, .48);
+  --signature-glow: rgba(216, 184, 106, .12);
+  --signature-panel: linear-gradient(145deg, rgba(14, 48, 39, .96), rgba(5, 22, 18, .98));
+  --signature-panel-soft: linear-gradient(145deg, rgba(12, 39, 32, .9), rgba(5, 20, 16, .94));
+}
+
+body,
+.public-layout,
+.admin-shell,
+.admin-main {
+  background-color: var(--signature-bg);
+}
+
+/* Navegacion y estructura principal */
+.public-layout :where(.navbar, .navbar.is-scrolled, .mobile-menu, .footer),
+.admin-shell :where(.admin-navbar, .admin-sidebar, .admin-mobile-nav) {
+  border-color: var(--signature-border) !important;
+  background-color: rgba(4, 17, 14, .94) !important;
+}
+
+.public-layout :where(.navbar, .mobile-menu),
+.admin-shell :where(.admin-navbar, .admin-sidebar) {
+  box-shadow: 0 14px 38px rgba(0, 0, 0, .28), inset 0 -1px 0 rgba(216, 184, 106, .05);
+}
+
+/* Recuadros publicos */
+.public-layout :where(
+  .service-sales-card,
+  .club-membership-card,
+  .contact-direct-card,
+  .contact-info-grid article,
+  .inquiry-feature-card,
+  .inquiry-form-panel,
+  .option-card,
+  .inquiry-legal-consent,
+  .service-detail-content article,
+  .gallery-card,
+  .gallery-feature,
+  .fidelity-search-card,
+  .fidelity-explanation-card,
+  .fidelity-progress-panel,
+  .fidelity-garage,
+  .fidelity-reward-pass,
+  .legal-card,
+  .carousel-main,
+  .before-after-slider,
+  .modal-content
+) {
+  border-color: var(--signature-border) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 248, 226, .035), 0 18px 46px rgba(0, 0, 0, .22);
+}
+
+.public-layout :where(
+  .contact-direct-card,
+  .contact-info-grid article,
+  .inquiry-feature-card,
+  .inquiry-form-panel,
+  .service-detail-content article,
+  .fidelity-search-card,
+  .fidelity-explanation-card,
+  .fidelity-progress-panel,
+  .fidelity-garage,
+  .legal-card,
+  .modal-content
+) {
+  background: var(--signature-panel) !important;
+}
+
+/* Paneles, tarjetas y tablas administrativas */
+.admin-shell :where(
+  .dashboard-panel,
+  .admin-form-shell,
+  .stat-card,
+  .client-card,
+  .client-profile,
+  .client-profile-grid > section,
+  .client-profile-stats span,
+  .client-vehicle-list article,
+  .client-history-list article,
+  .cash-card,
+  .cash-summary-card,
+  .service-admin-card,
+  .gallery-admin-card,
+  .inquiry-card,
+  .settings-card,
+  .club-settings-card,
+  .turn-mobile-card,
+  .simple-table-container,
+  .admin-table-wrap,
+  .month-grid,
+  .week-grid,
+  .day-agenda,
+  .agenda-board,
+  .board-column,
+  .board-card,
+  .modal-content,
+  .receipt-modal,
+  .empty-state,
+  .admin-empty-state
+) {
+  border-color: var(--signature-border) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 248, 226, .035), 0 14px 34px rgba(0, 0, 0, .2);
+}
+
+.admin-shell :where(
+  .dashboard-panel,
+  .admin-form-shell,
+  .stat-card,
+  .client-card,
+  .client-profile,
+  .client-profile-grid > section,
+  .cash-card,
+  .cash-summary-card,
+  .service-admin-card,
+  .gallery-admin-card,
+  .inquiry-card,
+  .settings-card,
+  .club-settings-card,
+  .simple-table-container,
+  .admin-table-wrap,
+  .modal-content,
+  .receipt-modal
+) {
+  background: var(--signature-panel-soft) !important;
+}
+
+/* Campos y controles neutros */
+:where(.public-layout, .admin-shell) :where(input, textarea, select, fieldset) {
+  border-color: var(--signature-border-soft) !important;
+  background-color: rgba(3, 18, 14, .72);
+}
+
+:where(.public-layout, .admin-shell) :where(input, textarea, select):hover {
+  border-color: var(--signature-border) !important;
+}
+
+:where(.public-layout, .admin-shell) :where(input, textarea, select):focus {
+  border-color: var(--signature-border-strong) !important;
+  box-shadow: 0 0 0 3px var(--signature-glow) !important;
+}
+
+/* Bordes de acciones neutras; los estados semanticos quedan intactos. */
+:where(.public-layout, .admin-shell) :where(
+  button,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-pill-toggle,
+  .admin-action,
+  .client-open,
+  .fidelity-forget-access
+):not(.danger):not(.btn-danger):not(.is-error):not(.is-success) {
+  border-color: var(--signature-border) !important;
+}
+
+:where(.public-layout, .admin-shell) :where(
+  .admin-page-header-icon,
+  .contact-direct-icon,
+  .service-detail-content article > span,
+  .client-avatar
+) {
+  border-color: var(--signature-border) !important;
+  background: rgba(216, 184, 106, .1) !important;
+  color: var(--signature-champagne-light) !important;
+}
+
+/* Separadores y encabezados de tablas */
+:where(.public-layout, .admin-shell) :where(
+  header,
+  footer,
+  thead,
+  tr,
+  .section-divider,
+  .admin-form-actions,
+  .inquiry-submit-row
+) {
+  border-color: var(--signature-border-soft);
+}
+
+::selection {
+  background: rgba(216, 184, 106, .28);
+  color: #fffaf0;
+}
+
+@media (max-width: 640px) {
+  .admin-shell :where(.dashboard-panel, .admin-form-shell, .client-card, .modal-content),
+  .public-layout :where(.inquiry-form-panel, .contact-direct-card, .modal-content) {
+    box-shadow: inset 0 1px 0 rgba(255, 248, 226, .03), 0 10px 24px rgba(0, 0, 0, .18);
+  }
+}
