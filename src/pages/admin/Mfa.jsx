@@ -4,6 +4,7 @@ import { KeyRound, ShieldCheck } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../hooks/useAuth";
 import { getDefaultAdminPath, safeAdminRedirect } from "../../utils/permissions";
+import { requiresAdminMfa } from "../../utils/mfaPolicy";
 import businessLogo from "../../assets/logo.webp";
 import { mfaErrorMessage } from "../../utils/mfaErrors";
 import "./Login.css";
@@ -24,6 +25,9 @@ export default function Mfa() {
   }, [assuranceLevel, location.state, navigate, profile]);
 
   if (!profile) return <Navigate to="/admin/login" replace />;
+  if (!requiresAdminMfa(profile)) {
+    return <Navigate to={safeAdminRedirect(location.state?.from, getDefaultAdminPath(profile))} replace />;
+  }
 
   async function beginEnrollment() {
     setBusy(true); setError("");
