@@ -1052,19 +1052,19 @@ body {
 /* Panel administrador: base grafito neutra; champagne sólo como acento. */
 .admin-shell,
 .admin-main {
-  background-color: #0b0f14 !important;
+  background-color: #0a1110 !important;
 }
 
 .admin-shell :where(.admin-navbar, .admin-sidebar, .admin-mobile-nav) {
-  border-color: rgba(148, 163, 184, .16) !important;
-  background-color: rgba(15, 21, 28, .97) !important;
+  border-color: rgba(148, 163, 157, .16) !important;
+  background-color: rgba(14, 23, 21, .97) !important;
   box-shadow: none;
 }
 
 .admin-shell *,
 .admin-shell *::before,
 .admin-shell *::after {
-  border-color: rgba(148, 163, 184, .16) !important;
+  border-color: rgba(148, 163, 157, .16) !important;
 }
 
 .admin-shell :where(
@@ -1087,14 +1087,14 @@ body {
   .modal-content,
   .receipt-modal
 ) {
-  border-color: rgba(148, 163, 184, .16) !important;
-  background: #121922 !important;
+  border-color: rgba(148, 163, 157, .16) !important;
+  background: #131c1a !important;
   box-shadow: 0 10px 26px rgba(0, 0, 0, .15) !important;
 }
 
 .admin-shell :where(input, textarea, select) {
-  border-color: rgba(148, 163, 184, .18) !important;
-  background: #0f151c !important;
+  border-color: rgba(148, 163, 157, .18) !important;
+  background: #0e1715 !important;
 }
 
 .admin-shell :where(input, textarea, select, button, a):focus-visible,
