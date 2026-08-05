@@ -89,6 +89,11 @@
 .client-fidelity-card-preview .cc-front-vehicle small,
 .client-fidelity-card-preview .cc-front-pass { font-size: .4rem; }
 .client-fidelity-card-preview .cc-holder-name { font-size: .68rem; }
+.client-fidelity-card-preview .cc-front-identity-meta { right:.85rem;bottom:2.35rem;gap:.42rem;max-width:68%; }
+.client-fidelity-card-preview .cc-front-identity-meta small { font-size:.3rem; }
+.client-fidelity-card-preview .cc-front-identity-meta strong { font-size:.4rem; }
+.client-fidelity-card-preview .cc-front-identity-meta .cc-front-plate { padding:.18rem .28rem; }
+.client-fidelity-card-preview .cc-front-identity-meta .cc-front-plate strong { font-size:.44rem; }
 .client-fidelity-card-preview .cc-flip-button { right: .4rem; bottom: -.75rem; padding: .3rem .5rem; font-size: .55rem; }
 .client-fidelity-card-preview .cc-back-heading { top: .4rem; right: .45rem; left: .45rem; padding: .3rem .45rem; }
 .client-fidelity-card-preview .cc-back-heading small { font-size: .4rem; }
@@ -373,3 +378,6 @@
   background: rgba(56, 189, 248, 0.25);
   border-color: #38bdf8;
 }
+
+.btn-fidelity-view { display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1rem;border:1px solid rgba(167,139,250,.34);border-radius:8px;color:#c4b5fd;background:rgba(124,58,237,.1);font-size:.85rem;font-weight:650;text-decoration:none;transition:all .2s ease; }
+.btn-fidelity-view:hover { border-color:#a78bfa;color:#ede9fe;background:rgba(124,58,237,.2); }
