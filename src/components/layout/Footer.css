@@ -20,7 +20,7 @@
 
 .footer-top {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(130px, 0.65fr) minmax(230px, 1fr);
+  grid-template-columns: minmax(260px, .85fr) minmax(440px, 1.15fr);
   gap: clamp(1.5rem, 3vw, 2.75rem);
   padding-bottom: clamp(2rem, 3.5vw, 2.75rem);
   border-bottom: 1px solid var(--color-border);
@@ -101,7 +101,6 @@
   color: #f2d995;
 }
 
-.footer-nav,
 .footer-info {
   display: flex;
   flex-direction: column;
@@ -121,15 +120,29 @@
   text-transform: uppercase;
 }
 
-.footer-nav a {
-  display: inline-block;
-  color: var(--color-text-soft);
-  font-size: 0.95rem;
-  transition: color 0.2s ease;
+.footer-contact-heading p {
+  max-width: 46ch;
+  margin: .3rem 0 0;
+  color: var(--color-text-muted);
+  font-size: .82rem;
+  line-height: 1.5;
 }
 
-.footer-nav a:hover {
-  color: var(--color-white);
+.footer-contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .65rem;
+}
+
+.footer-contact-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .45rem 1rem;
+  padding-top: .2rem;
+}
+
+.footer-contact-meta > :last-child:nth-child(odd) {
+  grid-column: 1 / -1;
 }
 
 .footer-wa-btn {
@@ -206,19 +219,12 @@ a.footer-detail:hover {
 
 @media (max-width: 900px) {
   .footer-top {
-    grid-template-columns: minmax(0, 1.2fr) minmax(120px, .65fr) minmax(210px, 1fr);
-    gap: 1.4rem;
-  }
-}
-
-@media (max-width: 720px) {
-  .footer-top {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 1.75rem;
   }
 
   .footer-brand {
-    grid-column: 1 / -1;
+    max-width: 620px;
   }
 }
 
@@ -233,15 +239,17 @@ a.footer-detail:hover {
     padding-bottom: 2rem;
   }
 
-  .footer-nav {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 1rem;
-    row-gap: .55rem;
+  .footer-contact-actions {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  .footer-nav-title {
-    grid-column: 1 / -1;
+  .footer-contact-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-contact-meta > :last-child:nth-child(odd) {
+    grid-column: auto;
   }
 
   .footer-bottom {

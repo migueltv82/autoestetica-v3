@@ -53,28 +53,27 @@ function Footer() {
             )}
           </div>
 
-          <nav className="footer-nav" aria-label="Links del sitio">
-            <span className="footer-nav-title">Explorar</span>
-            <Link to="/">Inicio</Link>
-            <Link to="/servicios">Servicios</Link>
-            <Link to="/galeria">Galería</Link>
-            <Link to="/contacto">Contacto</Link>
-          </nav>
-
           <div className="footer-info">
-            <span className="footer-nav-title">Contacto</span>
-            {settings.whatsapp ? <a href={getWaLink()} target="_blank" rel="noopener noreferrer" className="footer-wa-btn">
-              <WhatsAppIcon size={16} />
-              <span>{settings.whatsapp}</span>
-            </a> : null}
-            {settings.phone ? <a className="footer-detail footer-phone-whatsapp" href={phoneWhatsAppLink} target="_blank" rel="noopener noreferrer" aria-label={`Escribir por WhatsApp al ${settings.phone}`}><WhatsAppIcon size={13} /> {settings.phone}</a> : null}
-            {settings.email ? <a className="footer-detail" href={`mailto:${settings.email}`}><Mail size={13} /> {settings.email}</a> : null}
-            {settings.openingHours ? <p className="footer-detail">
-              <Clock size={13} /> {settings.openingHours}
-            </p> : null}
-            {settings.address ? <p className="footer-detail">
-              <MapPin size={13} /> {settings.address}
-            </p> : null}
+            <div className="footer-contact-heading">
+              <span className="footer-nav-title">Contacto directo</span>
+              <p>Consultanos por tu vehículo y coordinemos el tratamiento adecuado.</p>
+            </div>
+            <div className="footer-contact-actions">
+              {settings.whatsapp ? <a href={getWaLink()} target="_blank" rel="noopener noreferrer" className="footer-wa-btn">
+                <WhatsAppIcon size={16} />
+                <span>{settings.whatsapp}</span>
+              </a> : null}
+              {settings.phone ? <a className="footer-detail footer-phone-whatsapp" href={phoneWhatsAppLink} target="_blank" rel="noopener noreferrer" aria-label={`Escribir por WhatsApp al ${settings.phone}`}><WhatsAppIcon size={16} /> <span>{settings.phone}</span></a> : null}
+            </div>
+            <div className="footer-contact-meta">
+              {settings.email ? <a className="footer-detail" href={`mailto:${settings.email}`}><Mail size={13} /> {settings.email}</a> : null}
+              {settings.openingHours ? <p className="footer-detail">
+                <Clock size={13} /> {settings.openingHours}
+              </p> : null}
+              {settings.address ? <p className="footer-detail">
+                <MapPin size={13} /> {settings.address}
+              </p> : null}
+            </div>
           </div>
         </div>
 
