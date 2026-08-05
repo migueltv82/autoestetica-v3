@@ -1284,3 +1284,116 @@ body {
     box-shadow: 0 8px 22px rgba(0, 0, 0, .22) !important;
   }
 }
+
+/* Caja: superficies contables integradas a la identidad del administrador. */
+.admin-shell :where(
+  .cash-controls,
+  .cash-methods,
+  .cash-panel,
+  .cash-movement-list article,
+  .cash-operation-list article
+) {
+  border-color: rgba(210, 187, 135, .18) !important;
+  background: #131d1a !important;
+  box-shadow: none !important;
+}
+
+.admin-shell :where(
+  .cash-controls input,
+  .cash-controls button,
+  .cash-methods article,
+  .cash-row-actions button
+) {
+  border-color: rgba(210, 187, 135, .16) !important;
+  background: #192521 !important;
+}
+
+.admin-shell .cash-close-button {
+  border-color: rgba(218, 193, 137, .38) !important;
+  background: rgba(201, 174, 114, .09) !important;
+  color: #e4ce98 !important;
+}
+
+.admin-shell :where(.cash-methods > header, .cash-panel > header) {
+  padding-bottom: .7rem;
+  border-bottom: 1px solid rgba(210, 187, 135, .13) !important;
+}
+
+.admin-shell :where(.cash-controls button, .cash-row-actions button):hover {
+  border-color: rgba(218, 193, 137, .38) !important;
+  background: #23312d !important;
+}
+
+/* Club: editor, planes y vista previa con verde gris y champagne. */
+.admin-shell :where(
+  .club-sidebar,
+  .club-editor-empty,
+  .club-editor-card,
+  .club-preview-card,
+  .club-plan-card,
+  .club-switch,
+  .club-form-actions,
+  .club-preview-notes
+) {
+  border-color: rgba(210, 187, 135, .18) !important;
+  background: #131d1a !important;
+  box-shadow: none !important;
+}
+
+.admin-shell :where(.club-editor-card, .club-preview-card, .club-sidebar) {
+  background: linear-gradient(145deg, #16211e, #101916) !important;
+}
+
+.admin-shell :where(.club-plan-card, .club-switch, .club-form-actions, .club-preview-notes) {
+  background: #192521 !important;
+}
+
+.admin-shell :where(.club-plan-card:hover, .club-plan-card.selected, .club-switch:hover) {
+  border-color: rgba(218, 193, 137, .4) !important;
+  background: #23312d !important;
+}
+
+.admin-shell .club-plan-card.selected {
+  box-shadow: inset 3px 0 0 #c9ae72 !important;
+}
+
+.admin-shell :where(.club-sidebar-header, .club-section-header) {
+  border-color: rgba(210, 187, 135, .16) !important;
+}
+
+.admin-shell :where(.club-kicker, .club-preview-features svg) {
+  color: #d9c994 !important;
+}
+
+.admin-shell :where(.club-plan-topline > strong, .club-preview-price strong) {
+  color: #fff1c9 !important;
+}
+
+.admin-shell :where(.club-field input, .club-field textarea, .club-feature-row input) {
+  border-color: rgba(210, 187, 135, .2) !important;
+  background: #0d1714 !important;
+}
+
+.admin-shell :where(.club-field input, .club-field textarea, .club-feature-row input):focus {
+  border-color: rgba(218, 193, 137, .5) !important;
+  box-shadow: 0 0 0 3px rgba(201, 174, 114, .09) !important;
+}
+
+.admin-shell .club-preview-price {
+  border-color: rgba(218, 193, 137, .24) !important;
+  background: rgba(201, 174, 114, .07) !important;
+}
+
+.admin-shell .club-empty-icon {
+  border-color: rgba(218, 193, 137, .24) !important;
+  background: rgba(201, 174, 114, .09) !important;
+  color: #d9c994 !important;
+}
+
+.admin-shell .club-switch-control {
+  background: #34443e !important;
+}
+
+.admin-shell .club-switch.is-on .club-switch-control {
+  background: #c9ae72 !important;
+}
