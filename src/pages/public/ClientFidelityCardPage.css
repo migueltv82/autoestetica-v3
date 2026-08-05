@@ -1514,7 +1514,7 @@
 .cc-card--back.cc-card--progress-2:not(.is-celebrating):not(.is-revealed) .cc-puzzle-logo-image { opacity:.78;filter:blur(3.2px) sepia(.17) saturate(.7) contrast(1.02) brightness(.74) drop-shadow(0 15px 22px rgba(0,0,0,.46)); }
 .cc-card--back.cc-card--progress-3:not(.is-celebrating):not(.is-revealed) .cc-puzzle-logo-image { opacity:.9;filter:blur(1.3px) sepia(.13) saturate(.82) contrast(1.06) brightness(.86) drop-shadow(0 16px 22px rgba(0,0,0,.44)); }
 .cc-card--back.cc-card--progress-4:not(.is-celebrating):not(.is-revealed) .cc-puzzle-logo-image { opacity:1;filter:blur(0) sepia(.08) saturate(.96) contrast(1.1) brightness(1) drop-shadow(0 16px 23px rgba(0,0,0,.42)); }
-.cc-card--back .cc-puzzle-logo-piece { opacity:1;filter:blur(0) saturate(1.08) contrast(1.12) brightness(1.06); }
+.cc-card--back .cc-puzzle-logo-piece { opacity:1;clip-path:circle(49% at 50% 50%);filter:blur(0) saturate(1.08) contrast(1.12) brightness(1.06); }
 .cc-card--back .cc-svg-piece-cut,.cc-card--back .cc-svg-piece.is-earned .cc-svg-piece-cut,.cc-card--back .cc-svg-piece:not(.is-earned) .cc-svg-piece-cut { stroke:rgba(218,186,112,.62);stroke-width:1.45;filter:drop-shadow(0 0 2px rgba(216,184,106,.22)); }
 .cc-card--back .cc-svg-piece.is-earned .cc-svg-piece-cut { stroke:rgba(239,216,164,.76);filter:drop-shadow(0 0 3px rgba(216,184,106,.3)); }
 .cc-card--back:not(.is-celebrating):not(.is-revealed) .cc-svg-piece.is-earned { animation:ccPieceChampagneGlow 4.8s ease-in-out infinite; }

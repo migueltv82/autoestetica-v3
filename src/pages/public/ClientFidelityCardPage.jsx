@@ -269,13 +269,14 @@ export function PuzzleFidelityCard({ card, businessName, logoSrc, stampsCount, i
                   style={{ transformBox: "fill-box", transformOrigin: "center" }}
                 >
                   {slot < stampsCount ? (
-                    <image
-                      className="cc-puzzle-logo-piece"
-                      href={logoSrc}
-                      x="205" y="20" width="590" height="590"
-                      preserveAspectRatio="xMidYMid slice"
-                      clipPath={`url(#${puzzleClipId}-${slot})`}
-                    />
+                    <g clipPath={`url(#${puzzleClipId}-${slot})`}>
+                      <image
+                        className="cc-puzzle-logo-piece"
+                        href={logoSrc}
+                        x="205" y="20" width="590" height="590"
+                        preserveAspectRatio="xMidYMid slice"
+                      />
+                    </g>
                   ) : null}
                   <path className="cc-svg-piece-cover" d={path} />
                   <path className="cc-svg-piece-texture" d={path} />
