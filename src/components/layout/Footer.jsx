@@ -56,7 +56,6 @@ function Footer() {
           <div className="footer-info">
             <div className="footer-contact-heading">
               <span className="footer-nav-title">Contacto directo</span>
-              <p>Consultanos por tu vehículo y coordinemos el tratamiento adecuado.</p>
             </div>
             <div className="footer-contact-actions">
               {settings.whatsapp ? <a href={getWaLink()} target="_blank" rel="noopener noreferrer" className="footer-wa-btn">
