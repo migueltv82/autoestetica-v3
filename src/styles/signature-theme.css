@@ -215,6 +215,178 @@ body,
   }
 }
 
+/* Escala de controles: textos e iconos legibles sin perder densidad. */
+.public-layout :where(
+  .btn-primary,
+  .btn-secondary,
+  .btn-premium,
+  .btn-ghost,
+  .home-btn,
+  .contact-actions a,
+  .contact-bottom-cta a,
+  .sales-card-actions a,
+  .service-detail-wa,
+  .service-detail-cta a,
+  .gallery-cta a,
+  .fidelity-cta,
+  .club-membership-cta,
+  .footer-wa-btn
+) {
+  min-height: 46px;
+  padding: .76rem 1.08rem;
+  border-radius: 12px;
+  font-size: max(.84rem, 13px) !important;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.admin-shell :where(a[href*="wa.me"], a[href*="api.whatsapp.com"]) {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  padding: .65rem .82rem;
+  border-radius: 9px;
+  font-size: max(.72rem, 12px) !important;
+  font-weight: 760;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.public-layout a[href*="wa.me"],
+.public-layout a[href*="api.whatsapp.com"] {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  padding: .76rem 1.08rem;
+  border-radius: 12px;
+  font-size: max(.84rem, 13px) !important;
+  font-weight: 800;
+  line-height: 1.25;
+  white-space: normal;
+  text-align: center;
+}
+
+.public-layout :where(a[href*="wa.me"], a[href*="api.whatsapp.com"]) svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+}
+
+.admin-shell :where(
+  .btn-premium,
+  .btn-primary-admin,
+  .btn-form-primary,
+  .admin-action,
+  .client-card-actions a,
+  .client-card-actions button,
+  .client-ready-actions a,
+  .client-ready-actions button,
+  .receipt-actions button,
+  .btn-fidelity-whatsapp,
+  .btn-fidelity-share,
+  .btn-action-confirm
+) {
+  min-height: 42px;
+  padding: .65rem .82rem;
+  font-size: max(.72rem, 12px) !important;
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.admin-shell :where(
+  .client-card-actions a,
+  .client-card-actions button,
+  .client-ready-actions a,
+  .receipt-actions button,
+  .btn-fidelity-whatsapp,
+  .btn-fidelity-share,
+  .btn-action-confirm
+) svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
+/* Acciones solo-icono de agenda: area tactil amplia, icono claro. */
+.admin-shell :where(.week-turn-actions, .month-span-heading, .day-turn-actions) :where(a, button),
+.admin-shell :where(.btn-action-whatsapp) {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  min-height: 38px;
+  padding: 0 !important;
+  border-radius: 9px;
+  font-size: 0 !important;
+}
+
+.admin-shell :where(.week-turn-actions, .month-span-heading, .day-turn-actions) :where(a, button) svg,
+.admin-shell .btn-action-whatsapp svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 640px) {
+  .public-layout :where(
+    .btn-primary,
+    .btn-secondary,
+    .btn-premium,
+    .btn-ghost,
+    .home-btn,
+    .contact-actions a,
+    .contact-bottom-cta a,
+    .sales-card-actions a,
+    .service-detail-wa,
+    .service-detail-cta a,
+    .gallery-cta a,
+    .fidelity-cta,
+    .club-membership-cta,
+    .footer-wa-btn,
+    a[href*="wa.me"],
+    a[href*="api.whatsapp.com"]
+  ) {
+    min-height: 48px;
+    padding: .82rem 1rem;
+    font-size: max(.88rem, 14px) !important;
+  }
+
+  .admin-shell :where(
+    .btn-premium,
+    .btn-primary-admin,
+    .btn-form-primary,
+    .admin-action,
+    .client-card-actions a,
+    .client-card-actions button,
+    .client-ready-actions a,
+    .client-ready-actions button,
+    .receipt-actions button,
+    .btn-fidelity-whatsapp,
+    .btn-fidelity-share,
+    .btn-action-confirm
+  ) {
+    min-height: 44px;
+    font-size: max(.76rem, 12px) !important;
+  }
+
+  .admin-shell :where(a[href*="wa.me"], a[href*="api.whatsapp.com"]) {
+    min-height: 44px;
+    font-size: max(.76rem, 12px) !important;
+  }
+
+  .admin-shell :where(.week-turn-actions, .month-span-heading, .day-turn-actions) :where(a, button),
+  .admin-shell .btn-action-whatsapp {
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+    min-height: 42px;
+    padding: 0 !important;
+    font-size: 0 !important;
+  }
+}
+
 /* Contraste editorial: serif premium para relato, sans para operacion. */
 .public-layout :where(
   .home-hero-content h1,
