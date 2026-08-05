@@ -5,6 +5,7 @@ import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../hooks/useAuth";
 import { getDefaultAdminPath, safeAdminRedirect } from "../../utils/permissions";
 import businessLogo from "../../assets/logo.webp";
+import { mfaErrorMessage } from "../../utils/mfaErrors";
 import "./Login.css";
 import "./Mfa.css";
 
@@ -26,11 +27,20 @@ export default function Mfa() {
 
   async function beginEnrollment() {
     setBusy(true); setError("");
+    const incompleteFactors = mfaFactors.filter((factor) => factor.status === "unverified");
+    for (const factor of incompleteFactors) {
+      const { error: cleanupError } = await supabase.auth.mfa.unenroll({ factorId: factor.id });
+      if (cleanupError && cleanupError.code !== "mfa_factor_not_found") {
+        setBusy(false);
+        setError(mfaErrorMessage(cleanupError));
+        return;
+      }
+    }
     const { data, error: enrollError } = await supabase.auth.mfa.enroll({
-      factorType: "totp", friendlyName: `Autoestética ${profile.full_name || profile.role}`,
+      factorType: "totp", issuer: "Autoestética Tucumán",
     });
     setBusy(false);
-    if (enrollError) { setError("No pudimos preparar el segundo factor."); return; }
+    if (enrollError) { setError(mfaErrorMessage(enrollError)); return; }
     setEnrollment(data);
   }
 
@@ -40,7 +50,7 @@ export default function Mfa() {
     if (!factorId || !/^\d{6}$/.test(code)) { setError("Ingresá el código de 6 dígitos de tu aplicación."); return; }
     setBusy(true); setError("");
     const { error: verifyError } = await supabase.auth.mfa.challengeAndVerify({ factorId, code });
-    if (verifyError) { setBusy(false); setError("El código no es válido o venció."); return; }
+    if (verifyError) { setBusy(false); setError(mfaErrorMessage(verifyError, "verify")); return; }
     await refreshMfa();
     setBusy(false);
   }
