@@ -348,3 +348,150 @@ body,
   color: currentColor !important;
   stroke: currentColor;
 }
+
+/* Sistema tipografico legible para tarjetas y paneles. */
+:where(.public-layout, .admin-shell) {
+  font-kerning: normal;
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
+}
+
+:where(.public-layout, .admin-shell) :where(
+  .dashboard-panel,
+  .admin-form-shell,
+  .stat-card,
+  .client-card,
+  .client-profile,
+  .cash-methods,
+  .cash-panel,
+  .service-admin-card,
+  .gallery-admin-card,
+  .inquiry-card,
+  .settings-card,
+  .club-settings-card,
+  .contact-direct-card,
+  .contact-info-grid article,
+  .inquiry-feature-card,
+  .inquiry-form-panel,
+  .service-detail-content article,
+  .service-sales-card,
+  .fidelity-progress-panel,
+  .fidelity-garage,
+  .legal-card,
+  .modal-content
+) :where(h2, h3, h4, strong) {
+  color: #fffaf0;
+  font-weight: 760;
+  line-height: 1.28;
+  text-wrap: pretty;
+}
+
+.public-layout :where(
+  .contact-direct-card,
+  .contact-info-grid article,
+  .inquiry-feature-card,
+  .inquiry-form-panel,
+  .service-detail-content article,
+  .service-sales-card,
+  .fidelity-progress-panel,
+  .fidelity-garage,
+  .legal-card,
+  .modal-content
+) :where(p, li, label) {
+  color: rgba(255, 248, 232, .78) !important;
+  font-size: max(.79rem, 13px);
+  line-height: 1.62;
+}
+
+.public-layout :where(
+  .contact-direct-card,
+  .contact-info-grid article,
+  .inquiry-feature-card,
+  .inquiry-form-panel,
+  .service-detail-content article,
+  .service-sales-card,
+  .fidelity-progress-panel,
+  .fidelity-garage,
+  .legal-card,
+  .modal-content
+) small {
+  color: rgba(239, 224, 190, .68) !important;
+  font-size: max(.68rem, 11px);
+  line-height: 1.5;
+}
+
+.admin-shell :where(
+  .dashboard-panel,
+  .admin-form-shell,
+  .stat-card,
+  .client-card,
+  .client-profile,
+  .cash-methods,
+  .cash-panel,
+  .service-admin-card,
+  .gallery-admin-card,
+  .inquiry-card,
+  .settings-card,
+  .club-settings-card,
+  .modal-content,
+  .receipt-modal
+) :where(p, li, label) {
+  color: #c9c4b7 !important;
+  font-size: max(.72rem, 12px);
+  line-height: 1.55;
+}
+
+.admin-shell :where(
+  .dashboard-panel,
+  .admin-form-shell,
+  .stat-card,
+  .client-card,
+  .client-profile,
+  .cash-methods,
+  .cash-panel,
+  .service-admin-card,
+  .gallery-admin-card,
+  .inquiry-card,
+  .settings-card,
+  .club-settings-card,
+  .modal-content,
+  .receipt-modal
+) small {
+  color: #aaa99f !important;
+  font-size: max(.63rem, 10px);
+  line-height: 1.48;
+}
+
+.admin-shell :where(.stat-card-label, .admin-page-header-kicker, .admin-form-kicker) {
+  color: #d9c994 !important;
+  font-size: max(.69rem, 11px);
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.admin-shell :where(.stat-card-trend, .admin-page-header-text) {
+  color: #b8b5aa !important;
+  font-size: max(.74rem, 12px);
+  line-height: 1.55;
+}
+
+:where(.public-layout, .admin-shell) :where(input, textarea, select, button) {
+  letter-spacing: .005em;
+}
+
+:where(.public-layout, .admin-shell) :where(input, textarea, select)::placeholder {
+  color: rgba(239, 224, 190, .5) !important;
+  opacity: 1;
+}
+
+@media (max-width: 640px) {
+  .public-layout :where(.service-sales-card, .contact-info-grid article, .inquiry-feature-card, .modal-content) :where(p, li, label),
+  .admin-shell :where(.client-card, .cash-panel, .admin-form-shell, .modal-content) :where(p, li, label) {
+    font-size: .8rem;
+    line-height: 1.58;
+  }
+
+  :where(.public-layout, .admin-shell) :where(input, textarea, select) {
+    font-size: 16px !important;
+  }
+}
