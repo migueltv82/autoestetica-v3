@@ -1005,12 +1005,13 @@ body {
 /* Footer: dos acciones WhatsApp separadas, alineadas con el sistema visual. */
 .public-layout .site-footer :where(.footer-wa-btn, .footer-phone-whatsapp) {
   display: inline-flex;
-  width: min(100%, 270px);
-  min-height: 44px;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 42px;
   align-items: center;
   justify-content: flex-start;
-  gap: .65rem;
-  padding: .68rem .9rem;
+  gap: .5rem;
+  padding: .58rem .72rem;
   border: 1px solid var(--signature-border-strong) !important;
   border-radius: 11px;
   background: linear-gradient(135deg,#fff3cf,#d8b86a 52%,#a98236) !important;
@@ -1040,9 +1041,10 @@ body {
 
 @media (max-width: 640px) {
   .public-layout .site-footer :where(.footer-wa-btn, .footer-phone-whatsapp) {
-    width: min(100%, 300px);
-    min-height: 46px;
-    padding: .72rem .9rem;
+    width: fit-content;
+    max-width: 100%;
+    min-height: 44px;
+    padding: .64rem .76rem;
     font-size: max(.86rem, 14px) !important;
   }
 }
