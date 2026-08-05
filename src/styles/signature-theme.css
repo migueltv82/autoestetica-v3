@@ -1001,3 +1001,48 @@ body {
     font-size: 16px !important;
   }
 }
+
+/* Footer: telefonos separados y discretos, ambos con destino WhatsApp. */
+.public-layout .site-footer :where(.footer-wa-btn, .footer-phone-whatsapp) {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 32px;
+  align-items: center;
+  justify-content: flex-start;
+  gap: .6rem;
+  padding: .25rem 0;
+  border: 0 !important;
+  border-radius: 0;
+  background: transparent !important;
+  color: rgba(255, 248, 232, .74) !important;
+  box-shadow: none !important;
+  font-size: max(.86rem, 13px) !important;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.public-layout .site-footer :where(.footer-wa-btn, .footer-phone-whatsapp) svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  color: var(--signature-champagne-light) !important;
+}
+
+.public-layout .site-footer :where(.footer-wa-btn, .footer-phone-whatsapp):hover {
+  border: 0 !important;
+  background: transparent !important;
+  color: #fffaf0 !important;
+  box-shadow: none !important;
+  filter: none;
+  transform: translateX(3px);
+}
+
+@media (max-width: 640px) {
+  .public-layout .site-footer :where(.footer-wa-btn, .footer-phone-whatsapp) {
+    width: fit-content;
+    min-height: 38px;
+    padding: .35rem 0;
+    font-size: max(.9rem, 14px) !important;
+  }
+}
