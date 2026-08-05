@@ -137,6 +137,9 @@ export function PuzzleFidelityCard({ card, businessName, logoSrc, stampsCount, i
     ? card.vehicle
     : [card.vehicle?.brand, card.vehicle?.model].filter(Boolean).join(" ") || card.vehicle?.type;
   const vehicle = (vehicleValue || "Tu vehículo").toUpperCase();
+  const vehicleType = (card.vehicleType || "Vehiculo").toUpperCase();
+  const licensePlate = card.licensePlate?.toUpperCase() || null;
+  const activatedYear = card.activatedAt ? new Date(card.activatedAt).getFullYear() : null;
   const puzzlePieces = [
     "M0 0H500V105C500 128 535 120 558 128C625 151 625 244 558 267C535 275 500 267 500 290V315H365C342 315 350 350 342 373C319 440 226 440 203 373C195 350 203 315 180 315H0Z",
     "M500 0H1000V315H820C797 315 805 350 797 373C774 440 681 440 658 373C650 350 658 315 635 315H500V290C500 267 535 275 558 267C625 244 625 151 558 128C535 120 500 128 500 105Z",
@@ -185,6 +188,11 @@ export function PuzzleFidelityCard({ card, businessName, logoSrc, stampsCount, i
           <div className="cc-bg-layer cc-bg-layer--2" />
           <div className="cc-bg-hologram" />
           <img src={logoSrc} alt="" className="cc-logo-watermark" onError={(event) => { event.currentTarget.src = defaultLogo; }} />
+          <div className="cc-front-identity-meta" aria-label="Identidad del vehiculo">
+            <span><small>CLASE</small><strong>{vehicleType}</strong></span>
+            {licensePlate ? <span className="cc-front-plate"><small>PATENTE</small><strong>{licensePlate}</strong></span> : null}
+            {activatedYear ? <span><small>SOCIO DESDE</small><strong>{activatedYear}</strong></span> : null}
+          </div>
           <div className="cc-row cc-row--top">
             <div className="cc-brand"><img src={logoSrc} alt={businessName} className="cc-logo" onError={(event) => { event.currentTarget.src = defaultLogo; }} /><div><span className="cc-brand-name">{businessName}</span><span className="cc-plan-label">Fidelity Pass</span></div></div>
             <div className="cc-chip">{isUnlocked ? <span className="cc-chip--reward"><Gift size={14} /> PREMIO LISTO</span> : <span className="cc-chip--vip"><ShieldCheck size={14} /> CLIENTE VIP</span>}</div>

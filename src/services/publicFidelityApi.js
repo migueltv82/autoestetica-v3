@@ -21,6 +21,9 @@ export async function lookupPublicFidelityCards({ token = "", phone = "", access
     status: card.status || "active",
     totalRewardsRedeemed: Number(card.total_rewards_redeemed || 0),
     vehicle: (card.vehicle_label || "").trim() || null,
+    vehicleType: (card.vehicle_type || "").trim() || null,
+    licensePlate: (card.license_plate || "").trim() || null,
+    activatedAt: card.activated_at || null,
   }));
 }
 

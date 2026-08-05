@@ -1295,6 +1295,27 @@
   .fidelity-card-focus-heading small { font-size:.62rem; }
 }
 
+/* Identidad del vehiculo grabada en el frente del pase. */
+.cc-front-identity-meta { position:absolute;z-index:4;right:1.7rem;bottom:3.35rem;display:flex;align-items:end;justify-content:flex-end;gap:.85rem;max-width:62%; }
+.cc-front-identity-meta>span { display:grid;gap:.12rem;min-width:0;text-align:right; }
+.cc-front-identity-meta small { color:rgba(125,211,252,.48);font-size:.42rem;font-weight:900;letter-spacing:.16em; }
+.cc-front-identity-meta strong { overflow:hidden;color:rgba(226,232,240,.82);font-family:'Courier New',monospace;font-size:.58rem;font-weight:850;letter-spacing:.08em;text-overflow:ellipsis;text-shadow:-1px -1px 0 rgba(255,255,255,.18),1px 1px 0 rgba(0,0,0,.9);white-space:nowrap; }
+.cc-front-identity-meta .cc-front-plate { padding:.3rem .48rem;border:1px solid rgba(226,232,240,.32);border-radius:5px;background:linear-gradient(180deg,rgba(241,245,249,.13),rgba(148,163,184,.06));box-shadow:inset 0 0 0 1px rgba(0,0,0,.32),0 2px 5px rgba(0,0,0,.2); }
+.cc-front-identity-meta .cc-front-plate small { color:rgba(226,232,240,.45); }
+.cc-front-identity-meta .cc-front-plate strong { color:#e5ebef;font-size:.64rem;letter-spacing:.12em; }
+
+@media (max-width:520px) {
+  .cc-front-identity-meta { right:1rem;bottom:2.65rem;gap:.45rem;max-width:67%; }
+  .cc-front-identity-meta small { font-size:.34rem; }
+  .cc-front-identity-meta strong { font-size:.46rem; }
+  .cc-front-identity-meta .cc-front-plate { padding:.22rem .34rem; }
+  .cc-front-identity-meta .cc-front-plate strong { font-size:.5rem; }
+}
+
+@media (max-width:380px) {
+  .cc-front-identity-meta>span:first-child { display:none; }
+}
+
 /* Progreso editorial: lectura inmediata del camino al beneficio. */
 .fidelity-progress-panel { position:relative;display:grid;gap:1.05rem;max-width:600px;width:100%;margin:.15rem auto 0;padding:1.2rem 1.25rem 1.1rem;border:1px solid rgba(125,211,252,.16);border-radius:20px;background:linear-gradient(145deg,rgba(15,27,45,.92),rgba(7,15,28,.94));box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 18px 36px rgba(0,0,0,.2);overflow:hidden; }
 .fidelity-progress-panel::after { content:"";position:absolute;top:-55px;right:-45px;width:150px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.13),transparent 70%);pointer-events:none; }
