@@ -1294,3 +1294,30 @@
   .fidelity-card-focus-heading strong { font-size:.9rem; }
   .fidelity-card-focus-heading small { font-size:.62rem; }
 }
+
+/* Garage Fidelity: selector premium por vehiculo. */
+.fidelity-garage { position:relative;gap:.8rem;padding:1rem;border-color:rgba(125,211,252,.16);border-radius:20px;background:linear-gradient(145deg,rgba(10,22,38,.94),rgba(5,12,24,.88));box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 16px 38px rgba(0,0,0,.2);overflow:hidden; }
+.fidelity-garage::after { content:"";position:absolute;top:-70px;right:-35px;width:170px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.12),transparent 70%);pointer-events:none; }
+.fidelity-garage>header { position:relative;z-index:1;display:flex;align-items:end;justify-content:space-between;gap:1rem;padding:0 .1rem .15rem; }
+.fidelity-garage>header>div { display:grid;gap:.12rem; }
+.fidelity-garage>header span { color:#7dd3fc;font-size:.58rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase; }
+.fidelity-garage>header strong { color:#f8fafc;font-size:1rem;letter-spacing:-.015em; }
+.fidelity-garage>header>small { color:#64748b;font-size:.65rem;font-weight:720; }
+.fidelity-garage>span { display:none; }
+.fidelity-garage>div { position:relative;z-index:1;gap:.7rem;margin-inline:-.1rem;padding:.1rem .1rem .35rem;scroll-snap-type:x proximity; }
+.fidelity-garage button { position:relative;min-width:220px;grid-template-columns:43px minmax(0,1fr) 42px;grid-template-areas:"icon name progress";gap:.65rem;padding:.78rem;border-color:rgba(148,163,184,.14);border-radius:15px;background:linear-gradient(145deg,rgba(30,41,59,.82),rgba(10,20,35,.9));box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 8px 18px rgba(0,0,0,.16);scroll-snap-align:start;overflow:hidden; }
+.fidelity-garage button::before { content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.055) 50%,transparent 70%);translate:-110% 0;transition:translate .55s ease; }
+.fidelity-garage button:hover::before,.fidelity-garage button.is-active::before { translate:110% 0; }
+.fidelity-garage button>svg { grid-area:icon;width:43px;height:43px;padding:11px;border:1px solid rgba(125,211,252,.2);border-radius:13px;color:#7dd3fc;background:rgba(14,116,144,.1); }
+.fidelity-garage button>strong { grid-area:name;align-self:center;font-size:.78rem;line-height:1.15; }
+.fidelity-garage button>strong::before { content:"Fidelity Pass";display:block;margin-bottom:.22rem;color:#64748b;font-size:.5rem;font-weight:850;letter-spacing:.12em;text-transform:uppercase; }
+.fidelity-garage button>small { grid-area:progress;display:grid;place-items:center;align-self:center;width:40px;height:40px;border:1px solid rgba(125,211,252,.25);border-radius:50%;color:#dbeafe;font-size:.6rem;font-weight:850;background:radial-gradient(circle,rgba(14,116,144,.22),rgba(15,23,42,.9));box-shadow:inset 0 0 12px rgba(56,189,248,.08); }
+.fidelity-garage button.is-active { border-color:rgba(56,189,248,.58);background:linear-gradient(145deg,rgba(14,116,144,.29),rgba(15,23,42,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 28px rgba(2,132,199,.12),0 0 0 1px rgba(56,189,248,.08);transform:translateY(-1px); }
+.fidelity-garage button.is-active::after { content:"";position:absolute;top:8px;right:8px;width:5px;height:5px;border-radius:50%;background:#7dd3fc;box-shadow:0 0 9px #38bdf8; }
+.fidelity-garage button.is-active>small { border-color:rgba(250,204,21,.42);color:#fef08a;background:radial-gradient(circle,rgba(250,204,21,.14),rgba(15,23,42,.94));box-shadow:inset 0 0 12px rgba(250,204,21,.08),0 0 14px rgba(250,204,21,.06); }
+
+@media (max-width:520px) {
+  .fidelity-garage { margin-inline:-.15rem;padding:.85rem;border-radius:18px; }
+  .fidelity-garage>header>small { display:none; }
+  .fidelity-garage button { min-width:205px; }
+}

@@ -470,7 +470,8 @@ export default function ClientFidelityCardPage() {
                 </header>
 
                 {cards.length > 1 ? (
-                  <nav className="fidelity-vehicle-switcher" aria-label="Elegir tarjeta por vehiculo">
+                  <nav className="fidelity-vehicle-switcher fidelity-garage" aria-label="Elegir tarjeta por vehiculo">
+                    <header><div><span>Garage Fidelity</span><strong>Tus vehiculos</strong></div><small>{cards.length} tarjetas activas</small></header>
                     <span>ElegÃ­ tu vehÃ­culo</span>
                     <div>
                       {cards.map((item) => (
