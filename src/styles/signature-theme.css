@@ -4,6 +4,9 @@
  * Los colores semanticos (error, exito, WhatsApp, servicios y estados) se conservan.
  */
 :root {
+  --font-main: "Manrope", system-ui, -apple-system, sans-serif;
+  --font-display: "Manrope", system-ui, sans-serif;
+  --font-editorial: "Cormorant Garamond", Georgia, serif;
   --signature-bg: #04110e;
   --signature-bg-deep: #020c0a;
   --signature-surface: #0a241d;
@@ -17,6 +20,15 @@
   --signature-glow: rgba(216, 184, 106, .18);
   --signature-panel: linear-gradient(145deg, rgba(14, 48, 39, .96), rgba(5, 22, 18, .98));
   --signature-panel-soft: linear-gradient(145deg, rgba(12, 39, 32, .9), rgba(5, 20, 16, .94));
+}
+
+.public-layout,
+.admin-shell,
+.super-premium-login,
+.mfa-page {
+  --font-main: "Manrope", system-ui, -apple-system, sans-serif;
+  --font-display: "Manrope", system-ui, sans-serif;
+  font-family: var(--font-main);
 }
 
 body,
@@ -203,6 +215,128 @@ body,
   }
 }
 
+/* Contraste editorial: serif premium para relato, sans para operacion. */
+.public-layout :where(
+  .home-hero-content h1,
+  .home-section-heading h2,
+  .contact-hero h1,
+  .contact-section-heading h2,
+  .catalog-header h1,
+  .gallery-heading h1,
+  .service-detail h1,
+  .legal-header h1,
+  .club-membership-heading h2
+) {
+  font-family: var(--font-editorial);
+  font-weight: 600;
+  letter-spacing: -.035em;
+  line-height: .98;
+}
+
+.public-layout :where(
+  .home-brand-card h2,
+  .home-transformation-copy h2,
+  .contact-direct-card h2,
+  .contact-bottom-cta h2,
+  .service-detail-cta h2,
+  .fidelity-client-welcome h1,
+  .fidelity-explanation-card h3
+) {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  line-height: 1.05;
+}
+
+.public-layout :where(
+  .home-kicker,
+  .contact-kicker,
+  .catalog-kicker,
+  .gallery-kicker,
+  .service-detail-kicker,
+  .legal-kicker,
+  .fidelity-client-welcome span
+) {
+  font-family: var(--font-main);
+  font-style: normal;
+  font-weight: 800 !important;
+}
+
+.public-layout :where(p, li) strong,
+.public-layout :where(.service-price, .sales-card-price, .fidelity-progress-copy strong) {
+  color: #fffaf0;
+  font-family: var(--font-main);
+  font-weight: 800;
+}
+
+.public-layout :where(p, blockquote, .section-quote) em {
+  color: var(--signature-champagne-light);
+  font-family: var(--font-editorial);
+  font-size: 1.08em;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.public-layout :where(.btn-primary, .btn-premium, .home-btn, a[href*="wa.me"]) {
+  font-family: var(--font-main);
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: .01em;
+}
+
+.admin-shell :where(
+  .admin-page-header-title,
+  .dashboard-title,
+  .admin-form-shell h2,
+  .dashboard-panel h2,
+  .modal-content h2
+) {
+  font-family: var(--font-main);
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: -.025em;
+}
+
+.admin-shell :where(
+  .stat-card-value,
+  .cash-amount,
+  .turn-form-total strong,
+  .service-price,
+  td strong
+) {
+  font-family: var(--font-main);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+
+.admin-shell :where(.admin-page-header-kicker, .admin-form-kicker, th) {
+  font-family: var(--font-main);
+  font-style: normal;
+  font-weight: 800 !important;
+}
+
+@media (max-width: 640px) {
+  .public-layout :where(
+    .home-hero-content h1,
+    .contact-hero h1,
+    .catalog-header h1,
+    .service-detail h1,
+    .legal-header h1
+  ) {
+    line-height: 1.02;
+  }
+
+  .public-layout :where(
+    .home-brand-card h2,
+    .contact-direct-card h2,
+    .service-detail-cta h2
+  ) {
+    font-size: clamp(1.55rem, 8vw, 2.1rem);
+  }
+}
+
 /* Escala tipografica integral: web publica, operacion y acceso. */
 :root {
   --type-caption: .7rem;
@@ -218,7 +352,7 @@ body,
 
 body {
   font-size: 16px;
-  font-weight: 450;
+  font-weight: 400;
 }
 
 :where(.public-layout, .admin-shell, .super-premium-login, .mfa-page) :where(h1, h2, h3, h4) {
