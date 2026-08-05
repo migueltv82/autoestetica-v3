@@ -42,7 +42,7 @@ const TRUST_ITEMS = [
 
 function Home() {
   const { services } = useServices();
-  const { settings } = useSettings();
+  const { settings, isLoading: areSettingsLoading } = useSettings();
   const { publishedImages } = useGallery();
   const featuredServices = Array.isArray(services) ? [...services.filter((service) => service.featured), ...services.filter((service) => !service.featured)].slice(0, 3) : [];
   const whatsappNumber = (settings.whatsapp || "5493815448147").replace(/\D/g, "");
@@ -61,7 +61,7 @@ function Home() {
   return (
     <PageTransition>
       <PublicLayout className="home-public-layout">
-        <div className="home-premium">
+        <div className={`home-premium ${!areSettingsLoading && settings.clubSectionEnabled ? "home-with-club" : "home-without-club"}`}>
           <section className="home-hero" aria-labelledby="home-hero-title">
             <div className="home-hero-media" aria-hidden="true">
               <img src={heroImg} alt="" />
@@ -110,7 +110,7 @@ function Home() {
             </div>
           </section>
 
-          {settings.clubSectionEnabled ? <ClubMembershipSection /> : null}
+          {!areSettingsLoading && settings.clubSectionEnabled ? <ClubMembershipSection /> : null}
 
           <section className="home-transformation" aria-labelledby="home-transformation-title">
             <div className="container home-transformation-shell">

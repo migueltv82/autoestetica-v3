@@ -33,6 +33,31 @@
   color: var(--home-text);
 }
 
+/* Mantiene un ritmo vertical equilibrado con el Club publicado u oculto. */
+.home-with-club .club-public-section {
+  padding-bottom: clamp(2.25rem, 3.5vw, 3.5rem);
+}
+
+.home-with-club .home-transformation {
+  padding-top: clamp(2.25rem, 3.5vw, 3.5rem);
+}
+
+.home-without-club .home-transformation {
+  position: relative;
+  padding-top: clamp(4rem, 6vw, 5.75rem);
+}
+
+.home-without-club .home-transformation::before {
+  position: absolute;
+  top: 0;
+  right: 8%;
+  left: 8%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(216, 184, 106, 0.34), transparent);
+  content: "";
+  pointer-events: none;
+}
+
 .home-hero {
   position: relative;
   display: grid;
@@ -388,6 +413,18 @@
     padding: 3.15rem 0;
   }
   .home-transformation{padding:3.2rem 0}.home-transformation-grid,.home-transformation-shell{gap:1rem}.home-transformation-shell{padding:.7rem;border-radius:20px}.home-transformation-copy{text-align:center}.home-transformation-copy h2{max-width:12ch;margin-right:auto;margin-left:auto;font-size:2rem}.home-transformation-copy>p{font-size:.9rem}.home-transformation-copy>div{align-items:center}.home-transformation-proof span{width:auto}.home-transformation-slider::before{inset:-.35rem;border-radius:20px}.home-transformation-slider .ba-slider-container{height:390px;border-radius:16px}
+
+  .home-with-club .club-public-section {
+    padding-bottom: 1.75rem;
+  }
+
+  .home-with-club .home-transformation {
+    padding-top: 1.75rem;
+  }
+
+  .home-without-club .home-transformation {
+    padding-top: 3.25rem;
+  }
 
   .home-section-heading {
     margin-bottom: 1.8rem;
