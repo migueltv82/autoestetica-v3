@@ -14,7 +14,7 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(() => location.state?.authError || "");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(() => location.state?.passwordUpdated ? "Contraseña actualizada. Ya podés iniciar sesión." : "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event) {

@@ -25,7 +25,7 @@ npx supabase secrets set TURNSTILE_SECRET_KEY=TU_CLAVE_SECRETA PUBLIC_SITE_ORIGI
 
 ## Supabase Authentication
 
-En Authentication > URL Configuration configurar el dominio final como `Site URL` y agregar `https://TU_DOMINIO/admin/login` en Redirect URLs. En Authentication > Providers > Email, deshabilitar el registro público, exigir confirmación de email y activar la protección de contraseñas filtradas si el plan la ofrece. Owner y admin tienen MFA TOTP obligatorio desde la aplicación.
+En Authentication > URL Configuration configurar el dominio final como `Site URL` y agregar `https://TU_DOMINIO/admin/login` y `https://TU_DOMINIO/admin/restablecer-clave` en Redirect URLs. Para desarrollo local agregar también `http://localhost:5173/admin/restablecer-clave`. En Authentication > Providers > Email, deshabilitar el registro público, exigir confirmación de email y activar la protección de contraseñas filtradas si el plan la ofrece. Owner y admin tienen MFA TOTP obligatorio desde la aplicación.
 
 ## Compilación
 

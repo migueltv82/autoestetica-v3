@@ -35,7 +35,7 @@ Antes de desplegar las funciones, configurar `TURNSTILE_SECRET_KEY` y `PUBLIC_SI
 En Supabase > Authentication > URL Configuration:
 
 - `Site URL`: el dominio definitivo.
-- `Redirect URLs`: `https://TU_DOMINIO/admin/login`.
+- `Redirect URLs`: `https://TU_DOMINIO/admin/login` y `https://TU_DOMINIO/admin/restablecer-clave`.
 
 ## 3. Validar y publicar
 

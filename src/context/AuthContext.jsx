@@ -59,7 +59,7 @@ export function AuthProvider({ children }) {
     isLoading,
     signIn: (email, password) => supabase.auth.signInWithPassword({ email, password }),
     signOut: () => supabase.auth.signOut(),
-    resetPassword: (email) => supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/admin/login` }),
+    resetPassword: (email) => supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/admin/restablecer-clave` }),
     refreshMfa: async () => {
       const [assuranceResult, factorsResult] = await Promise.all([
         supabase.auth.mfa.getAuthenticatorAssuranceLevel(), supabase.auth.mfa.listFactors(),
