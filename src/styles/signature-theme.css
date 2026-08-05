@@ -1012,11 +1012,11 @@ body {
   justify-content: flex-start;
   gap: .5rem;
   padding: .58rem .72rem;
-  border: 1px solid var(--signature-border-strong) !important;
+  border: 1px solid rgba(216,184,106,.48) !important;
   border-radius: 11px;
-  background: linear-gradient(135deg,#fff3cf,#d8b86a 52%,#a98236) !important;
-  color: #071a15 !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.42),0 9px 22px rgba(216,184,106,.16) !important;
+  background: linear-gradient(145deg,rgba(18,29,39,.96),rgba(7,14,20,.98)) !important;
+  color: #f0d99f !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05),0 9px 22px rgba(0,0,0,.2) !important;
   font-size: max(.82rem, 13px) !important;
   font-weight: 800;
   line-height: 1.25;
@@ -1032,10 +1032,10 @@ body {
 
 .public-layout .site-footer :where(.footer-wa-btn, .footer-phone-whatsapp):hover {
   border-color: rgba(255,235,190,.82) !important;
-  background: linear-gradient(135deg,#fff8e8,#e4c984 55%,#b58c3c) !important;
-  color: #04110e !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.5),0 13px 28px rgba(216,184,106,.24) !important;
-  filter: brightness(1.02);
+  background: linear-gradient(145deg,rgba(42,39,29,.98),rgba(14,20,22,.98)) !important;
+  color: #fff1c9 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08),0 13px 28px rgba(0,0,0,.28),0 0 18px rgba(216,184,106,.1) !important;
+  filter: brightness(1.04);
   transform: translateY(-1px);
 }
 

@@ -106,12 +106,10 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  padding-left: clamp(1rem, 2vw, 1.75rem);
-  border-left: 1px solid rgba(216, 184, 106, .28);
 }
 
 .footer-nav-title {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0;
   color: var(--color-primary);
   font-size: 0.7rem;
   font-weight: 700;
@@ -122,15 +120,17 @@
 .footer-contact-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: .65rem;
+  gap: .75rem;
 }
 
 .footer-contact-meta {
   display: flex;
   align-items: center;
   gap: 0;
-  padding-top: .65rem;
-  border-top: 1px solid rgba(216, 184, 106, .14);
+  padding: .58rem .65rem;
+  border: 1px solid rgba(216, 184, 106, .15);
+  border-radius: 10px;
+  background: rgba(255, 248, 232, .025);
   white-space: nowrap;
 }
 
@@ -249,10 +249,8 @@ a.footer-detail:hover {
 
   .footer-info {
     max-width: 700px;
-    padding-top: 1.15rem;
-    padding-left: 0;
-    border-top: 1px solid rgba(216, 184, 106, .2);
-    border-left: 0;
+    padding-top: 1.1rem;
+    border-top: 1px solid rgba(216, 184, 106, .16);
   }
 }
 
@@ -276,6 +274,7 @@ a.footer-detail:hover {
     align-items: flex-start;
     flex-direction: column;
     gap: .5rem;
+    padding: .7rem;
     white-space: normal;
   }
 
