@@ -1295,6 +1295,35 @@
   .fidelity-card-focus-heading small { font-size:.62rem; }
 }
 
+/* Progreso editorial: lectura inmediata del camino al beneficio. */
+.fidelity-progress-panel { position:relative;display:grid;gap:1.05rem;max-width:600px;width:100%;margin:.15rem auto 0;padding:1.2rem 1.25rem 1.1rem;border:1px solid rgba(125,211,252,.16);border-radius:20px;background:linear-gradient(145deg,rgba(15,27,45,.92),rgba(7,15,28,.94));box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 18px 36px rgba(0,0,0,.2);overflow:hidden; }
+.fidelity-progress-panel::after { content:"";position:absolute;top:-55px;right:-45px;width:150px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.13),transparent 70%);pointer-events:none; }
+.fidelity-progress-copy { position:relative;z-index:1;display:grid;gap:.22rem; }
+.fidelity-progress-copy>span { display:flex;align-items:center;gap:.4rem;color:#7dd3fc;font-size:.62rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase; }
+.fidelity-progress-copy>strong { color:#f8fafc;font-size:1.18rem;font-weight:850;letter-spacing:-.025em;line-height:1.2; }
+.fidelity-progress-copy>p { margin:0;color:#8190a5;font-size:.74rem;line-height:1.4; }
+.fidelity-progress-journey { position:relative;z-index:1;padding-top:.1rem; }
+.fidelity-progress-track { position:absolute;top:11px;right:9%;left:9%;height:3px;border-radius:999px;background:rgba(100,116,139,.22);overflow:hidden; }
+.fidelity-progress-track i { display:block;width:var(--fidelity-progress);height:100%;border-radius:inherit;background:linear-gradient(90deg,#0284c7,#38bdf8,#facc15);box-shadow:0 0 10px rgba(56,189,248,.55);transition:width .55s cubic-bezier(.2,.75,.2,1); }
+.fidelity-progress-milestones { display:grid;grid-template-columns:repeat(4,1fr); }
+.fidelity-progress-milestones>span { z-index:1;display:grid;justify-items:center;gap:.36rem;color:#64748b;font-size:.66rem;font-weight:850; }
+.fidelity-progress-milestones>span>b { display:grid;place-items:center;width:23px;height:23px;border:1px solid rgba(100,116,139,.38);border-radius:50%;color:#64748b;background:#101a2a;box-shadow:0 0 0 4px #0b1524; }
+.fidelity-progress-milestones>span>b svg { color:#07111f;stroke-width:3; }
+.fidelity-progress-milestones>span.is-done>b { border-color:rgba(125,211,252,.75);background:linear-gradient(145deg,#7dd3fc,#facc15);box-shadow:0 0 0 4px #0b1524,0 0 14px rgba(56,189,248,.35); }
+.fidelity-progress-milestones small { color:#64748b;font-size:.56rem;font-weight:720;white-space:nowrap; }
+.fidelity-progress-milestones>span.is-done small { color:#cbd5e1; }
+.fidelity-progress-panel.is-complete { border-color:rgba(250,204,21,.38);background:linear-gradient(145deg,rgba(55,42,12,.42),rgba(12,20,31,.96));box-shadow:inset 0 1px 0 rgba(254,240,138,.1),0 18px 42px rgba(0,0,0,.24),0 0 32px rgba(250,204,21,.07); }
+.fidelity-progress-panel.is-complete::after { background:radial-gradient(circle,rgba(250,204,21,.19),transparent 70%); }
+.fidelity-progress-panel.is-complete .fidelity-progress-copy>span { color:#facc15; }
+.fidelity-progress-panel.is-complete .fidelity-progress-copy>strong { color:#fef3c7; }
+
+@media (max-width:520px) {
+  .fidelity-progress-panel { padding:1rem .85rem .95rem;border-radius:18px; }
+  .fidelity-progress-copy>strong { font-size:1.02rem; }
+  .fidelity-progress-milestones small { font-size:.5rem; }
+  .fidelity-progress-track { right:10%;left:10%; }
+}
+
 /* Garage Fidelity: selector premium por vehiculo. */
 .fidelity-garage { position:relative;gap:.8rem;padding:1rem;border-color:rgba(125,211,252,.16);border-radius:20px;background:linear-gradient(145deg,rgba(10,22,38,.94),rgba(5,12,24,.88));box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 16px 38px rgba(0,0,0,.2);overflow:hidden; }
 .fidelity-garage::after { content:"";position:absolute;top:-70px;right:-35px;width:170px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.12),transparent 70%);pointer-events:none; }

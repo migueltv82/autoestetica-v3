@@ -512,6 +512,29 @@ export default function ClientFidelityCardPage() {
                   <p className="fidelity-card-hint"><RotateCw size={14} /> Toca la tarjeta para ver el reverso</p>
                 </section>
 
+                <section className={`fidelity-progress-panel${isUnlocked ? " is-complete" : ""}`} aria-label="Progreso hacia tu premio">
+                  <div className="fidelity-progress-copy">
+                    <span>{isUnlocked ? <Gift size={16} /> : <Award size={16} />}{isUnlocked ? "Beneficio desbloqueado" : "Camino al premio"}</span>
+                    <strong>
+                      {isUnlocked
+                        ? "Tu proximo Lavado Premium es gratis"
+                        : `Te ${4 - stampsCount === 1 ? "falta" : "faltan"} ${4 - stampsCount} ${4 - stampsCount === 1 ? "visita" : "visitas"}`}
+                    </strong>
+                    <p>{isUnlocked ? "Ya podes coordinar el turno para canjearlo." : "Cada trabajo finalizado suma una nueva pieza a tu tarjeta."}</p>
+                  </div>
+                  <div className="fidelity-progress-journey" style={{ "--fidelity-progress": `${stampsCount <= 1 ? 0 : Math.min(((stampsCount - 1) / 3) * 100, 100)}%` }}>
+                    <div className="fidelity-progress-track"><i /></div>
+                    <div className="fidelity-progress-milestones">
+                      {[1, 2, 3, 4].map((step) => (
+                        <span key={step} className={step <= stampsCount ? "is-done" : ""}>
+                          <b>{step <= stampsCount ? <CheckCircle2 size={15} /> : step}</b>
+                          <small>{step === 4 ? "Premio" : `Visita ${step}`}</small>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </section>
+
                 {/* Banner de premio */}
                 {isUnlocked && (
                   <div className="fidelity-reward-alert">
