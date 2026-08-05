@@ -203,6 +203,206 @@ body,
   }
 }
 
+/* Escala tipografica integral: web publica, operacion y acceso. */
+:root {
+  --type-caption: .7rem;
+  --type-label: .75rem;
+  --type-small: .8rem;
+  --type-body: .94rem;
+  --type-body-large: 1.05rem;
+  --type-card-title: 1rem;
+  --type-section-title: clamp(1.8rem, 4vw, 3.2rem);
+  --leading-tight: 1.2;
+  --leading-copy: 1.65;
+}
+
+body {
+  font-size: 16px;
+  font-weight: 450;
+}
+
+:where(.public-layout, .admin-shell, .super-premium-login, .mfa-page) :where(h1, h2, h3, h4) {
+  color: #fffaf0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  text-wrap: balance;
+}
+
+.public-layout :where(main, footer) p {
+  color: rgba(255, 248, 232, .76);
+  font-size: var(--type-body);
+  line-height: var(--leading-copy);
+  text-wrap: pretty;
+}
+
+.public-layout :where(.home-section-heading, .contact-section-heading, .catalog-header, .gallery-heading) h2 {
+  font-size: var(--type-section-title);
+  letter-spacing: -.035em;
+}
+
+.public-layout :where(.home-kicker, .contact-kicker, .catalog-kicker, .gallery-kicker, .service-detail-kicker, .legal-kicker) {
+  color: var(--signature-champagne-light) !important;
+  font-size: max(var(--type-label), 12px) !important;
+  font-weight: 800 !important;
+  letter-spacing: .12em;
+  line-height: 1.4;
+}
+
+.public-layout :where(.brand-text, .nav-links a, .btn-minimal) {
+  color: rgba(255, 248, 232, .86);
+  font-weight: 700;
+}
+
+.public-layout .nav-links a {
+  font-size: max(.82rem, 13px);
+}
+
+.public-layout :where(.footer-tagline, .footer-nav a, .footer-detail) {
+  color: rgba(255, 248, 232, .72) !important;
+  font-size: max(.84rem, 13px);
+  line-height: 1.62;
+}
+
+.public-layout :where(.footer-nav-title, .footer-bottom) {
+  color: rgba(240, 217, 159, .82);
+  font-size: max(.72rem, 11px);
+  font-weight: 750;
+}
+
+.admin-shell {
+  font-size: .875rem;
+}
+
+.admin-shell :where(.admin-page-header-title, .dashboard-title) {
+  color: #fffaf0 !important;
+  font-weight: 780;
+}
+
+.admin-shell :where(.admin-sidebar-link, .brand-copy strong) {
+  color: #d6d4cc;
+  font-size: max(.82rem, 13px);
+  font-weight: 680;
+}
+
+.admin-shell :where(.brand-copy span, .sidebar-user) {
+  color: #aaa99f;
+  font-size: max(.66rem, 11px);
+}
+
+.admin-shell :where(th, .table-head, .admin-table-head) {
+  color: #d9c994 !important;
+  font-size: max(.68rem, 11px) !important;
+  font-weight: 800 !important;
+  letter-spacing: .06em;
+}
+
+.admin-shell :where(td, .table-cell) {
+  color: #d8d6ce;
+  font-size: max(.74rem, 12px);
+  line-height: 1.48;
+}
+
+.admin-shell :where(.admin-form-group label, .settings-field label, .cash-controls label, .team-add-form label) {
+  color: #d5d0c3 !important;
+  font-size: max(.72rem, 12px) !important;
+  font-weight: 720;
+  line-height: 1.4;
+}
+
+.admin-shell :where(input, textarea, select) {
+  color: #fffaf0;
+  font-size: max(.78rem, 13px);
+  line-height: 1.4;
+}
+
+.admin-shell button,
+.admin-shell a {
+  font-weight: 680;
+}
+
+.admin-shell :where(.client-name-line h3, .cash-methods h3, .cash-panel h3, .dashboard-panel h3) {
+  font-size: max(.88rem, 14px);
+}
+
+.admin-shell :where(.client-card-facts small, .cash-operation-list small, .cash-movement-main small, .team-user-main small, .team-user-meta) {
+  color: #aaa99f !important;
+  font-size: max(.63rem, 10px) !important;
+  line-height: 1.45;
+}
+
+.admin-shell :where(.client-card-facts strong, .cash-operation-list strong, .cash-movement-main strong, .turn-service-option strong) {
+  color: #e8e3d8;
+  font-size: max(.7rem, 12px);
+  line-height: 1.42;
+}
+
+/* La agenda necesita densidad, pero nunca texto microscopico. */
+.admin-shell :where(.month-turn, .month-span-turn, .week-turn, .day-turn, .board-card) {
+  font-size: max(.64rem, 10px);
+  line-height: 1.35;
+}
+
+.admin-shell :where(.month-turn, .month-span-turn, .week-turn, .day-turn, .board-card) small {
+  color: #b0afa7 !important;
+  font-size: max(.6rem, 10px) !important;
+}
+
+.admin-shell :where(.month-turn, .month-span-turn, .week-turn, .day-turn, .board-card) strong {
+  color: #f4efe4;
+  font-size: max(.68rem, 11px);
+  font-weight: 750;
+}
+
+.admin-shell :where(.week-readonly-status, .status-pill, [class*="status-"]) {
+  font-size: max(.62rem, 10px);
+  font-weight: 780;
+  letter-spacing: .02em;
+}
+
+:where(.feedback-toast, .feedback-confirm, .super-premium-login, .mfa-card) {
+  font-family: var(--font-main);
+  color: #fffaf0;
+}
+
+:where(.feedback-toast, .feedback-confirm, .super-premium-login, .mfa-card) p {
+  color: #c7c3b8 !important;
+  font-size: max(.8rem, 13px);
+  line-height: 1.58;
+}
+
+:where(.super-premium-login, .mfa-card) :where(label, .login-forgot) {
+  color: #d8d2c4;
+  font-size: max(.78rem, 13px);
+  font-weight: 650;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --type-body: .9rem;
+    --type-body-large: 1rem;
+  }
+
+  .public-layout .brand-text {
+    font-size: max(.78rem, 12px);
+  }
+
+  .public-layout .mobile-nav-links a {
+    font-size: 1.08rem;
+    font-weight: 700;
+  }
+
+  .admin-shell :where(.admin-mobile-link small, .admin-mobile-more .link-label) {
+    color: #c9c4b7;
+    font-size: max(.62rem, 10px) !important;
+    font-weight: 760;
+  }
+
+  .admin-shell :where(button, a) {
+    line-height: 1.3;
+  }
+}
+
 /* Home hero: reemplaza la identidad azul propia de la portada. */
 .home-public-layout {
   --home-bg: #04110e;
