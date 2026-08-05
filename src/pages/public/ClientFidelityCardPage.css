@@ -1403,6 +1403,49 @@
   .cc-card--back:not(.is-celebrating) .cc-svg-piece:not(.is-earned) .cc-svg-piece-texture { animation:none; }
 }
 
+/* Reward Pass: confirmacion premium posterior a la celebracion. */
+.fidelity-reward-pass { position:relative;display:grid;gap:1rem;max-width:600px;width:100%;margin:.2rem auto 0;padding:1.2rem;border:1px solid rgba(250,204,21,.42);border-radius:22px;background:linear-gradient(145deg,rgba(60,43,8,.58),rgba(16,22,32,.97) 46%,rgba(6,14,25,.98));box-shadow:inset 0 1px 0 rgba(254,240,138,.14),0 22px 46px rgba(0,0,0,.3),0 0 42px rgba(250,204,21,.08);overflow:hidden;isolation:isolate; }
+.fidelity-reward-pass-glow { position:absolute;z-index:-1;top:-75%;left:38%;width:70%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(250,204,21,.28),rgba(56,189,248,.09) 42%,transparent 70%);filter:blur(14px); }
+.fidelity-reward-pass>header { display:flex;align-items:center;justify-content:space-between;gap:1rem; }
+.fidelity-reward-pass>header span { display:flex;align-items:center;gap:.4rem;color:#facc15;font-size:.65rem;font-weight:900;letter-spacing:.16em;text-transform:uppercase; }
+.fidelity-reward-pass>header small { padding:.3rem .58rem;border:1px solid rgba(250,204,21,.28);border-radius:999px;color:#fef3c7;background:rgba(250,204,21,.08);font-size:.58rem;font-weight:800; }
+.fidelity-reward-pass-main { display:flex;align-items:center;gap:1rem;padding:.15rem 0; }
+.fidelity-reward-seal { position:relative;width:66px;height:66px;flex:0 0 66px;border:1px solid rgba(254,240,138,.62);border-radius:50%;background:#06101d;box-shadow:inset 0 0 18px rgba(125,211,252,.25),0 0 0 4px rgba(250,204,21,.07),0 10px 22px rgba(0,0,0,.35);overflow:hidden; }
+.fidelity-reward-seal img { width:100%;height:100%;border-radius:50%;object-fit:cover; }
+.fidelity-reward-seal i { position:absolute;top:-20%;left:-55%;width:25%;height:145%;transform:skewX(-20deg);background:linear-gradient(90deg,transparent,#fff,rgba(254,240,138,.75),transparent);animation:fidelityRewardSealShine 3.8s ease-in-out infinite; }
+.fidelity-reward-pass-main>div:last-child { display:grid;gap:.18rem;min-width:0; }
+.fidelity-reward-pass-main small { color:#94a3b8;font-size:.62rem;font-weight:760; }
+.fidelity-reward-pass-main strong { overflow:hidden;color:#fff7c2;font-size:1.25rem;font-weight:900;letter-spacing:-.025em;text-overflow:ellipsis;white-space:nowrap; }
+.fidelity-reward-pass-main span { justify-self:start;padding:.22rem .46rem;border:1px solid rgba(226,232,240,.24);border-radius:5px;color:#e2e8f0;background:rgba(255,255,255,.045);font-family:'Courier New',monospace;font-size:.65rem;font-weight:850;letter-spacing:.12em; }
+.fidelity-reward-code { display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.78rem .9rem;border:1px solid rgba(148,163,184,.15);border-radius:14px;background:rgba(2,8,18,.48); }
+.fidelity-reward-code>span { display:grid;gap:.16rem; }
+.fidelity-reward-code small { color:#64748b;font-size:.5rem;font-weight:900;letter-spacing:.16em; }
+.fidelity-reward-code strong { color:#f8fafc;font-family:'Courier New',monospace;font-size:.9rem;letter-spacing:.12em; }
+.fidelity-reward-code em { color:#facc15;font-size:.7rem;font-style:normal;font-weight:850;white-space:nowrap; }
+.fidelity-reward-share { min-height:44px;display:flex;align-items:center;justify-content:center;gap:.45rem;border:1px solid rgba(125,211,252,.24);border-radius:12px;color:#bae6fd;background:rgba(14,116,144,.1);font-size:.74rem;font-weight:800;cursor:pointer;transition:border-color .2s ease,background .2s ease,transform .2s ease; }
+.fidelity-reward-share:hover { border-color:rgba(125,211,252,.5);background:rgba(14,116,144,.2);transform:translateY(-1px); }
+.fidelity-reward-alert { display:none; }
+.fidelity-cta.is-reward { min-height:56px;border:1px solid rgba(250,204,21,.42);background:linear-gradient(135deg,#ca8a04,#eab308 52%,#facc15);color:#171009;font-weight:900;box-shadow:0 10px 28px rgba(234,179,8,.28),inset 0 1px 0 rgba(255,255,255,.4); }
+.fidelity-cta.is-reward:hover { background:linear-gradient(135deg,#eab308,#facc15);box-shadow:0 13px 34px rgba(234,179,8,.36); }
+
+@keyframes fidelityRewardSealShine {
+  0%,48% { opacity:0;translate:-120% 0; }
+  58% { opacity:1; }
+  76%,100% { opacity:0;translate:620% 0; }
+}
+
+@media (max-width:520px) {
+  .fidelity-reward-pass { padding:1rem;border-radius:19px; }
+  .fidelity-reward-pass>header small { display:none; }
+  .fidelity-reward-seal { width:56px;height:56px;flex-basis:56px; }
+  .fidelity-reward-pass-main strong { font-size:1.02rem; }
+  .fidelity-reward-code { align-items:flex-start;flex-direction:column;gap:.45rem; }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .fidelity-reward-seal i { animation:none;display:none; }
+}
+
 /* Progreso editorial: lectura inmediata del camino al beneficio. */
 .fidelity-progress-panel { position:relative;display:grid;gap:1.05rem;max-width:600px;width:100%;margin:.15rem auto 0;padding:1.2rem 1.25rem 1.1rem;border:1px solid rgba(125,211,252,.16);border-radius:20px;background:linear-gradient(145deg,rgba(15,27,45,.92),rgba(7,15,28,.94));box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 18px 36px rgba(0,0,0,.2);overflow:hidden; }
 .fidelity-progress-panel::after { content:"";position:absolute;top:-55px;right:-45px;width:150px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.13),transparent 70%);pointer-events:none; }

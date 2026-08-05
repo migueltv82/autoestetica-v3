@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  CheckCircle2, Circle, Gift, MessageCircle, Search,
+  CheckCircle2, Circle, Gift, MessageCircle, Search, Share2,
   ShieldCheck, Sparkles, TicketCheck, ArrowLeft, HelpCircle, Award, Car, RotateCw
 } from "lucide-react";
 import PublicLayout from "../../components/layout/PublicLayout";
@@ -345,6 +345,7 @@ export default function ClientFidelityCardPage() {
   const [isLoading, setIsLoading] = useState(Boolean(accessToken));
   const [searched, setSearched] = useState(Boolean(accessToken));
   const [searchError, setSearchError] = useState("");
+  const [shareMessage, setShareMessage] = useState("");
   const { settings } = useSettings();
 
   const logoSrc = settings?.logoUrl || defaultLogo;
@@ -415,6 +416,21 @@ export default function ClientFidelityCardPage() {
     setPhoneInput("");
     setAccessCode("");
     setSearchError("");
+  }
+
+  async function shareReward() {
+    const shareUrl = `${window.location.origin}/tarjeta?token=${encodeURIComponent(card.publicToken || accessToken)}`;
+    const shareData = { title: "Mi Fidelity Pass", text: `Mi Fidelity Pass de ${businessName}`, url: shareUrl };
+    try {
+      if (navigator.share) await navigator.share(shareData);
+      else {
+        await navigator.clipboard.writeText(shareUrl);
+        setShareMessage("Enlace copiado");
+        window.setTimeout(() => setShareMessage(""), 2200);
+      }
+    } catch (error) {
+      if (error?.name !== "AbortError") setShareMessage("No pudimos compartir el enlace");
+    }
   }
 
   const whatsappNumber = (settings?.whatsapp || "5493815448147").replace(/\D/g, "");
@@ -573,6 +589,29 @@ export default function ClientFidelityCardPage() {
                   </div>
                 </section>
 
+                {isUnlocked ? (
+                  <section className="fidelity-reward-pass" aria-label="Premio Fidelity desbloqueado">
+                    <div className="fidelity-reward-pass-glow" aria-hidden="true" />
+                    <header>
+                      <span><Gift size={16} /> Reward Pass</span>
+                      <small>Beneficio disponible</small>
+                    </header>
+                    <div className="fidelity-reward-pass-main">
+                      <div className="fidelity-reward-seal"><img src={logoSrc} alt="" /><i /></div>
+                      <div>
+                        <small>Premio desbloqueado para</small>
+                        <strong>{card.vehicle || "Vehiculo registrado"}</strong>
+                        {card.licensePlate ? <span>{card.licensePlate}</span> : null}
+                      </div>
+                    </div>
+                    <div className="fidelity-reward-code">
+                      <span><small>CODIGO DE CANJE</small><strong>{`AT-${String(card.publicToken || card.id || "FIDELITY").replaceAll("-", "").slice(0, 8).toUpperCase()}`}</strong></span>
+                      <em>5to Lavado Premium</em>
+                    </div>
+                    <button type="button" className="fidelity-reward-share" onClick={shareReward}><Share2 size={16} /> {shareMessage || "Compartir mi tarjeta"}</button>
+                  </section>
+                ) : null}
+
                 {/* Banner de premio */}
                 {isUnlocked && (
                   <div className="fidelity-reward-alert">
@@ -585,7 +624,7 @@ export default function ClientFidelityCardPage() {
                 )}
 
                 {/* CTA WhatsApp */}
-                <a href={whatsAppLink()} target="_blank" rel="noreferrer" className="fidelity-cta">
+                <a href={whatsAppLink()} target="_blank" rel="noreferrer" className={`fidelity-cta${isUnlocked ? " is-reward" : ""}`}>
                   <MessageCircle size={18} />
                   {isUnlocked ? "🎁 Canjear mi 5° Lavado Gratis" : "Pedir turno por WhatsApp"}
                 </a>
