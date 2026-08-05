@@ -1005,7 +1005,7 @@ body {
 /* Footer: dos acciones WhatsApp separadas, alineadas con el sistema visual. */
 .public-layout .site-footer :where(.footer-wa-btn, .footer-phone-whatsapp) {
   display: inline-flex;
-  width: fit-content;
+  width: 210px;
   max-width: 100%;
   min-height: 42px;
   align-items: center;
@@ -1041,7 +1041,7 @@ body {
 
 @media (max-width: 640px) {
   .public-layout .site-footer :where(.footer-wa-btn, .footer-phone-whatsapp) {
-    width: fit-content;
+    width: 210px;
     max-width: 100%;
     min-height: 44px;
     padding: .64rem .76rem;
