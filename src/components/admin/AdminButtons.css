@@ -165,3 +165,87 @@
     width: 100%;
   }
 }
+
+/* Premium green/champagne button language. */
+.admin-shell :is(.btn-primary-admin, .btn-premium, .btn-form-primary) {
+  border-color: #e0c98f !important;
+  background: linear-gradient(135deg, #ead9ad 0%, #c9ae72 58%, #aa8c50 100%) !important;
+  color: #14201c !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .38), 0 7px 18px rgba(0, 0, 0, .18) !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .2);
+}
+
+.admin-shell :is(.btn-primary-admin, .btn-premium, .btn-form-primary):hover:not(:disabled) {
+  border-color: #f3dfaa !important;
+  background: linear-gradient(135deg, #f4e6bf 0%, #d8bd7d 55%, #b79755 100%) !important;
+  color: #0d1814 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 10px 24px rgba(0, 0, 0, .25), 0 0 16px rgba(201, 174, 114, .12) !important;
+  transform: translateY(-1px);
+}
+
+.admin-shell :is(.btn-primary-admin, .btn-premium, .btn-form-primary):active:not(:disabled) {
+  box-shadow: inset 0 2px 5px rgba(67, 49, 20, .2) !important;
+  transform: translateY(0);
+}
+
+.admin-shell :is(.btn-ghost, .btn-form-secondary) {
+  border-color: rgba(210, 187, 135, .24) !important;
+  background: #192521 !important;
+  color: #e3e8e5 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025) !important;
+}
+
+.admin-shell :is(.btn-ghost, .btn-form-secondary):hover:not(:disabled) {
+  border-color: rgba(218, 193, 137, .46) !important;
+  background: #23312d !important;
+  color: #fff8e8 !important;
+  transform: translateY(-1px);
+}
+
+.admin-shell .btn-danger {
+  border-color: rgba(251, 113, 133, .32) !important;
+  background: rgba(127, 29, 29, .18) !important;
+  color: #fda4af !important;
+}
+
+.admin-shell :is(button, a):focus-visible {
+  outline: 3px solid rgba(224, 201, 143, .36) !important;
+  outline-offset: 2px;
+}
+
+.admin-shell :is(.btn-icon-sm, .btn-icon-danger-sm, .btn-mini-action, .btn-ghost-mini) {
+  border-color: rgba(210, 187, 135, .2) !important;
+  background: #192521 !important;
+  color: #d4dad6 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025);
+}
+
+.admin-shell :is(.btn-icon-sm, .btn-mini-action, .btn-ghost-mini):hover:not(:disabled) {
+  border-color: rgba(218, 193, 137, .45) !important;
+  background: #283832 !important;
+  color: #fff8e8 !important;
+}
+
+.admin-shell :is(.btn-icon-danger-sm, .btn-danger-mini, .btn-action-danger) {
+  border-color: rgba(251, 113, 133, .28) !important;
+  background: rgba(127, 29, 29, .16) !important;
+  color: #fda4af !important;
+}
+
+.admin-shell :is(.week-controls button, .board-card button) {
+  border-color: rgba(210, 187, 135, .22) !important;
+  background: #192521 !important;
+  color: #e3e8e5 !important;
+}
+
+.admin-shell :is(.week-controls button, .board-card button):hover:not(:disabled) {
+  border-color: rgba(218, 193, 137, .45) !important;
+  background: #283832 !important;
+  color: #fff8e8 !important;
+}
+
+.admin-shell button:disabled,
+.admin-shell [aria-disabled="true"] {
+  opacity: .52;
+  filter: saturate(.55);
+}
