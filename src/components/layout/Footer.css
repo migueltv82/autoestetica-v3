@@ -20,9 +20,9 @@
 
 .footer-top {
   display: grid;
-  grid-template-columns: minmax(260px, .9fr) minmax(440px, 1.1fr);
+  grid-template-columns: minmax(220px, .62fr) minmax(0, 1.38fr);
   align-items: center;
-  gap: clamp(2rem, 4vw, 3.75rem);
+  gap: clamp(1.25rem, 2.5vw, 2.5rem);
   padding-bottom: clamp(2rem, 3.5vw, 2.75rem);
   border-bottom: 1px solid var(--color-border);
 }
@@ -106,7 +106,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  padding-left: clamp(1.5rem, 3vw, 2.5rem);
+  padding-left: clamp(1rem, 2vw, 1.75rem);
   border-left: 1px solid rgba(216, 184, 106, .28);
 }
 
@@ -131,6 +131,7 @@
   gap: 0;
   padding-top: .65rem;
   border-top: 1px solid rgba(216, 184, 106, .14);
+  white-space: nowrap;
 }
 
 .footer-contact-meta > * {
@@ -275,6 +276,7 @@ a.footer-detail:hover {
     align-items: flex-start;
     flex-direction: column;
     gap: .5rem;
+    white-space: normal;
   }
 
   .footer-contact-meta > * {
