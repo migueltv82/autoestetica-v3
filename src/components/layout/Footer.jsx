@@ -1,12 +1,16 @@
 import { Link } from "react-router-dom";
-import { Clock, Mail, MapPin, Phone } from "lucide-react";
+import { Clock, Mail, MapPin } from "lucide-react";
 import { useSettings } from "../../hooks/useSettings";
+import { normalizeArgentinaPhone } from "../../utils/whatsapp";
 import { InstagramIcon, FacebookIcon, TikTokIcon, WhatsAppIcon } from "../ui/SocialIcons";
 import defaultLogo from "../../assets/logo.webp";
 import "./Footer.css";
 
 function Footer() {
   const { settings, getWaLink } = useSettings();
+  const phoneWhatsAppLink = settings.phone
+    ? `https://wa.me/${normalizeArgentinaPhone(settings.phone)}?text=${encodeURIComponent(`Hola, quiero hacer una consulta a ${settings.businessName || "Autoestética Tucumán"}.`)}`
+    : "";
 
   const normalizeUrl = (value, baseUrl) => {
     const clean = String(value || "").trim();
@@ -63,7 +67,7 @@ function Footer() {
               <WhatsAppIcon size={16} />
               <span>{settings.whatsapp}</span>
             </a> : null}
-            {settings.phone ? <a className="footer-detail" href={`tel:${settings.phone.replace(/[^\d+]/g, "")}`}><Phone size={13} /> {settings.phone}</a> : null}
+            {settings.phone ? <a className="footer-detail footer-phone-whatsapp" href={phoneWhatsAppLink} target="_blank" rel="noopener noreferrer" aria-label={`Escribir por WhatsApp al ${settings.phone}`}><WhatsAppIcon size={13} /> {settings.phone}</a> : null}
             {settings.email ? <a className="footer-detail" href={`mailto:${settings.email}`}><Mail size={13} /> {settings.email}</a> : null}
             {settings.openingHours ? <p className="footer-detail">
               <Clock size={13} /> {settings.openingHours}
