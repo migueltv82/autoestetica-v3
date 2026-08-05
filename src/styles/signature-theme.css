@@ -1397,3 +1397,97 @@ body {
 .admin-shell .club-switch.is-on .club-switch-control {
   background: #c9ae72 !important;
 }
+
+/* Contraste tipográfico reforzado para uso diario en tablet y móvil. */
+.admin-shell {
+  --color-text: #f7f9f8;
+  --color-text-soft: #d4dad6;
+  --color-text-muted: #aeb9b3;
+  --color-primary: #d5bd86;
+}
+
+.admin-shell :where(
+  p,
+  li,
+  label,
+  td,
+  .admin-page-header-text,
+  .stat-card-trend,
+  .club-plan-subtitle,
+  .club-switch-copy small,
+  .club-preview-card p,
+  .cash-methods article span,
+  .cash-panel p,
+  .cash-method,
+  .agenda-turn-service,
+  .agenda-turn-client p,
+  .agenda-compact-vehicle,
+  .board-card p
+) {
+  color: #cbd3ce !important;
+}
+
+.admin-shell :where(
+  small,
+  .admin-form-help,
+  .admin-field-help,
+  .cash-movement-main small,
+  .cash-operation-list small,
+  .week-day > header small,
+  .week-turn span,
+  .month-turn span,
+  .board-card-top > span,
+  .club-preview-price small
+) {
+  color: #b5c0ba !important;
+}
+
+.admin-shell :where(
+  h1,
+  h2,
+  h3,
+  h4,
+  th,
+  strong,
+  .admin-page-header-title,
+  .admin-form-title,
+  .client-name-line h3,
+  .club-plan-title
+) {
+  color: #f8faf9;
+}
+
+.admin-shell :where(input, textarea, select) {
+  color: #f3f6f4 !important;
+}
+
+.admin-shell :where(input, textarea, select)::placeholder {
+  color: #89968f !important;
+  opacity: 1;
+}
+
+.admin-shell :where(
+  .btn-ghost,
+  .btn-secondary-admin,
+  .week-controls button,
+  .agenda-day-nav > button,
+  .agenda-mobile-turn footer button,
+  .cash-controls button:not(.cash-close-button),
+  .cash-row-actions button:not(.danger),
+  .board-card button
+) {
+  color: #e3e8e5 !important;
+}
+
+.admin-shell :where(
+  .admin-page-header-kicker,
+  .admin-form-kicker,
+  .club-kicker,
+  .stat-card-label
+) {
+  color: #e2ce9e !important;
+}
+
+.admin-shell :where(.week-empty, .board-empty, .agenda-empty, .cash-empty, .cash-empty-small, .club-empty-list) {
+  color: #aeb9b3 !important;
+}
