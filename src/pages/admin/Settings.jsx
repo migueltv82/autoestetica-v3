@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import {
   Check,
   Clock3,
+  Crown,
   Image,
   Mail,
   MapPin,
@@ -189,6 +190,25 @@ function SettingsForm({ initialSettings, onSave }) {
             <Field label="URL del logo" hint="Se usa en el encabezado, footer y recibos." full>
               <div className="settings-input-icon"><Image size={15} /><input type="url" name="logoUrl" value={form.logoUrl} onChange={change} placeholder="https://…" /></div>
             </Field>
+          </SettingsSection>
+
+          <SettingsSection icon={<Crown size={20} />} title="Club Autoestética Tucumán" text="Decidí cuándo mostrar la propuesta del Club en la página de inicio." badge="Inicio">
+            <div className="settings-visibility-control">
+              <div>
+                <strong>Publicar sección del Club</strong>
+                <small>{form.clubSectionEnabled ? "Visible para todos los visitantes." : "Oculta en el sitio público; la configuración se conserva."}</small>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={form.clubSectionEnabled}
+                className={`settings-visibility-switch${form.clubSectionEnabled ? " active" : ""}`}
+                onClick={() => setForm((current) => ({ ...current, clubSectionEnabled: !current.clubSectionEnabled }))}
+              >
+                <span aria-hidden="true" />
+                <b>{form.clubSectionEnabled ? "Activa" : "Oculta"}</b>
+              </button>
+            </div>
           </SettingsSection>
 
           <SettingsSection icon={<Image size={20} />} title="Deslizá y descubrí" text="Controlá el antes y después principal que aparece en la página de inicio." badge="Inicio">

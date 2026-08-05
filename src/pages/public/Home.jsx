@@ -110,7 +110,7 @@ function Home() {
             </div>
           </section>
 
-          <ClubMembershipSection />
+          {settings.clubSectionEnabled ? <ClubMembershipSection /> : null}
 
           <section className="home-transformation" aria-labelledby="home-transformation-title">
             <div className="container home-transformation-shell">

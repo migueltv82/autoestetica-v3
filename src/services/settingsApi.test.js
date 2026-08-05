@@ -29,6 +29,7 @@ describe("settingsApi", () => {
       receipt_footer: null,
       confirmation_message_template: "Confirmación",
       ready_message_template: "Listo",
+      club_section_enabled: false,
     })).toMatchObject({
       businessName: "Autoestética Tucumán",
       address: "Yerba Buena",
@@ -36,6 +37,7 @@ describe("settingsApi", () => {
       receiptFooter: DEFAULT_SETTINGS.receiptFooter,
       confirmationMessageTemplate: "Confirmación",
       readyMessageTemplate: "Listo",
+      clubSectionEnabled: false,
     });
   });
 
@@ -54,6 +56,7 @@ describe("settingsApi", () => {
       address: null,
       whatsapp: "+54 9 381 5448147",
       logo_url: null,
+      club_section_enabled: true,
     });
     expect(buildWhatsAppLink({ whatsapp: "+54 9 381 5448147" })).toBe("https://wa.me/5493815448147");
   });
