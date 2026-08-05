@@ -302,3 +302,49 @@ body,
 :where(.public-layout, .admin-shell) :where(.is-active, .is-selected, [aria-selected="true"]) {
   border-color: var(--signature-border-strong) !important;
 }
+
+/* WhatsApp comparte exactamente el acabado del CTA principal del hero. */
+:where(.public-layout, .admin-shell) :where(
+  a[href*="wa.me"],
+  a[href*="api.whatsapp.com"],
+  .receipt-whatsapp,
+  .btn-fidelity-whatsapp,
+  .btn-fidelity-share,
+  .btn-action-whatsapp,
+  .btn-action-confirm
+) {
+  border: 1px solid var(--signature-border-strong) !important;
+  background: linear-gradient(135deg,#fff3cf,#d8b86a 52%,#a98236) !important;
+  color: #071a15 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.42),0 12px 30px rgba(216,184,106,.22) !important;
+  text-shadow: none !important;
+}
+
+:where(.public-layout, .admin-shell) :where(
+  a[href*="wa.me"],
+  a[href*="api.whatsapp.com"],
+  .receipt-whatsapp,
+  .btn-fidelity-whatsapp,
+  .btn-fidelity-share,
+  .btn-action-whatsapp,
+  .btn-action-confirm
+):hover {
+  border-color: rgba(255,235,190,.82) !important;
+  background: linear-gradient(135deg,#fff8e8,#e4c984 55%,#b58c3c) !important;
+  color: #04110e !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5),0 16px 36px rgba(216,184,106,.3) !important;
+  filter: brightness(1.03);
+}
+
+:where(.public-layout, .admin-shell) :where(
+  a[href*="wa.me"],
+  a[href*="api.whatsapp.com"],
+  .receipt-whatsapp,
+  .btn-fidelity-whatsapp,
+  .btn-fidelity-share,
+  .btn-action-whatsapp,
+  .btn-action-confirm
+) svg {
+  color: currentColor !important;
+  stroke: currentColor;
+}
