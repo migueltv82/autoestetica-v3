@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -127,6 +127,7 @@ function CreditStyleCard({ card, businessName, logoSrc, stampsCount, isUnlocked 
    Página principal
 ────────────────────────────────────────────────────────────── */
 export function PuzzleFidelityCard({ card, businessName, logoSrc, stampsCount, isUnlocked }) {
+  const puzzleClipId = `ccpiece${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   const [showBack, setShowBack] = useState(false);
   const [isCelebrating, setIsCelebrating] = useState(false);
   const [celebrationComplete, setCelebrationComplete] = useState(false);
@@ -238,6 +239,11 @@ export function PuzzleFidelityCard({ card, businessName, logoSrc, stampsCount, i
                   <rect width="18" height="18" fill="transparent" />
                   <path d="M0 2H18M0 11H18" stroke="#f1d99f" strokeOpacity=".06" strokeWidth="1" />
                 </pattern>
+                {puzzlePieces.map((path, slot) => (
+                  <clipPath id={`${puzzleClipId}-${slot}`} key={`${puzzleClipId}-${slot}`} clipPathUnits="userSpaceOnUse">
+                    <path d={path} />
+                  </clipPath>
+                ))}
               </defs>
               <motion.image
                 className="cc-puzzle-logo-image"
@@ -262,6 +268,15 @@ export function PuzzleFidelityCard({ card, businessName, logoSrc, stampsCount, i
                   transition={{ duration: 3.15, delay: slot * .06, times: [0, .2, .43, .64, .84, 1], ease: [0.22, 0.75, 0.2, 1] }}
                   style={{ transformBox: "fill-box", transformOrigin: "center" }}
                 >
+                  {slot < stampsCount ? (
+                    <image
+                      className="cc-puzzle-logo-piece"
+                      href={logoSrc}
+                      x="205" y="20" width="590" height="590"
+                      preserveAspectRatio="xMidYMid slice"
+                      clipPath={`url(#${puzzleClipId}-${slot})`}
+                    />
+                  ) : null}
                   <path className="cc-svg-piece-cover" d={path} />
                   <path className="cc-svg-piece-texture" d={path} />
                   <path className="cc-svg-piece-bevel" d={path} />
