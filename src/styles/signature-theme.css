@@ -11,10 +11,10 @@
   --signature-surface-raised: #164538;
   --signature-champagne: #d8b86a;
   --signature-champagne-light: #f0d99f;
-  --signature-border: rgba(224, 198, 139, .24);
-  --signature-border-soft: rgba(224, 198, 139, .15);
-  --signature-border-strong: rgba(240, 217, 159, .48);
-  --signature-glow: rgba(216, 184, 106, .12);
+  --signature-border: rgba(232, 205, 143, .42);
+  --signature-border-soft: rgba(224, 198, 139, .24);
+  --signature-border-strong: rgba(246, 222, 164, .68);
+  --signature-glow: rgba(216, 184, 106, .18);
   --signature-panel: linear-gradient(145deg, rgba(14, 48, 39, .96), rgba(5, 22, 18, .98));
   --signature-panel-soft: linear-gradient(145deg, rgba(12, 39, 32, .9), rgba(5, 20, 16, .94));
 }
@@ -278,6 +278,24 @@ body,
 :where(.public-layout, .admin-shell) *::before,
 :where(.public-layout, .admin-shell) *::after {
   border-color: var(--signature-border) !important;
+}
+
+:where(.public-layout, .admin-shell) :where(
+  article,
+  form,
+  fieldset,
+  .dashboard-panel,
+  .admin-form-shell,
+  .stat-card,
+  .client-card,
+  .modal-content,
+  .service-sales-card,
+  .contact-direct-card,
+  .inquiry-form-panel,
+  .fidelity-progress-panel,
+  .fidelity-garage
+) {
+  box-shadow: inset 0 0 0 1px rgba(255, 240, 198, .055), 0 14px 34px rgba(0, 0, 0, .22), 0 0 18px rgba(216, 184, 106, .045) !important;
 }
 
 :where(.public-layout, .admin-shell) :where(input, textarea, select, button, a):focus-visible,
