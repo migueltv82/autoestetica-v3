@@ -220,7 +220,7 @@ export function PuzzleFidelityCard({ card, businessName, logoSrc, stampsCount, i
           <div className="cc-row cc-row--bottom"><div className="cc-holder-info"><span className="cc-holder-label">TITULAR</span><span className="cc-holder-name cc-embossed">{clientName || "—"}</span></div><span className="cc-front-pass cc-embossed">AUTOESTÉTICA<br />TUCUMÁN</span></div>
         </article>
 
-        <article className={`cc-card cc-card--back ${isUnlocked ? "cc-card--unlocked" : ""} ${isCelebrating ? "is-celebrating" : ""} ${celebrationComplete ? "is-revealed" : ""}`} aria-label={`Reverso de la tarjeta, ${stampsCount} de 4 piezas`}>
+        <article className={`cc-card cc-card--back cc-card--progress-${stampsCount} ${isUnlocked ? "cc-card--unlocked" : ""} ${isCelebrating ? "is-celebrating" : ""} ${celebrationComplete ? "is-revealed" : ""}`} aria-label={`Reverso de la tarjeta, ${stampsCount} de 4 piezas`}>
           <div className={`cc-puzzle ${isUnlocked ? "is-complete" : ""}`}>
             <svg className="cc-puzzle-svg" viewBox="0 0 1000 630" preserveAspectRatio="none" role="img" aria-label={`${stampsCount} de 4 piezas completadas`}>
               <defs>
@@ -438,7 +438,7 @@ export default function ClientFidelityCardPage() {
   }
 
   const whatsappNumber = (settings?.whatsapp || "5493815448147").replace(/\D/g, "");
-  const stampsCount = card?.stampsCount || 0;
+  const stampsCount = Math.min(4, Math.max(0, Number(card?.stampsCount) || 0));
   const isUnlocked = card?.status === "reward_ready" || stampsCount >= 4;
 
   const whatsAppLink = () => {

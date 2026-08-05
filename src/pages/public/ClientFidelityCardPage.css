@@ -1508,6 +1508,14 @@
 .cc-svg-piece.is-earned .cc-svg-piece-bevel { stroke:rgba(4,31,24,.7);filter:drop-shadow(0 -1px 0 rgba(255,240,198,.25)) drop-shadow(0 4px 3px rgba(0,0,0,.72)); }
 .cc-svg-piece.is-earned .cc-svg-piece-cut { stroke:rgba(240,216,160,.84);filter:drop-shadow(0 0 4px rgba(216,184,106,.42)); }
 .cc-svg-piece:not(.is-earned) .cc-svg-piece-cut { stroke:rgba(183,157,98,.58);filter:drop-shadow(0 0 2px rgba(216,184,106,.2)); }
+.cc-card--back:not(.is-celebrating):not(.is-revealed) .cc-puzzle-logo-image { transition:filter .85s cubic-bezier(.2,.75,.2,1),opacity .85s ease; }
+.cc-card--back.cc-card--progress-0:not(.is-celebrating):not(.is-revealed) .cc-puzzle-logo-image { opacity:.58;filter:blur(8px) sepia(.24) saturate(.48) contrast(.92) brightness(.52) drop-shadow(0 14px 20px rgba(0,0,0,.5)); }
+.cc-card--back.cc-card--progress-1:not(.is-celebrating):not(.is-revealed) .cc-puzzle-logo-image { opacity:.68;filter:blur(5.5px) sepia(.2) saturate(.58) contrast(.97) brightness(.63) drop-shadow(0 15px 21px rgba(0,0,0,.48)); }
+.cc-card--back.cc-card--progress-2:not(.is-celebrating):not(.is-revealed) .cc-puzzle-logo-image { opacity:.78;filter:blur(3.2px) sepia(.17) saturate(.7) contrast(1.02) brightness(.74) drop-shadow(0 15px 22px rgba(0,0,0,.46)); }
+.cc-card--back.cc-card--progress-3:not(.is-celebrating):not(.is-revealed) .cc-puzzle-logo-image { opacity:.9;filter:blur(1.3px) sepia(.13) saturate(.82) contrast(1.06) brightness(.86) drop-shadow(0 16px 22px rgba(0,0,0,.44)); }
+.cc-card--back.cc-card--progress-4:not(.is-celebrating):not(.is-revealed) .cc-puzzle-logo-image { opacity:1;filter:blur(0) sepia(.08) saturate(.96) contrast(1.1) brightness(1) drop-shadow(0 16px 23px rgba(0,0,0,.42)); }
+.cc-card--back .cc-svg-piece-cut,.cc-card--back .cc-svg-piece.is-earned .cc-svg-piece-cut,.cc-card--back .cc-svg-piece:not(.is-earned) .cc-svg-piece-cut { stroke:rgba(218,186,112,.62);stroke-width:1.45;filter:drop-shadow(0 0 2px rgba(216,184,106,.22)); }
+.cc-card--back .cc-svg-piece.is-earned .cc-svg-piece-cut { stroke:rgba(239,216,164,.76);filter:drop-shadow(0 0 3px rgba(216,184,106,.3)); }
 .cc-card--back:not(.is-celebrating):not(.is-revealed) .cc-svg-piece.is-earned { animation:ccPieceChampagneGlow 4.8s ease-in-out infinite; }
 
 @keyframes ccPieceChampagneGlow {
