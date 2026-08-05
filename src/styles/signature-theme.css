@@ -202,3 +202,85 @@ body,
     box-shadow: inset 0 1px 0 rgba(255, 248, 226, .03), 0 10px 24px rgba(0, 0, 0, .18);
   }
 }
+
+/* Home hero: reemplaza la identidad azul propia de la portada. */
+.home-public-layout {
+  --home-bg: #04110e;
+  --home-panel: #071a15;
+  --home-surface: #0e3027;
+  --home-line: rgba(224, 198, 139, .18);
+  --home-line-strong: rgba(240, 217, 159, .4);
+  --home-text: #fff8e8;
+  --home-text-soft: rgba(255, 248, 232, .74);
+  --home-text-muted: rgba(239, 224, 190, .52);
+  --home-metal: #d8b86a;
+  --home-metal-soft: #f0d99f;
+  --color-primary: #d8b86a;
+  --color-primary-soft: rgba(216, 184, 106, .12);
+  --color-accent: #f0d99f;
+  --rgb-primary: 216, 184, 106;
+  --rgb-accent: 240, 217, 159;
+}
+
+.home-public-layout .home-hero {
+  background: linear-gradient(180deg, #020c0a 0%, #08251e 52%, #04110e 100%);
+}
+
+.home-public-layout .home-hero-media img {
+  filter: brightness(.63) saturate(.72) sepia(.08) hue-rotate(82deg) contrast(1.14);
+}
+
+.home-public-layout .home-hero-overlay {
+  background: linear-gradient(90deg,#04110e 0%,rgba(4,17,14,.97) 27%,rgba(5,30,24,.69) 58%,rgba(4,17,14,.12) 100%),linear-gradient(180deg,rgba(4,17,14,.03),rgba(4,24,19,.15) 55%,#04110e 100%),radial-gradient(circle at 70% 30%,rgba(216,184,106,.16),transparent 34%);
+}
+
+.home-public-layout .home-brand-card {
+  border-color: var(--signature-border-strong) !important;
+  background: linear-gradient(145deg,rgba(14,48,39,.78),rgba(3,17,14,.68)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,248,226,.06),0 24px 62px rgba(0,0,0,.38),0 0 34px rgba(216,184,106,.06);
+}
+
+.home-public-layout .home-brand-glow {
+  background: rgba(216,184,106,.18);
+}
+
+.home-public-layout :where(.home-brand-card > img, .home-hero-proof span) {
+  border-color: var(--signature-border) !important;
+}
+
+.home-public-layout :where(.home-brand-card > span, .home-kicker, .home-hero-proof svg) {
+  color: var(--signature-champagne-light) !important;
+}
+
+.home-public-layout .home-kicker::before {
+  background: linear-gradient(90deg,#d8b86a,transparent);
+}
+
+.home-public-layout .home-hero-proof span {
+  background: rgba(8,38,30,.62);
+  color: rgba(255,248,232,.78);
+}
+
+.home-public-layout .home-btn-primary {
+  border-color: var(--signature-border-strong) !important;
+  background: linear-gradient(135deg,#fff3cf,#d8b86a 52%,#a98236);
+  color: #071a15;
+  box-shadow: 0 12px 30px rgba(216,184,106,.22);
+}
+
+.home-public-layout .home-btn-primary:hover {
+  background: linear-gradient(135deg,#fff8e8,#e4c984 55%,#b58c3c);
+  box-shadow: 0 16px 36px rgba(216,184,106,.3);
+}
+
+/* Garantia final: cualquier contorno visible adopta champagne. */
+:where(.public-layout, .admin-shell) *,
+:where(.public-layout, .admin-shell) *::before,
+:where(.public-layout, .admin-shell) *::after {
+  border-color: var(--signature-border) !important;
+}
+
+:where(.public-layout, .admin-shell) :where(input, textarea, select, button, a):focus-visible,
+:where(.public-layout, .admin-shell) :where(.is-active, .is-selected, [aria-selected="true"]) {
+  border-color: var(--signature-border-strong) !important;
+}
