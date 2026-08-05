@@ -1341,6 +1341,47 @@
   .cc-card--back:not(.is-celebrating):not(.is-revealed) .cc-svg-piece.is-earned { animation:none; }
 }
 
+/* Experiencia tactil y responsive de la tarjeta. */
+.cc-card-flipper { cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation; }
+.cc-card-flipper:focus-visible { outline:2px solid #7dd3fc;outline-offset:5px;border-radius:20px; }
+.cc-card-stage:active .cc-card-flipper:not(.is-flipped) { transform:scale(.992); }
+.cc-card-stage:active .cc-card-flipper.is-flipped { transform:rotateY(180deg) scale(.992); }
+.cc-flip-button { min-height:38px; }
+
+@media (max-width:520px) {
+  .fidelity-page-shell { padding:1.25rem 0 3.5rem; }
+  .fidelity-main-wrapper { width:100%; }
+  .fidelity-card-focus { margin-inline:-.1rem; }
+  .cc-card-stage { border-radius:16px; }
+  .cc-card-stage .cc-card--front { padding:1rem 1.05rem .82rem; }
+  .cc-card-stage .cc-row--top { align-items:flex-start; }
+  .cc-card-stage .cc-brand-name { max-width:145px;overflow:hidden;font-size:.52rem;text-overflow:ellipsis;white-space:nowrap; }
+  .cc-card-stage .cc-plan-label { font-size:.5rem; }
+  .cc-card-stage .cc-chip--vip,.cc-card-stage .cc-chip--reward { padding:.32rem .48rem;font-size:.47rem; }
+  .cc-card-stage .cc-chip--vip svg,.cc-card-stage .cc-chip--reward svg { width:11px;height:11px; }
+  .cc-card-stage .cc-holder-name { max-width:185px;overflow:hidden;font-size:.72rem;text-overflow:ellipsis;white-space:nowrap; }
+  .cc-card-stage .cc-front-pass { font-size:.4rem; }
+  .cc-flip-button { right:.45rem;bottom:-1.15rem;min-width:116px;min-height:44px;justify-content:center;padding:.55rem .75rem;font-size:.64rem; }
+  .fidelity-card-hint { margin-top:.55rem;padding-right:112px;justify-content:flex-start;font-size:.64rem; }
+  .fidelity-forget-access { min-height:44px; }
+  .fidelity-garage button { min-height:66px; }
+  .fidelity-main-wrapper>.fidelity-cta { min-height:52px;font-size:.92rem; }
+}
+
+@media (max-width:380px) {
+  .cc-card-stage .cc-card--front { padding:.85rem .9rem .72rem; }
+  .cc-card-stage .cc-logo { width:27px;height:27px; }
+  .cc-card-stage .cc-front-vehicle strong { font-size:.94rem; }
+  .cc-card-stage .cc-holder-name { max-width:155px;font-size:.64rem; }
+  .cc-card-stage .cc-front-pass { display:none; }
+  .fidelity-card-focus-heading small { padding:.28rem .45rem;font-size:.56rem; }
+  .fidelity-card-hint { padding-right:105px;font-size:.58rem; }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .cc-card-flipper { transition-duration:.01ms; }
+}
+
 /* Progreso editorial: lectura inmediata del camino al beneficio. */
 .fidelity-progress-panel { position:relative;display:grid;gap:1.05rem;max-width:600px;width:100%;margin:.15rem auto 0;padding:1.2rem 1.25rem 1.1rem;border:1px solid rgba(125,211,252,.16);border-radius:20px;background:linear-gradient(145deg,rgba(15,27,45,.92),rgba(7,15,28,.94));box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 18px 36px rgba(0,0,0,.2);overflow:hidden; }
 .fidelity-progress-panel::after { content:"";position:absolute;top:-55px;right:-45px;width:150px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.13),transparent 70%);pointer-events:none; }

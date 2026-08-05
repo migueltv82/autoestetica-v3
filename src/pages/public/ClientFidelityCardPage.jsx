@@ -182,7 +182,19 @@ export function PuzzleFidelityCard({ card, businessName, logoSrc, stampsCount, i
       <button type="button" className="cc-flip-button" onClick={handleFlip}>
         <RotateCw size={14} /> {showBack ? "Ver frente" : "Ver troqueles"}
       </button>
-      <div className={`cc-card-flipper ${showBack ? "is-flipped" : ""}`}>
+      <div
+        className={`cc-card-flipper ${showBack ? "is-flipped" : ""}`}
+        role="button"
+        tabIndex={0}
+        aria-label={showBack ? "Ver el frente de la tarjeta" : "Ver los troqueles de la tarjeta"}
+        onClick={handleFlip}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleFlip();
+          }
+        }}
+      >
         <article className={`cc-card cc-card--front ${isUnlocked ? "cc-card--unlocked" : ""}`} aria-label={`Frente de la tarjeta Fidelity de ${clientName}`}>
           <div className="cc-bg-layer cc-bg-layer--1" />
           <div className="cc-bg-layer cc-bg-layer--2" />
