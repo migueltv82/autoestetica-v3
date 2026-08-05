@@ -225,18 +225,18 @@ export function PuzzleFidelityCard({ card, businessName, logoSrc, stampsCount, i
             <svg className="cc-puzzle-svg" viewBox="0 0 1000 630" preserveAspectRatio="none" role="img" aria-label={`${stampsCount} de 4 piezas completadas`}>
               <defs>
                 <linearGradient id="cc-puzzle-pending" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stopColor="#0e1c2d" stopOpacity=".86" />
-                  <stop offset=".48" stopColor="#06101d" stopOpacity=".76" />
-                  <stop offset="1" stopColor="#020813" stopOpacity=".92" />
+                  <stop offset="0" stopColor="#174c3e" stopOpacity=".9" />
+                  <stop offset=".48" stopColor="#0a2c24" stopOpacity=".82" />
+                  <stop offset="1" stopColor="#041713" stopOpacity=".94" />
                 </linearGradient>
                 <linearGradient id="cc-puzzle-edge" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stopColor="#e0f2fe" stopOpacity=".82" />
-                  <stop offset=".45" stopColor="#38bdf8" stopOpacity=".5" />
-                  <stop offset="1" stopColor="#020617" stopOpacity=".9" />
+                  <stop offset="0" stopColor="#fff0c6" stopOpacity=".9" />
+                  <stop offset=".45" stopColor="#d8b86a" stopOpacity=".65" />
+                  <stop offset="1" stopColor="#071c17" stopOpacity=".94" />
                 </linearGradient>
                 <pattern id="cc-puzzle-texture" width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(32)">
                   <rect width="18" height="18" fill="transparent" />
-                  <path d="M0 2H18M0 11H18" stroke="#bae6fd" strokeOpacity=".045" strokeWidth="1" />
+                  <path d="M0 2H18M0 11H18" stroke="#f1d99f" strokeOpacity=".06" strokeWidth="1" />
                 </pattern>
               </defs>
               <motion.image

@@ -1495,6 +1495,30 @@
   .cc-member-serial { display:none; }
 }
 
+/* Signature Series: el dorso comparte material, luz y metal con el frente. */
+.cc-card-stage .cc-card--back { border:1px solid rgba(232,210,164,.62);background:radial-gradient(circle at 50% 44%,#174c3e 0%,#0b3027 42%,#061713 100%);box-shadow:0 32px 75px rgba(0,0,0,.72),0 0 0 1px rgba(255,248,226,.1) inset,0 0 0 5px rgba(3,22,17,.76) inset,0 0 48px rgba(193,163,98,.18); }
+.cc-card-stage .cc-card--back::before { content:"";position:absolute;z-index:2;inset:0;border-radius:inherit;background:repeating-linear-gradient(112deg,transparent 0 3px,rgba(255,248,226,.014) 3px 4px),linear-gradient(105deg,transparent 12%,rgba(237,220,178,.1) 42%,transparent 57%);mix-blend-mode:screen;pointer-events:none; }
+.cc-card--back .cc-puzzle { background:radial-gradient(circle at 50% 46%,rgba(30,96,77,.96),#0a3026 48%,#041713 100%);box-shadow:inset 0 0 0 9px rgba(3,22,17,.58),inset 0 0 0 10px rgba(224,198,139,.2); }
+.cc-card--back .cc-puzzle::before { background:linear-gradient(118deg,transparent 20%,rgba(255,240,198,.085) 38%,transparent 53%),radial-gradient(circle at 50% 48%,transparent 35%,rgba(2,18,14,.52) 100%); }
+.cc-card--back .cc-puzzle-logo-image { filter:sepia(.18) saturate(.82) contrast(1.08) brightness(.9) drop-shadow(0 16px 22px rgba(0,0,0,.46)); }
+.cc-svg-piece { filter:drop-shadow(0 6px 6px rgba(0,0,0,.54)); }
+.cc-svg-piece.is-earned { filter:drop-shadow(0 8px 7px rgba(0,0,0,.5)) drop-shadow(0 0 6px rgba(216,184,106,.18)); }
+.cc-svg-piece-bevel { stroke:rgba(2,20,15,.86);filter:drop-shadow(0 -1px 0 rgba(255,240,198,.16)) drop-shadow(0 4px 3px rgba(0,0,0,.76)); }
+.cc-svg-piece-cut { filter:drop-shadow(0 0 3px rgba(216,184,106,.34)); }
+.cc-svg-piece.is-earned .cc-svg-piece-bevel { stroke:rgba(4,31,24,.7);filter:drop-shadow(0 -1px 0 rgba(255,240,198,.25)) drop-shadow(0 4px 3px rgba(0,0,0,.72)); }
+.cc-svg-piece.is-earned .cc-svg-piece-cut { stroke:rgba(240,216,160,.84);filter:drop-shadow(0 0 4px rgba(216,184,106,.42)); }
+.cc-svg-piece:not(.is-earned) .cc-svg-piece-cut { stroke:rgba(183,157,98,.58);filter:drop-shadow(0 0 2px rgba(216,184,106,.2)); }
+.cc-card--back:not(.is-celebrating):not(.is-revealed) .cc-svg-piece.is-earned { animation:ccPieceChampagneGlow 4.8s ease-in-out infinite; }
+
+@keyframes ccPieceChampagneGlow {
+  0%,100% { filter:drop-shadow(0 8px 7px rgba(0,0,0,.5)) drop-shadow(0 0 3px rgba(216,184,106,.12)); }
+  50% { filter:drop-shadow(0 9px 8px rgba(0,0,0,.52)) drop-shadow(0 0 9px rgba(216,184,106,.3)); }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .cc-card--back:not(.is-celebrating):not(.is-revealed) .cc-svg-piece.is-earned { animation:none; }
+}
+
 /* Progreso editorial: lectura inmediata del camino al beneficio. */
 .fidelity-progress-panel { position:relative;display:grid;gap:1.05rem;max-width:600px;width:100%;margin:.15rem auto 0;padding:1.2rem 1.25rem 1.1rem;border:1px solid rgba(125,211,252,.16);border-radius:20px;background:linear-gradient(145deg,rgba(15,27,45,.92),rgba(7,15,28,.94));box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 18px 36px rgba(0,0,0,.2);overflow:hidden; }
 .fidelity-progress-panel::after { content:"";position:absolute;top:-55px;right:-45px;width:150px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.13),transparent 70%);pointer-events:none; }
