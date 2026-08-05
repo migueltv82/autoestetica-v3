@@ -8,10 +8,23 @@ import {
 import PublicLayout from "../../components/layout/PublicLayout";
 import PageTransition from "../../components/ui/PageTransition";
 import Seo from "../../components/ui/Seo";
-import { lookupPublicFidelityCard } from "../../services/publicFidelityApi";
+import { lookupPublicFidelityCards } from "../../services/publicFidelityApi";
 import { useSettings } from "../../hooks/useSettings";
 import defaultLogo from "../../assets/logo.webp";
 import "./ClientFidelityCardPage.css";
+
+const REMEMBERED_FIDELITY_TOKEN = "autoestetica:fidelity-access";
+
+function getRememberedToken() {
+  try { return window.localStorage.getItem(REMEMBERED_FIDELITY_TOKEN) || ""; } catch { return ""; }
+}
+
+function rememberToken(token) {
+  try {
+    if (token) window.localStorage.setItem(REMEMBERED_FIDELITY_TOKEN, token);
+    else window.localStorage.removeItem(REMEMBERED_FIDELITY_TOKEN);
+  } catch { /* El acceso sigue funcionando aunque el navegador bloquee storage. */ }
+}
 
 /* ──────────────────────────────────────────────────────────────
    Sub-componente: Tarjeta al estilo crédito (landscape)
@@ -282,15 +295,17 @@ export function PuzzleFidelityCard({ card, businessName, logoSrc, stampsCount, i
 }
 
 export default function ClientFidelityCardPage() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const tokenParam = searchParams.get("token") || "";
   const phoneParam = searchParams.get("phone") || searchParams.get("telefono") || "";
 
   const [phoneInput, setPhoneInput] = useState(phoneParam);
   const [accessCode, setAccessCode] = useState("");
-  const [card, setCard] = useState(null);
-  const [isLoading, setIsLoading] = useState(Boolean(tokenParam));
-  const [searched, setSearched] = useState(Boolean(tokenParam));
+  const [accessToken, setAccessToken] = useState(() => tokenParam || getRememberedToken());
+  const [cards, setCards] = useState([]);
+  const [selectedCardId, setSelectedCardId] = useState(null);
+  const [isLoading, setIsLoading] = useState(Boolean(accessToken));
+  const [searched, setSearched] = useState(Boolean(accessToken));
   const [searchError, setSearchError] = useState("");
   const { settings } = useSettings();
 
@@ -301,12 +316,17 @@ export default function ClientFidelityCardPage() {
     let isMounted = true;
 
     async function load() {
-      if (!tokenParam) { setIsLoading(false); return; }
+      if (!accessToken) { setIsLoading(false); return; }
       setIsLoading(true);
       setSearched(true);
       try {
-        const result = await lookupPublicFidelityCard({ token: tokenParam });
-        if (isMounted) setCard(result);
+        const result = await lookupPublicFidelityCards({ token: accessToken });
+        if (isMounted) {
+          setCards(result);
+          setSelectedCardId(result[0]?.id || null);
+          if (result.length) rememberToken(accessToken);
+          else if (!tokenParam) rememberToken("");
+        }
       } catch (err) {
         console.error("Error buscando tarjeta fidelity:", err);
       } finally {
@@ -316,7 +336,7 @@ export default function ClientFidelityCardPage() {
 
     load();
     return () => { isMounted = false; };
-  }, [tokenParam]);
+  }, [accessToken, tokenParam]);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -333,15 +353,31 @@ export default function ClientFidelityCardPage() {
     setSearched(true);
     setSearchError("");
     try {
-      const result = await lookupPublicFidelityCard({ phone: normalizedPhone, accessCode });
-      setCard(result);
+      const result = await lookupPublicFidelityCards({ phone: normalizedPhone, accessCode });
+      setCards(result);
+      setSelectedCardId(result[0]?.id || null);
+      if (result[0]?.publicToken) rememberToken(result[0].publicToken);
     } catch (err) {
       console.error(err);
-      setCard(null);
+      setCards([]);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const card = cards.find((item) => item.id === selectedCardId) || cards[0] || null;
+
+  function forgetAccess() {
+    rememberToken("");
+    setAccessToken("");
+    if (tokenParam) setSearchParams({}, { replace: true });
+    setCards([]);
+    setSelectedCardId(null);
+    setSearched(false);
+    setPhoneInput("");
+    setAccessCode("");
+    setSearchError("");
+  }
 
   const whatsappNumber = (settings?.whatsapp || "5493815448147").replace(/\D/g, "");
   const stampsCount = card?.stampsCount || 0;
@@ -429,8 +465,30 @@ export default function ClientFidelityCardPage() {
 
                 <header className="fidelity-client-welcome">
                   <img src={logoSrc} alt={`Logo de ${businessName}`} onError={(event) => { event.currentTarget.src = defaultLogo; }} />
-                  <div><span>{businessName}</span><h1>Bienvenido, {card.client?.name || card.clientName}</h1><p>Esta es tu Tarjeta Fidelity personal.</p></div>
+                  <div><span>{businessName}</span><h1>Bienvenido, {card.client?.name || card.clientName}</h1><p>Tu acceso quedÃ³ guardado de forma segura en este dispositivo.</p></div>
+                  <button type="button" className="fidelity-forget-access" onClick={forgetAccess}>Cambiar cliente</button>
                 </header>
+
+                {cards.length > 1 ? (
+                  <nav className="fidelity-vehicle-switcher" aria-label="Elegir tarjeta por vehiculo">
+                    <span>ElegÃ­ tu vehÃ­culo</span>
+                    <div>
+                      {cards.map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          className={item.id === card.id ? "is-active" : ""}
+                          onClick={() => setSelectedCardId(item.id)}
+                          aria-pressed={item.id === card.id}
+                        >
+                          <Car size={16} />
+                          <strong>{item.vehicle || "VehÃ­culo"}</strong>
+                          <small>{item.stampsCount}/4 troqueles</small>
+                        </button>
+                      ))}
+                    </div>
+                  </nav>
+                ) : null}
 
                 {/* ── Tarjeta estilo crédito ── */}
                 <PuzzleFidelityCard

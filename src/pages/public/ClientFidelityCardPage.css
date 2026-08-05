@@ -163,11 +163,26 @@
 .fidelity-client-welcome span { display: block; color: #7dd3fc; font-size: .68rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
 .fidelity-client-welcome h1 { margin: .25rem 0 .15rem; color: #fff; font-size: 1.42rem; line-height: 1.15; overflow-wrap: anywhere; }
 .fidelity-client-welcome p { margin: 0; color: #94a3b8; font-size: .78rem; }
+.fidelity-forget-access { margin-left:auto;padding:.55rem .75rem;border:1px solid rgba(148,163,184,.22);border-radius:10px;color:#cbd5e1;background:rgba(15,23,42,.72);font-size:.72rem;font-weight:750;white-space:nowrap;cursor:pointer;transition:border-color .2s ease,color .2s ease,background .2s ease; }
+.fidelity-forget-access:hover { border-color:rgba(125,211,252,.55);color:#fff;background:rgba(30,41,59,.92); }
+.fidelity-vehicle-switcher { display:grid;gap:.65rem;padding:.85rem;border:1px solid rgba(125,211,252,.18);border-radius:16px;background:rgba(8,18,32,.82); }
+.fidelity-vehicle-switcher>span { color:#94a3b8;font-size:.7rem;font-weight:850;letter-spacing:.08em;text-transform:uppercase; }
+.fidelity-vehicle-switcher>div { display:flex;gap:.55rem;overflow-x:auto;padding-bottom:.15rem;scrollbar-width:thin; }
+.fidelity-vehicle-switcher button { min-width:145px;display:grid;grid-template-columns:auto 1fr;grid-template-areas:"icon name" "icon progress";align-items:center;gap:.1rem .5rem;padding:.65rem .75rem;border:1px solid rgba(148,163,184,.18);border-radius:12px;color:#cbd5e1;background:rgba(15,23,42,.78);text-align:left;cursor:pointer;transition:border-color .2s ease,background .2s ease,transform .2s ease; }
+.fidelity-vehicle-switcher button svg { grid-area:icon;color:#7dd3fc; }
+.fidelity-vehicle-switcher button strong { grid-area:name;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.78rem; }
+.fidelity-vehicle-switcher button small { grid-area:progress;color:#94a3b8;font-size:.65rem; }
+.fidelity-vehicle-switcher button.is-active { border-color:rgba(56,189,248,.75);color:#fff;background:linear-gradient(135deg,rgba(14,116,144,.34),rgba(30,41,59,.92));box-shadow:0 0 0 1px rgba(56,189,248,.12) inset; }
 
 @media (max-width: 520px) {
   .fidelity-client-welcome { align-items: center; padding: .85rem; }
   .fidelity-client-welcome img { width: 56px; height: 56px; flex-basis: 56px; border-radius: 14px; }
   .fidelity-client-welcome h1 { font-size: 1.08rem; }
+  .fidelity-client-welcome { flex-wrap:wrap; }
+  .fidelity-client-welcome div { flex:1; }
+  .fidelity-forget-access { width:100%;margin-left:0; }
+  .fidelity-vehicle-switcher { padding:.7rem; }
+  .fidelity-vehicle-switcher button { min-width:132px; }
 }
 
 /* ══════════════════════════════════════════════════════════════
