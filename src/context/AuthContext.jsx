@@ -20,16 +20,19 @@ export function AuthProvider({ children }) {
         setIsLoading(false);
         return;
       }
+      setIsLoading(true);
       const [{ data: profileData, error: profileError }, assuranceResult, factorsResult] = await Promise.all([supabase
         .from("profiles")
         .select("id, organization_id, full_name, role, active")
         .eq("id", nextSession.user.id)
         .single(), supabase.auth.mfa.getAuthenticatorAssuranceLevel(), supabase.auth.mfa.listFactors()]);
       if (profileError) console.error("No se pudo cargar el perfil:", profileError.message);
-      setProfile(profileData ?? null);
-      setAssuranceLevel(assuranceResult.data?.currentLevel ?? "aal1");
-      setMfaFactors(factorsResult.data?.totp ?? []);
-      setIsLoading(false);
+      if (active) {
+        setProfile(profileData ?? null);
+        setAssuranceLevel(assuranceResult.data?.currentLevel ?? "aal1");
+        setMfaFactors(factorsResult.data?.totp ?? []);
+        setIsLoading(false);
+      }
     }
 
     supabase.auth.getSession().then(({ data, error }) => {

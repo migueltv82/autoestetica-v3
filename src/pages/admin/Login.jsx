@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { Lock, Mail, ArrowRight, ArrowLeft } from "lucide-react";
 import PageTransition from "../../components/ui/PageTransition";
 import { useAuth } from "../../hooks/useAuth";
@@ -9,7 +9,6 @@ import businessLogo from "../../assets/logo.webp";
 import "./Login.css";
 
 function Login() {
-  const navigate = useNavigate();
   const location = useLocation();
   const { user, profile, assuranceLevel, isLoading, signIn, signOut, resetPassword } = useAuth();
   const [email, setEmail] = useState("");
@@ -29,7 +28,8 @@ function Login() {
       setError(authError.message === "Invalid login credentials" ? "Email o contraseña incorrectos." : "No pudimos iniciar sesión. Intentá nuevamente.");
       return;
     }
-    navigate(safeAdminRedirect(location.state?.from, getDefaultAdminPath(profile)), { replace: true });
+    // AuthContext espera a cargar perfil y MFA; la redirección se resuelve abajo
+    // con el estado completo para evitar ciclos login → panel → login.
   }
 
   async function handleResetPassword() {
@@ -43,9 +43,10 @@ function Login() {
     else setMessage("Te enviamos un enlace de recuperación a tu email.");
   }
 
-  if (!isLoading && user && profile?.active !== false) {
+  if (!isLoading && user && profile && profile.active !== false) {
     const needsMfa = ["owner", "admin"].includes(profile?.role) && assuranceLevel !== "aal2";
-    return <Navigate to={needsMfa ? "/admin/mfa" : getDefaultAdminPath(profile)} replace />;
+    const destination = safeAdminRedirect(location.state?.from, getDefaultAdminPath(profile));
+    return <Navigate to={needsMfa ? "/admin/mfa" : destination} replace state={needsMfa ? { from: destination } : undefined} />;
   }
 
   return (
