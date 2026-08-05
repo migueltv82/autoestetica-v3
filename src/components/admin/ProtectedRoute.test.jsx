@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useAuth } from "../../hooks/useAuth";
 import { OWNER_ROLES } from "../../utils/permissions";
 import ProtectedRoute from "./ProtectedRoute";
@@ -35,7 +35,10 @@ function renderProtectedRoute(authState, roles = OWNER_ROLES) {
 describe("ProtectedRoute", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv("VITE_REQUIRE_MFA", "true");
   });
+
+  afterEach(() => vi.unstubAllEnvs());
 
   it("renders protected content for an active allowed user", () => {
     renderProtectedRoute({

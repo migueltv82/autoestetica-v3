@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useAuth } from "../../hooks/useAuth";
 import Login from "./Login";
 
@@ -20,7 +20,12 @@ function renderLogin(authState, entry = "/admin/login") {
 }
 
 describe("Login", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.stubEnv("VITE_REQUIRE_MFA", "true");
+  });
+
+  afterEach(() => vi.unstubAllEnvs());
 
   it("no redirige mientras existe sesión pero el perfil todavía no cargó", () => {
     renderLogin({ user: { id: "owner-id" }, profile: null, assuranceLevel: "aal1", isLoading: false });

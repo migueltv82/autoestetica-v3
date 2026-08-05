@@ -4,6 +4,7 @@ import { Lock, Mail, ArrowRight, ArrowLeft } from "lucide-react";
 import PageTransition from "../../components/ui/PageTransition";
 import { useAuth } from "../../hooks/useAuth";
 import { getDefaultAdminPath, safeAdminRedirect } from "../../utils/permissions";
+import { requiresAdminMfa } from "../../utils/mfaPolicy";
 import loginBg from "../../assets/login-bg.webp";
 import businessLogo from "../../assets/logo.webp";
 import "./Login.css";
@@ -44,7 +45,7 @@ function Login() {
   }
 
   if (!isLoading && user && profile && profile.active !== false) {
-    const needsMfa = ["owner", "admin"].includes(profile?.role) && assuranceLevel !== "aal2";
+    const needsMfa = requiresAdminMfa(profile) && assuranceLevel !== "aal2";
     const destination = safeAdminRedirect(location.state?.from, getDefaultAdminPath(profile));
     return <Navigate to={needsMfa ? "/admin/mfa" : destination} replace state={needsMfa ? { from: destination } : undefined} />;
   }
