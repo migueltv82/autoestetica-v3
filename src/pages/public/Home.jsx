@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle2, MessageCircle, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, FlaskConical, Gem, MessageCircle, ScanSearch, ShieldCheck, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import PublicLayout from "../../components/layout/PublicLayout";
 import PageTransition from "../../components/ui/PageTransition";
@@ -24,14 +24,17 @@ const FADE_UP = {
 
 const TRUST_ITEMS = [
   {
+    icon: ScanSearch,
     title: "Diagnóstico personalizado",
     description: "Evaluamos el estado real antes de intervenir.",
   },
   {
+    icon: FlaskConical,
     title: "Productos profesionales",
     description: "Procesos adecuados para cada superficie.",
   },
   {
+    icon: Gem,
     title: "Terminación premium",
     description: "Resultados limpios, equilibrados y duraderos.",
   },
@@ -148,18 +151,24 @@ function Home() {
           </section>
 
           <section className="home-trust container" aria-label="Confianza">
-            {TRUST_ITEMS.map((item, index) => (
+            {TRUST_ITEMS.map((item, index) => {
+              const Icon = item.icon;
+              return (
               <motion.article
                 key={item.title}
                 {...FADE_UP}
                 transition={{ ...FADE_UP.transition, delay: index * 0.06 }}
                 className="home-trust-item"
               >
-                <span>0{index + 1}</span>
+                <div className="home-trust-item-head">
+                  <span className="home-trust-icon" aria-hidden="true"><Icon size={20} strokeWidth={1.7} /></span>
+                  <span className="home-trust-index">0{index + 1}</span>
+                </div>
                 <h3>{item.title}</h3>
                 <p>{item.description}</p>
               </motion.article>
-            ))}
+              );
+            })}
           </section>
         </div>
       </PublicLayout>
