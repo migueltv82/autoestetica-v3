@@ -82,6 +82,8 @@ export function validateClubPlan(plan) {
 }
 
 export async function checkClubAdmin() {
+  if (supabase.isConfigured === false) return false;
+
   const { data: userData, error: userError } = await supabase.auth.getUser();
   if (userError) throw userError;
   const userId = userData?.user?.id;
@@ -98,6 +100,8 @@ export async function checkClubAdmin() {
 }
 
 export async function fetchClubPlans({ activeOnly = false } = {}) {
+  if (supabase.isConfigured === false) return [];
+
   let query = supabase
     .from("club_plans")
     .select("*")
@@ -113,6 +117,7 @@ export async function fetchClubPlans({ activeOnly = false } = {}) {
 export async function saveClubPlan(plan) {
   const errors = validateClubPlan(plan);
   if (errors.length) throw new Error(errors.join(" "));
+  if (supabase.isConfigured === false) throw new Error("Supabase no esta configurado.");
 
   const { data, error } = await supabase
     .from("club_plans")
@@ -125,6 +130,8 @@ export async function saveClubPlan(plan) {
 }
 
 export async function deleteClubPlan(id) {
+  if (supabase.isConfigured === false) throw new Error("Supabase no esta configurado.");
+
   const { error } = await supabase
     .from("club_plans")
     .delete()
@@ -134,6 +141,8 @@ export async function deleteClubPlan(id) {
 }
 
 export function subscribeToClubPlans(onChange) {
+  if (supabase.isConfigured === false) return () => {};
+
   const channel = supabase
     .channel(`club-plans-${crypto.randomUUID()}`)
     .on("postgres_changes", { event: "*", schema: "public", table: "club_plans" }, onChange)

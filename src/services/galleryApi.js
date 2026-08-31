@@ -28,6 +28,8 @@ async function uploadGalleryImage({ organizationId, dataUrl, label }) {
 }
 
 export async function fetchGalleryItems({ organizationId }) {
+  if (supabase.isConfigured === false) return [];
+
   const targetId = organizationId || await getPublicOrganizationId();
   const publicOnly = !organizationId;
   let query = supabase

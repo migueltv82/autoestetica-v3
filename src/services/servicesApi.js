@@ -13,6 +13,18 @@ const INITIAL_SERVICE_CATALOG = [
   { name: "Lavado de Motos", description: "Lavado detallado de carrocería, motor, ruedas y zonas de difícil acceso con terminación segura para cada superficie.", duration_label: "2 a 3 horas", icon_name: "Bike", featured: false },
 ];
 
+function getInitialServiceRows() {
+  return INITIAL_SERVICE_CATALOG.map((service, index) => ({
+    ...service,
+    id: `initial-service-${index + 1}`,
+    base_price: 0,
+    active: true,
+    public_visible: true,
+    display: { ...DEFAULT_SERVICE_DISPLAY, price: false },
+    gallery: [],
+  }));
+}
+
 export function mapService(service) {
   return {
     id: service.id,
@@ -94,6 +106,8 @@ async function seedMissingInitialServices(organizationId, rows) {
 }
 
 export async function fetchServices({ organizationId, canManageCatalog }) {
+  if (supabase.isConfigured === false) return getInitialServiceRows().map(mapService);
+
   const targetId = organizationId || await getPublicOrganizationId();
   const publicOnly = !organizationId;
   let rows = await listServiceRows({ targetId, publicOnly });

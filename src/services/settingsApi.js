@@ -105,6 +105,8 @@ export function buildBusinessSettingsPayload(settings, organizationId) {
 }
 
 export async function fetchBusinessSettings({ organizationId }) {
+  if (supabase.isConfigured === false) return DEFAULT_SETTINGS;
+
   const targetId = organizationId || await getPublicOrganizationId();
   const { data, error } = await supabase
     .from("business_settings")
