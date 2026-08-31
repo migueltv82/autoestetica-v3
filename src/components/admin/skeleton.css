@@ -17,6 +17,11 @@
   border-radius: 12px !important;
 }
 
+.skeleton-w-50 { width: 50%; }
+.skeleton-w-70 { width: 70%; }
+.skeleton-w-80 { width: 80%; }
+.skeleton-w-60px { width: 60px; }
+
 @keyframes pulse-skeleton {
   0% {
     background-position: 200% 0;

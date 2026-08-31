@@ -1,28 +1,95 @@
-.btn-premium {
+.btn-primary {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  padding: 0.85rem 1.75rem;
+  padding: 0.95rem 1.45rem;
+  border-radius: 999px;
   background: var(--gradient-primary);
-  color: #000 !important;
+  color: #0a0a0a !important;
   font-weight: 700;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  letter-spacing: 0.01em;
+  border: 1px solid rgba(255, 255, 255, 0.22);
   cursor: pointer;
-  transition: all var(--transition-fast);
-  box-shadow: 0 4px 15px rgba(0, 191, 166, 0.3);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    filter var(--transition-fast),
+    background var(--transition-fast);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.28);
+}
+
+.btn-primary::before {
+  display: none;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.96);
+  box-shadow: 0 20px 38px rgba(0, 0, 0, 0.34);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.95rem 1.45rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--color-text) !important;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  transform: translateY(-1px);
+  border-color: var(--color-border-strong);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-premium {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.65rem;
+  background: var(--gradient-primary);
+  color: #0a0a0a !important;
+  font-weight: 700;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  cursor: pointer;
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    filter var(--transition-fast);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.3);
   text-shadow: none;
 }
 
+.btn-premium::before {
+  display: none;
+}
+
 .btn-premium:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(0, 191, 166, 0.45);
-  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.36);
+  filter: brightness(0.96);
 }
 
 .btn-premium:active {
-  transform: translateY(0) scale(0.98);
+  transform: translateY(0) scale(0.99);
 }
 
 .btn-ghost {
@@ -31,17 +98,22 @@
   justify-content: center;
   gap: 0.75rem;
   padding: 0.85rem 1.75rem;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.035);
   color: var(--color-text-soft) !important;
   font-weight: 600;
-  border-radius: 14px;
-  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.06);
   color: var(--color-text) !important;
   border-color: rgba(255, 255, 255, 0.15);
   transform: translateY(-2px);
@@ -53,25 +125,54 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 0.6rem 1.25rem;
-  background: rgba(239, 68, 68, 0.08);
-  color: #ef4444 !important;
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--color-text-soft) !important;
   font-weight: 600;
   border-radius: 12px;
-  border: 1px solid rgba(239, 68, 68, 0.15);
+  border: 1px solid var(--color-border);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
   font-size: 0.85rem;
 }
 
 .btn-danger:hover {
-  background: rgba(239, 68, 68, 0.15);
-  transform: scale(1.05);
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+  background: rgba(255, 255, 255, 0.07);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
 }
 
-/* Specific Small Action Buttons */
 .btn-mini-action {
   padding: 0.5rem 1rem;
   font-size: 0.8rem;
-  border-radius: 10px;
+  border-radius: 12px;
+}
+
+.btn-pill-toggle {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(12px);
+  color: rgba(245, 247, 251, 0.9);
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.btn-pill-toggle:hover {
+  transform: translateY(-1px);
+  border-color: var(--color-border-strong);
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.btn-pill-toggle:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.22);
+  outline-offset: 4px;
 }

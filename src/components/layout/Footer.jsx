@@ -1,80 +1,89 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { Clock, Mail, MapPin } from "lucide-react";
+import { useSettings } from "../../hooks/useSettings";
+import { normalizeArgentinaPhone } from "../../utils/whatsapp";
+import { InstagramIcon, FacebookIcon, TikTokIcon, WhatsAppIcon } from "../ui/SocialIcons";
+import defaultLogo from "../../assets/logo.webp";
 import "./Footer.css";
 
 function Footer() {
+  const { settings, getWaLink } = useSettings();
+  const phoneWhatsAppLink = settings.phone
+    ? `https://wa.me/${normalizeArgentinaPhone(settings.phone)}?text=${encodeURIComponent(`Hola, quiero hacer una consulta a ${settings.businessName || "Autoestética Tucumán"}.`)}`
+    : "";
+
+  const normalizeUrl = (value, baseUrl) => {
+    const clean = String(value || "").trim();
+    if (!clean) return "";
+    if (/^https?:\/\//i.test(clean)) return clean;
+    return `${baseUrl}${clean.replace(/^@/, "").replace(/^\//, "")}`;
+  };
+  const socialLinks = [
+    { key: "instagram", href: normalizeUrl(settings.instagram, "https://instagram.com/"), Icon: InstagramIcon, label: "Instagram" },
+    { key: "facebook", href: normalizeUrl(settings.facebook, "https://facebook.com/"), Icon: FacebookIcon, label: "Facebook" },
+    { key: "tiktok", href: normalizeUrl(settings.tiktok, "https://tiktok.com/@"), Icon: TikTokIcon, label: "TikTok" },
+  ].filter((s) => s.href);
+
   return (
     <footer className="site-footer">
-      <div className="footer-glow"></div>
-      <div className="container footer-shell relative-z">
-        <motion.div 
-          className="footer-brand"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="footer-logo">
-            <span className="brand-mark-footer"></span>
-            <h3>Autoestética Tucumán</h3>
+      <div className="container footer-shell">
+        <div className="footer-top">
+          <div className="footer-brand">
+            <div className="footer-brand-identity">
+              <img src={settings.logoUrl || defaultLogo} alt={`Logo de ${settings.businessName || "Autoestética Tucumán"}`} loading="lazy" decoding="async" onError={(event) => { event.currentTarget.src = defaultLogo; }} />
+              <h3>{settings.businessName || "Autoestética Tucumán"}</h3>
+            </div>
+            <p className="footer-tagline">Estética automotriz premium.</p>
+
+            {socialLinks.length > 0 && (
+              <div className="footer-social-links">
+                {socialLinks.map(({ key, href, Icon, label }) => (
+                  <a
+                    key={key}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className={`footer-social-btn footer-social-btn-${key}`}
+                  >
+                    <Icon size={18} />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
-          <p>
-            Atención personalizada para el cuidado estético de tu vehículo.
-            Consultas y turnos coordinados de forma exclusiva por WhatsApp.
-          </p>
-        </motion.div>
 
-        <div className="footer-info">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <span className="footer-label">Horario de atención</span>
-            <p>Lunes a viernes de 9:30 a 16:30 hs</p>
-            <p className="text-muted">Con turno previo</p>
-          </motion.div>
+          <div className="footer-info">
+            <div className="footer-contact-heading">
+              <span className="footer-nav-title">Contacto directo</span>
+            </div>
+            <div className="footer-contact-actions">
+              {settings.whatsapp ? <a href={getWaLink()} target="_blank" rel="noopener noreferrer" className="footer-wa-btn">
+                <WhatsAppIcon size={16} />
+                <span>{settings.whatsapp}</span>
+              </a> : null}
+              {settings.phone ? <a className="footer-detail footer-phone-whatsapp" href={phoneWhatsAppLink} target="_blank" rel="noopener noreferrer" aria-label={`Escribir por WhatsApp al ${settings.phone}`}><WhatsAppIcon size={16} /> <span>{settings.phone}</span></a> : null}
+            </div>
+            <div className="footer-contact-meta">
+              {settings.email ? <a className="footer-detail" href={`mailto:${settings.email}`}><Mail size={13} /> {settings.email}</a> : null}
+              {settings.openingHours ? <p className="footer-detail">
+                <Clock size={13} /> {settings.openingHours}
+              </p> : null}
+              {settings.address ? <p className="footer-detail">
+                <MapPin size={13} /> {settings.address}
+              </p> : null}
+            </div>
+          </div>
+        </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            <span className="footer-label">Contacto</span>
-            <p>
-              <a href="#" className="footer-link">WhatsApp: +54 9 381 5448147</a>
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            <span className="footer-label">Navegación</span>
-            <ul className="footer-nav">
-              <li><Link to="/">Inicio</Link></li>
-              <li><Link to="/servicios">Servicios</Link></li>
-              <li><Link to="/consulta">Consulta</Link></li>
-            </ul>
-          </motion.div>
+        <div className="footer-bottom">
+          <p>© {new Date().getFullYear()} {settings.businessName || "Autoestética Tucumán"}. Todos los derechos reservados.</p>
+          <div className="footer-legal">
+            <Link to="/privacidad">Privacidad</Link>
+            <Link to="/terminos">Condiciones</Link>
+          </div>
         </div>
       </div>
-      
-      <motion.div 
-        className="container"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, delay: 0.5 }}
-      >
-        <div className="footer-bottom">
-          <p>&copy; {new Date().getFullYear()} Autoestética Tucumán. Todos los derechos reservados.</p>
-        </div>
-      </motion.div>
     </footer>
   );
 }

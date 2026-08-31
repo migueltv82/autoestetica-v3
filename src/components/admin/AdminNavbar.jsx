@@ -1,119 +1,92 @@
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   CalendarDays,
   Wallet,
   Users,
   Wrench,
+  Crown,
   Settings,
   LogIn,
   Globe,
-  Menu,
+  Image as ImageIcon,
+  MoreHorizontal,
+  MessageSquareText,
   X,
 } from "lucide-react";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import "./AdminNavbar.css";
+import { useAuth } from "../../hooks/useAuth";
+import { useSettings } from "../../hooks/useSettings";
+import defaultLogo from "../../assets/logo.webp";
+import { useState } from "react";
+import { OWNER_ADMIN_ROLES, OWNER_ROLES, hasRole } from "../../utils/permissions";
 
 const items = [
-  {
-    to: "/admin/dashboard",
-    label: "Dashboard",
-    icon: <LayoutDashboard size={18} />,
-  },
-  {
-    to: "/admin/turnos",
-    label: "Turnos",
-    icon: <CalendarDays size={18} />,
-  },
-  {
-    to: "/admin/caja",
-    label: "Caja",
-    icon: <Wallet size={18} />,
-  },
-  {
-    to: "/admin/clientes",
-    label: "Clientes",
-    icon: <Users size={18} />,
-  },
-  {
-    to: "/admin/servicios",
-    label: "Servicios",
-    icon: <Wrench size={18} />,
-  },
-  {
-    to: "/admin/configuracion",
-    label: "Configuración",
-    icon: <Settings size={18} />,
-  },
+  { to: "/admin/dashboard", label: "Inicio", icon: <LayoutDashboard size={20} />, roles: OWNER_ADMIN_ROLES },
+  { to: "/admin/consultas", label: "Consultas", icon: <MessageSquareText size={20} /> },
+  { to: "/admin/turnos", label: "Agenda", icon: <CalendarDays size={20} /> },
+  { to: "/admin/caja", label: "Caja", icon: <Wallet size={20} />, roles: OWNER_ADMIN_ROLES },
+  { to: "/admin/clientes", label: "Clientes", icon: <Users size={20} /> },
+  { to: "/admin/servicios", label: "Servicios", icon: <Wrench size={20} />, roles: OWNER_ADMIN_ROLES },
+  { to: "/admin/galeria", label: "Galeria", icon: <ImageIcon size={20} />, roles: OWNER_ADMIN_ROLES },
+  { to: "/admin/club", label: "Club", icon: <Crown size={20} />, roles: OWNER_ADMIN_ROLES },
+  { to: "/admin/configuracion", label: "Ajustes", icon: <Settings size={20} />, roles: OWNER_ROLES },
 ];
 
 function AdminNavbar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { user, profile, signOut } = useAuth();
+  const { settings } = useSettings();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [showMore, setShowMore] = useState(false);
+  const visibleItems = items.filter((item) => !item.roles || hasRole(profile, item.roles));
+  const primaryItems = visibleItems.slice(0, 4);
+  const secondaryItems = visibleItems.slice(4);
+
+  function getLinkClassName({ isActive }) {
+    return `admin-sidebar-link${isActive ? " active" : ""}`;
+  }
+
+  async function handleSignOut() {
+    await signOut();
+    navigate("/admin/login", { replace: true });
+  }
 
   return (
-    <nav className="admin-navbar">
-      <div className="admin-navbar-container">
-        <div className="admin-navbar-brand">
-          <span className="admin-navbar-dot"></span>
-          <div>
-            <strong>Autoestética</strong>
-            <span>Admin</span>
-          </div>
+    <aside className="admin-sidebar">
+      <div className="sidebar-brand">
+        <img className="sidebar-brand-logo" src={settings.logoUrl || defaultLogo} alt={`Logo de ${settings.businessName || "Autoestética Tucumán"}`} onError={(event) => { event.currentTarget.src = defaultLogo; }} />
+        <div className="brand-copy">
+          <strong>{settings.businessName || "Autoestética Tucumán"}</strong>
+          <span>Panel de Control</span>
         </div>
-
-        <div className="admin-navbar-links desktop-only">
-          {items.map((item) => (
-            <NavLink key={item.to} to={item.to} className="admin-navbar-link">
-              <span>{item.icon}</span>
-              <span>{item.label}</span>
-            </NavLink>
-          ))}
-        </div>
-
-        <div className="admin-navbar-actions desktop-only">
-          <Link to="/" className="admin-navbar-site-link" title="Volver al sitio">
-            <Globe size={18} />
-          </Link>
-          <NavLink to="/admin/login" className="admin-navbar-logout">
-            <LogIn size={18} />
-            <span>Cerrar</span>
-          </NavLink>
-        </div>
-
-        <button className="admin-navbar-toggle mobile-only" onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
       </div>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div 
-            className="admin-navbar-mobile"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-          >
-            {items.map((item) => (
-              <NavLink key={item.to} to={item.to} className="admin-navbar-link" onClick={() => setIsOpen(false)}>
-                <span>{item.icon}</span>
-                <span>{item.label}</span>
-              </NavLink>
-            ))}
-            <hr style={{ opacity: 0.1, margin: "0.5rem 0" }} />
-            <Link to="/" className="admin-navbar-link" onClick={() => setIsOpen(false)}>
-              <Globe size={18} />
-              <span>Volver al sitio</span>
-            </Link>
-            <NavLink to="/admin/login" className="admin-navbar-link" onClick={() => setIsOpen(false)}>
-              <LogIn size={18} />
-              <span>Cerrar sesión</span>
-            </NavLink>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
+      <nav className="sidebar-nav">
+        {visibleItems.map((item) => (
+          <NavLink key={item.to} to={item.to} className={getLinkClassName}>
+            <span className="link-icon">{item.icon}</span>
+            <span className="link-label">{item.label}</span>
+          </NavLink>
+        ))}
+        {primaryItems.map((item) => <NavLink key={`mobile-${item.to}`} to={item.to} className={({ isActive }) => `admin-mobile-link${isActive ? " active" : ""}`} onClick={() => setShowMore(false)}><span>{item.icon}</span><small>{item.label}</small></NavLink>)}
+        {secondaryItems.length ? <button type="button" className={`admin-mobile-link mobile-more-trigger ${secondaryItems.some((item) => location.pathname.startsWith(item.to)) ? "active" : ""}`} onClick={() => setShowMore((current) => !current)} aria-expanded={showMore}><span>{showMore ? <X size={20} /> : <MoreHorizontal size={20} />}</span><small>Más</small></button> : null}
+      </nav>
+
+      {showMore && secondaryItems.length ? <div className="admin-mobile-more" role="dialog" aria-label="Más opciones"><header><div><strong>Más opciones</strong><span>{user?.email}</span></div><button type="button" onClick={() => setShowMore(false)} aria-label="Cerrar"><X size={20} /></button></header><div>{secondaryItems.map((item) => <NavLink key={`more-${item.to}`} to={item.to} className={getLinkClassName} onClick={() => setShowMore(false)}><span className="link-icon">{item.icon}</span><span className="link-label">{item.label}</span></NavLink>)}</div><Link to="/" className="admin-sidebar-link" onClick={() => setShowMore(false)}><span className="link-icon"><Globe size={20} /></span><span className="link-label">Ver sitio público</span></Link><button type="button" className="admin-sidebar-link logout sidebar-logout" onClick={handleSignOut}><span className="link-icon"><LogIn size={20} /></span><span className="link-label">Cerrar sesión</span></button></div> : null}
+
+      <div className="sidebar-footer">
+        {user?.email ? <span className="sidebar-user" title={user.email}>{user.email}</span> : null}
+        <Link to="/" className="admin-sidebar-link">
+          <span className="link-icon"><Globe size={20} /></span>
+          <span className="link-label">Ver sitio público</span>
+        </Link>
+        <button type="button" className="admin-sidebar-link logout sidebar-logout" onClick={handleSignOut}>
+          <span className="link-icon"><LogIn size={20} /></span>
+          <span className="link-label">Cerrar sesión</span>
+        </button>
+      </div>
+    </aside>
   );
 }
 

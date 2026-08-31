@@ -1,24 +1,10 @@
 import { Loader2 } from "lucide-react";
+import "./Loader.css";
 
 export default function Loader({ size = 48, className = "" }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "200px",
-        width: "100%",
-      }}
-      className={className}
-    >
-      <Loader2
-        size={size}
-        style={{
-          color: "var(--color-primary)",
-          animation: "spin 1s linear infinite",
-        }}
-      />
+    <div className={["loader-shell", className].filter(Boolean).join(" ")}>
+      <Loader2 size={size} className="loader-spinner" />
     </div>
   );
 }

@@ -1,261 +1,625 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  Edit2,
+  Eye,
+  EyeOff,
+  Image as ImageIcon,
+  Info,
+  Plus,
+  Star,
+  Trash2,
+  X,
+  UploadCloud,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
 import AdminLayout from "../../components/admin/AdminLayout";
-import PageTransition from "../../components/ui/PageTransition";
-import { Wrench, Plus, Edit2, Trash2, Clock, Zap, Info, Star, Image as ImageIcon, Camera } from "lucide-react";
-import { motion } from "framer-motion";
-import businessLogo from "../../assets/logo.jpg";
-import Modal from "../../components/ui/Modal";
+import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import Carousel from "../../components/ui/Carousel";
-
-const INITIAL_SERVICES = [
-  { 
-    id: 1, 
-    name: "Lavado Premium", 
-    price: 15000, 
-    duration: "2h", 
-    description: "Lavado detallado con cera rápida y aspirado profundo de tapizados y alfombras.", 
-    icon: <Zap size={22} />, 
-    featured: true,
-    gallery: [
-      { url: "https://images.unsplash.com/photo-1601362840469-51e4d8d59085?q=80&w=1470&auto=format&fit=crop", label: "Finalizado" },
-      { url: "https://images.unsplash.com/photo-1542462662-e17ee96c262d?q=80&w=1470&auto=format&fit=crop", label: "Proceso" },
-    ]
-  },
-  { 
-    id: 2, 
-    name: "Limpieza de Interior", 
-    price: 25000, 
-    duration: "4h", 
-    description: "Limpieza textil, cueros y plásticos con protección UV y nutrición de superficies.", 
-    icon: <Info size={22} />,
-    gallery: []
-  },
-  { 
-    id: 3, 
-    name: "Tratamiento Acrílico", 
-    price: 45000, 
-    duration: "6h", 
-    description: "Corrección de micro-rayas (swirls), abrillantado profundo y sellado acrílico protector.", 
-    icon: <Zap size={22} />, 
-    featured: true,
-    gallery: []
-  },
-  { 
-    id: 4, 
-    name: "Lavado de Motor", 
-    price: 8500, 
-    duration: "1h", 
-    description: "Limpieza técnica de motor a vapor con productos dieléctricos y terminación satinada.", 
-    icon: <Zap size={22} />,
-    gallery: []
-  },
-];
+import Modal from "../../components/ui/Modal";
+import PageTransition from "../../components/ui/PageTransition";
+import { useServices } from "../../hooks/useServices";
+import { getAvailableIcons, getIcon } from "../../utils/iconMapper";
+import { isTwoWheelService } from "../../utils/servicePricing";
+import { getServiceCoverUrl } from "../../utils/serviceMedia";
+import { useFeedback } from "../../hooks/useFeedback";
+import "./AdminServices.css";
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
+  visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 30, scale: 0.95 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: "easeOut" } },
-  hover: { y: -8, transition: { duration: 0.3, ease: "easeInOut" } }
+  hidden: { opacity: 0, y: 24, scale: 0.97 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: "easeOut" } },
+  hover: { y: -6, transition: { duration: 0.25, ease: "easeInOut" } },
 };
 
+const emptyForm = {
+  name: "",
+  category: "",
+  description: "",
+  price: "",
+  carPrice: "",
+  truckPrice: "",
+  priceOnRequest: false,
+  duration: "",
+  durationMinutes: 120,
+  iconName: "Zap",
+  coverImageUrl: "",
+  active: true,
+  publicVisible: true,
+  featured: false,
+  display: {
+    name: true,
+    description: true,
+    gallery: true,
+    duration: true,
+    price: true,
+  },
+  gallery: [],
+};
+
+const VISIBILITY_LABELS = {
+  name: "Nombre del servicio",
+  description: "Descripcion",
+  gallery: "Galeria de trabajos",
+  duration: "Duracion estimada",
+  price: "Precio",
+};
+
+const VISIBILITY_SHORT_LABELS = {
+  name: "Nombre",
+  description: "Desc.",
+  gallery: "Galeria",
+  duration: "Tiempo",
+  price: "Precio",
+};
+
+function ToggleSwitch({ checked, onChange, label }) {
+  return (
+    <label className="svc-toggle-row">
+      <span className="svc-toggle-label">{label}</span>
+      <button
+        type="button"
+        className={`svc-toggle ${checked ? "on" : "off"}`}
+        onClick={() => onChange(!checked)}
+        aria-pressed={checked}
+      >
+        <span className="svc-toggle-knob" />
+      </button>
+      <span className={`svc-toggle-status ${checked ? "visible" : "hidden"}`}>
+        {checked ? <Eye size={14} /> : <EyeOff size={14} />}
+        {checked ? "Visible" : "Oculto"}
+      </span>
+    </label>
+  );
+}
+
 function AdminServices() {
-  const [services, setServices] = useState(INITIAL_SERVICES);
+  const {
+    services,
+    addService,
+    updateService,
+    deleteService,
+    toggleFeatured,
+    togglePublished,
+    updateVisibility,
+    uploadServiceImage,
+    setServiceCover,
+    reorderServiceImages,
+    deleteServiceImage,
+    clearServiceImages,
+    isLoading,
+    error,
+  } = useServices();
+  const { confirm, notify } = useFeedback();
+
+  const [editingService, setEditingService] = useState(null);
   const [editingGallery, setEditingGallery] = useState(null);
-  const formatMoney = (val) => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 }).format(val);
+  const [form, setForm] = useState(emptyForm);
+  const [showIconPicker, setShowIconPicker] = useState(false);
+  const [showVisibility, setShowVisibility] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const galleryInputRef = useRef(null);
 
-  const openGalleryManager = (service) => {
-    setEditingGallery(service);
+  const formDisplay = { ...emptyForm.display, ...form.display };
+  const isNew = editingService === "new";
+  const currentService = isNew ? null : services.find((service) => service.id === editingService);
+  const usesSinglePrice = isTwoWheelService(form.name);
+
+  const formatMoney = (value) =>
+    new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+      minimumFractionDigits: 0,
+    }).format(value);
+
+  const resetEditState = () => {
+    setEditingService(null);
+    setForm(emptyForm);
+    setShowIconPicker(false);
+    setShowVisibility(false);
+    setSaveError("");
   };
 
-  const closeGalleryManager = () => {
-    setEditingGallery(null);
+  const openNew = () => {
+    setForm(emptyForm);
+    setEditingService("new");
+    setShowVisibility(false);
+    setShowIconPicker(false);
+    setSaveError("");
   };
 
-  const addMockImage = () => {
-    if (!editingGallery) return;
-    const mockImage = { 
-      url: "https://images.unsplash.com/photo-1574067332341-35f11e967a5b?q=80&w=1470&auto=format&fit=crop", 
-      label: "Nueva Foto" 
+  const openEdit = (service) => {
+    setForm({
+      name: service.name,
+      category: service.category || "",
+      description: service.description,
+      price: service.price,
+      carPrice: service.carPrice,
+      truckPrice: service.truckPrice,
+      priceOnRequest: service.priceOnRequest,
+      duration: service.duration,
+      durationMinutes: service.durationMinutes,
+      iconName: service.iconName,
+      coverImageUrl: service.coverImageUrl || "",
+      active: service.active !== false,
+      publicVisible: service.publicVisible !== false,
+      featured: Boolean(service.featured),
+      display: { ...emptyForm.display, ...service.display },
+      gallery: [...(service.gallery || [])],
+    });
+    setEditingService(service.id);
+    setShowVisibility(false);
+    setShowIconPicker(false);
+    setSaveError("");
+  };
+
+  const handleSave = async () => {
+    if (!form.name.trim() || !form.duration.trim()) {
+      notify("Completá el nombre y la duración del servicio.", "error");
+      return;
+    }
+
+    if ((Number.parseFloat(form.carPrice) || 0) <= 0 || (!usesSinglePrice && (Number.parseFloat(form.truckPrice) || 0) <= 0)) {
+      notify("Ingresá los valores internos del servicio para que los turnos y Caja calculen el total.", "error");
+      return;
+    }
+
+    const payload = {
+      ...form,
+      display: formDisplay,
+      price: Number.parseFloat(form.price) || 0,
+      carPrice: Number.parseFloat(form.carPrice) || 0,
+      truckPrice: usesSinglePrice ? Number.parseFloat(form.carPrice) || 0 : Number.parseFloat(form.truckPrice) || 0,
+      durationMinutes: Math.max(15, Number.parseInt(form.durationMinutes, 10) || 120),
     };
-    
-    setServices(prev => prev.map(s => 
-      s.id === editingGallery.id 
-        ? { ...s, gallery: [...s.gallery, mockImage] } 
-        : s
-    ));
-    // Update local editing state too
-    setEditingGallery(prev => ({ ...prev, gallery: [...prev.gallery, mockImage] }));
+
+    setIsSaving(true);
+    setSaveError("");
+    try {
+      if (editingService === "new") await addService(payload);
+      else await updateService(editingService, payload);
+      notify(isNew ? "Servicio creado." : "Cambios del servicio guardados.", "success");
+      resetEditState();
+    } catch (error) {
+      console.error(error);
+      setSaveError(error?.message || "No se pudieron guardar los cambios.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const setDisplayField = (key, value) => {
+    setForm((previous) => ({
+      ...previous,
+      display: { ...previous.display, [key]: value },
+    }));
+  };
+
+  const handleDeleteService = async (service) => {
+    if (await confirm({ title: "Eliminar servicio", message: `El servicio "${service.name}" dejara de mostrarse en el catalogo.`, confirmLabel: "Eliminar" })) {
+      await deleteService(service.id);
+      notify("Servicio eliminado.", "success");
+    }
+  };
+
+  const openGallery = (service) => setEditingGallery(service);
+  const closeGallery = () => setEditingGallery(null);
+
+  const handleGalleryUpload = async (event) => {
+    const files = [...(event.target.files || [])];
+    if (!files.length || !editingGallery) return;
+    setIsUploading(true);
+    try {
+      let gallery = [...(editingGallery.gallery || [])];
+      let coverImageUrl = editingGallery.coverImageUrl;
+      for (const file of files.slice(0, 6)) {
+        const image = await uploadServiceImage(editingGallery.id, file, { gallery, coverImageUrl });
+        gallery = [...gallery, image];
+        coverImageUrl ||= image.url;
+      }
+      setEditingGallery((current) => ({ ...current, gallery, coverImageUrl }));
+      notify(`${files.slice(0, 6).length} imagenes cargadas.`, "success");
+    } catch (error) { notify(error.message || "No se pudieron cargar las imagenes.", "error"); }
+    finally { setIsUploading(false); event.target.value = ""; }
+  };
+
+  const handleSetCover = async (image) => {
+    await setServiceCover(editingGallery.id, image);
+    setEditingGallery((current) => ({ ...current, coverImageUrl: image.url }));
+    notify("Portada actualizada.", "success");
+  };
+
+  const handleMoveImage = async (index, direction) => {
+    const gallery = [...editingGallery.gallery];
+    const target = index + direction;
+    if (target < 0 || target >= gallery.length) return;
+    [gallery[index], gallery[target]] = [gallery[target], gallery[index]];
+    await reorderServiceImages(editingGallery.id, gallery);
+    setEditingGallery((current) => ({ ...current, gallery }));
+  };
+
+  const handleDeleteGalleryImage = async (image) => {
+    if (!await confirm({ title: "Eliminar imagen", message: "La imagen se eliminara tambien de Supabase Storage.", confirmLabel: "Eliminar" })) return;
+    await deleteServiceImage(editingGallery.id, image);
+    const gallery = editingGallery.gallery.filter((item) => item.url !== image.url);
+    setEditingGallery((current) => ({ ...current, gallery, coverImageUrl: current.coverImageUrl === image.url ? gallery[0]?.url || "" : current.coverImageUrl }));
+    notify("Imagen eliminada.", "success");
+  };
+
+  const clearGallery = async () => {
+    if (!editingGallery || !await confirm({ title: "Limpiar galeria", message: "Se eliminaran todas las imagenes cargadas para este servicio.", confirmLabel: "Eliminar todas" })) return;
+    await clearServiceImages(editingGallery.id);
+    setEditingGallery({ ...editingGallery, gallery: [], coverImageUrl: "" });
+    notify("Galeria vaciada.", "success");
   };
 
   return (
     <PageTransition>
       <AdminLayout
-        title="Gestión de Servicios"
-        subtitle="Administrá tu catálogo de servicios, precios y galerías de fotos."
+        title="Gestion de Servicios"
+        subtitle="Administra tu catalogo, precios, visibilidad y galerias de fotos."
       >
-        <div style={{ position: "relative", minHeight: "80vh" }}>
-          
-          <div style={{ 
-            position: "fixed", 
-            top: "50%", 
-            left: "50%", 
-            transform: "translate(-50%, -50%)", 
-            opacity: 0.04, 
-            width: "min(60vw, 800px)",
-            pointerEvents: "none",
-            zIndex: 0,
-            filter: "grayscale(1) brightness(1.5)"
-          }}>
-            <img src={businessLogo} alt="Autoestética Watermark" style={{ width: "100%", height: "auto" }} />
-          </div>
+        <div className="admin-services-container">
+          <div className="admin-services-content">
+            <AdminPageHeader
+              eyebrow="Catalogo"
+              icon={<Star size={18} />}
+              title="Servicios y precios"
+              subtitle="Actualizá lo que ofrecés; los cambios se reflejan también en el sitio público."
+              actions={
+                <button type="button" className="btn-premium svc-new-btn" onClick={openNew}>
+                  <Plus size={20} />
+                  <span>Nuevo servicio</span>
+                </button>
+              }
+            />
 
-          <div style={{ position: "relative", zIndex: 1 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "4rem", gap: "2rem" }}>
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
-                  <Star size={24} className="text-secondary" style={{ fill: "var(--color-secondary)", opacity: 0.8 }} />
-                  <h2 style={{ fontSize: "1.75rem", fontWeight: 800, letterSpacing: "-0.02em" }}>Catálogo Operativo</h2>
-                </div>
-                <p style={{ color: "var(--color-text-soft)", fontSize: "1.05rem", maxWidth: "600px", lineHeight: "1.6" }}>
-                  Definí los estándares de calidad y las fotos que verán tus clientes.
-                </p>
-              </div>
-              <button className="btn-premium" style={{ minWidth: "200px", justifyContent: "center", height: "56px", fontSize: "1rem" }}>
-                <Plus size={22} /> Nuevo Servicio
-              </button>
-            </div>
+            {error ? <div className="svc-admin-error" role="alert">No pudimos actualizar el catálogo. Revisá la conexión.</div> : null}
+            {isLoading ? <div className="svc-admin-loading">Cargando servicios…</div> : null}
 
-            <motion.div 
-              style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))", gap: "2.5rem" }}
+            <motion.div
+              className="admin-services-grid"
               variants={containerVariants}
               initial="hidden"
               animate="visible"
             >
-              {services.map(service => (
-                <motion.div 
-                  key={service.id} 
-                  className="dashboard-panel" 
-                  variants={cardVariants}
-                  whileHover="hover"
-                  style={{ 
-                    display: "flex", 
-                    flexDirection: "column", 
-                    gap: "1.75rem",
-                    position: "relative",
-                    overflow: "hidden",
-                    border: service.featured ? "1px solid rgba(0, 191, 166, 0.4)" : "1px solid var(--color-border)",
-                    boxShadow: service.featured ? "0 10px 40px rgba(0, 191, 166, 0.1)" : "none",
-                    background: service.featured ? "rgba(0, 191, 166, 0.02)" : "rgba(255, 255, 255, 0.02)"
-                  }}
-                >
-                  {service.featured && (
-                    <div style={{ position: "absolute", top: "1rem", right: "-2.5rem", background: "var(--color-primary)", color: "#000", fontSize: "0.7rem", fontWeight: 900, textTransform: "uppercase", padding: "0.25rem 2.5rem", transform: "rotate(45deg)", boxShadow: "0 2px 10px rgba(0,0,0,0.2)" }}>
-                      Popular
-                    </div>
-                  )}
+              {services.map((service) => {
+                const displayConfig = { ...emptyForm.display, ...service.display };
 
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                    <div style={{ 
-                      width: "60px", 
-                      height: "60px", 
-                      borderRadius: "18px", 
-                      background: "rgba(0, 191, 166, 0.15)", 
-                      display: "flex", 
-                      alignItems: "center", 
-                      justifyContent: "center", 
-                      color: "var(--color-primary)",
-                      boxShadow: "0 8px 16px rgba(0, 191, 166, 0.1)",
-                      border: "1px solid rgba(0, 191, 166, 0.3)"
-                    }}>
-                      {service.icon}
-                    </div>
-                    <div style={{ display: "flex", gap: "0.75rem" }}>
-                      <button 
-                        className="btn-ghost btn-mini-action" 
-                        title="Gestionar Fotos"
-                        onClick={() => openGalleryManager(service)}
-                      >
-                        <ImageIcon size={18} />
-                      </button>
-                      <button className="btn-ghost btn-mini-action" title="Editar"><Edit2 size={18} /></button>
-                      <button className="btn-danger btn-mini-action" title="Eliminar"><Trash2 size={18} /></button>
-                    </div>
-                  </div>
+                return (
+                  <motion.div
+                    key={service.id}
+                    className={`service-card-pro ${service.featured ? "is-featured" : ""} ${service.active && service.publicVisible ? "is-published" : "is-hidden"}`}
+                    variants={cardVariants}
+                    whileHover="hover"
+                  >
+                    <div className="svc-card-cover"><img src={getServiceCoverUrl(service)} alt={service.name} loading="lazy" /></div>
+                    <span className={`svc-publish-badge ${service.active && service.publicVisible ? "published" : "hidden"}`}>{service.active && service.publicVisible ? <><Eye size={12} /> Publicado</> : <><EyeOff size={12} /> Oculto</>}</span>
+                    <div className="svc-card-header">
+                      <div className="service-icon-wrapper">
+                        {getIcon(service.iconName, { size: 20 })}
+                      </div>
 
-                  <div>
-                    <h3 style={{ fontSize: "1.4rem", fontWeight: 800, marginBottom: "0.85rem", color: "var(--color-white)", letterSpacing: "-0.01em" }}>{service.name}</h3>
-                    <p style={{ fontSize: "1rem", color: "var(--color-text-soft)", lineHeight: "1.7", minHeight: "3.5rem" }}>{service.description}</p>
-                  </div>
-
-                  <div style={{ 
-                    display: "flex", 
-                    justifyContent: "space-between", 
-                    alignItems: "center", 
-                    paddingTop: "1.5rem", 
-                    marginTop: "auto",
-                    borderTop: "1px solid rgba(255,255,255,0.08)"
-                  }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-                       <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--color-text-soft)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Tiempo Estimado</span>
-                       <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "1rem", color: "var(--color-text)", fontWeight: 700 }}>
-                        <Clock size={16} className="text-secondary" /> {service.duration}
+                      <div className="svc-card-controls">
+                        <button type="button" className="btn-icon-sm" title={service.active && service.publicVisible ? "Ocultar del sitio" : "Publicar en el sitio"} onClick={() => togglePublished(service.id)}>{service.active && service.publicVisible ? <Eye size={14} /> : <EyeOff size={14} />}</button>
+                        <button
+                          type="button"
+                          className="btn-icon-sm"
+                          title="Cambiar destacados"
+                          onClick={() => toggleFeatured(service.id)}
+                        >
+                          <Star size={14} fill={service.featured ? "currentColor" : "none"} />
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-icon-sm"
+                          title="Gestionar fotos"
+                          onClick={() => openGallery(service)}
+                        >
+                          <ImageIcon size={14} />
+                          {service.gallery?.length > 0 && (
+                            <span className="svc-dot-indicator" />
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-icon-sm"
+                          title="Editar"
+                          onClick={() => openEdit(service)}
+                        >
+                          <Edit2 size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-icon-danger-sm"
+                          title="Eliminar"
+                          onClick={() => handleDeleteService(service)}
+                        >
+                          <Trash2 size={14} />
+                        </button>
                       </div>
                     </div>
-                    <div style={{ textAlign: "right" }}>
-                       <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--color-text-soft)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Inversión</span>
-                       <div style={{ fontSize: "1.75rem", fontWeight: 900, color: "var(--color-primary)", letterSpacing: "-0.04em", lineHeight: "1" }}>
-                        {formatMoney(service.price)}
-                      </div>
+
+                    <div className="svc-card-body">
+                      {service.featured && <span className="svc-featured-label">Recomendado</span>}
+                      <h3 className="svc-title">{service.name}</h3>
+                      <p className="svc-desc">{service.description}</p>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+
+                    <div className="svc-card-footer-pro">
+                      <div className="svc-meta-group">
+                        <Clock size={12} />
+                        <span>{service.duration}</span>
+                      </div>
+                      <div className="svc-price-pro">{isTwoWheelService(service) ? <small>Precio interno {formatMoney(service.carPrice)}</small> : <><small>Auto {formatMoney(service.carPrice)}</small><small>Camioneta {formatMoney(service.truckPrice)}</small></>}</div>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </motion.div>
           </div>
         </div>
 
         <Modal
-          isOpen={!!editingGallery}
-          onClose={closeGalleryManager}
-          title={`Galería: ${editingGallery?.name}`}
-          maxWidth="1000px"
+          isOpen={Boolean(editingService)}
+          onClose={resetEditState}
+          title={isNew ? "Nuevo servicio" : `Editando: ${currentService?.name || ""}`}
+          maxWidth="780px"
         >
-          {editingGallery && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "2.5rem" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-                <Carousel images={editingGallery.gallery} />
-                <div style={{ display: "flex", gap: "1rem" }}>
-                  <button className="btn-premium" onClick={addMockImage}>
-                    <Camera size={18} /> Añadir Foto
+          {editingService ? (
+            <div className="svc-edit-modal">
+              <div className="svc-form-row">
+                <div className="admin-form-group svc-form-group svc-form-group-wide">
+                  <label>Nombre del servicio</label>
+                  <input
+                    type="text"
+                    className="admin-input"
+                    value={form.name}
+                    onChange={(event) => setForm((previous) => ({ ...previous, name: event.target.value }))}
+                    placeholder="Ej: Lavado Premium"
+                  />
+                </div>
+
+                <div className="admin-form-group svc-form-group svc-form-group-icon">
+                  <label>Icono</label>
+                  <button
+                    type="button"
+                    className="admin-input svc-icon-picker-btn"
+                    onClick={() => setShowIconPicker((previous) => !previous)}
+                  >
+                    {getIcon(form.iconName, { size: 18 })}
+                    <span>{form.iconName}</span>
+                    <ChevronDown size={14} />
                   </button>
-                  <button className="btn-ghost" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
-                    <Trash2 size={16} /> Limpiar Todo
+
+                  <AnimatePresence>
+                    {showIconPicker ? (
+                      <motion.div
+                        className="svc-icon-dropdown"
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {getAvailableIcons().map((iconName) => (
+                          <button
+                            key={iconName}
+                            type="button"
+                            className={`svc-icon-option ${form.iconName === iconName ? "selected" : ""}`}
+                            onClick={() => {
+                              setForm((previous) => ({ ...previous, iconName }));
+                              setShowIconPicker(false);
+                            }}
+                          >
+                            {getIcon(iconName, { size: 18 })}
+                            <span>{iconName}</span>
+                            {form.iconName === iconName ? <Check size={12} /> : null}
+                          </button>
+                        ))}
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              <div className="admin-form-group">
+                <label>Descripción</label>
+                <textarea
+                  className="admin-input svc-textarea"
+                  value={form.description}
+                  onChange={(event) => setForm((previous) => ({ ...previous, description: event.target.value }))}
+                  placeholder="Describe el servicio en detalle..."
+                  rows={3}
+                />
+              </div>
+
+              <div className="svc-price-mode">
+                <label className="svc-consult-toggle">
+                  <input type="checkbox" checked={formDisplay.price && !form.priceOnRequest} onChange={(event) => {
+                    const publishPrice = event.target.checked;
+                    setForm((previous) => ({ ...previous, priceOnRequest: !publishPrice, display: { ...previous.display, price: publishPrice } }));
+                  }} />
+                  <span><strong>Publicar precios en el sitio</strong><small>Si lo desactivás, el público verá “Consultar precio”; los valores internos seguirán activos para turnos y Caja.</small></span>
+                </label>
+                <div className={`svc-vehicle-prices ${usesSinglePrice ? "single" : ""}`}>
+                  <div className="admin-form-group"><label>{usesSinglePrice ? "Precio del servicio ($)" : "Precio Auto ($)"}</label><input type="number" min="0" className="admin-input" value={form.carPrice} onChange={(event) => setForm((previous) => ({ ...previous, carPrice: event.target.value }))} placeholder="15000" /></div>
+                  {!usesSinglePrice ? <div className="admin-form-group"><label>Precio Camioneta ($)</label><input type="number" min="0" className="admin-input" value={form.truckPrice} onChange={(event) => setForm((previous) => ({ ...previous, truckPrice: event.target.value }))} placeholder="20000" /></div> : null}
+                </div>
+                <div className="svc-consult-note">Estos valores se usan siempre dentro del panel al agendar, aunque no los publiques.</div>
+              </div>
+
+              <div className="admin-form-group">
+                <label>Categoría</label>
+                <input type="text" className="admin-input" value={form.category} onChange={(event) => setForm((previous) => ({ ...previous, category: event.target.value }))} placeholder="Ej: Lavado, Interior o Protección" />
+              </div>
+
+              <div className="svc-form-row">
+
+                <div className="admin-form-group svc-form-group">
+                  <label>Duracion</label>
+                  <input
+                    type="text"
+                    className="admin-input"
+                    value={form.duration}
+                    onChange={(event) => setForm((previous) => ({ ...previous, duration: event.target.value }))}
+                    placeholder="2h / 2 dias"
+                  />
+                </div>
+
+                <div className="admin-form-group svc-form-group">
+                  <label>Minutos para la agenda</label>
+                  <input type="number" min="15" step="15" className="admin-input" value={form.durationMinutes} onChange={(event) => setForm((previous) => ({ ...previous, durationMinutes: event.target.value }))} placeholder="120" />
+                </div>
+
+                <div className="admin-form-group svc-featured-toggle svc-featured-field">
+                  <label>Destacado</label>
+                  <button
+                    type="button"
+                    className={`svc-featured-btn ${form.featured ? "active" : ""}`}
+                    onClick={() => setForm((previous) => ({ ...previous, featured: !previous.featured }))}
+                  >
+                    <Star size={16} fill={form.featured ? "currentColor" : "none"} />
+                    {form.featured ? "Si" : "No"}
                   </button>
                 </div>
               </div>
-              <div className="dashboard-panel section-sm" style={{ height: "fit-content" }}>
-                <h4 style={{ color: "var(--color-white)", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <Info size={16} className="text-primary" /> Info de Gestión
+
+              <div className="svc-visibility-section">
+                <button
+                  type="button"
+                  className="svc-visibility-toggle-btn"
+                  onClick={() => setShowVisibility((previous) => !previous)}
+                >
+                  <Eye size={16} />
+                  <span>Ajustes de visibilidad publica</span>
+                  {showVisibility ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </button>
+
+                <AnimatePresence>
+                  {showVisibility ? (
+                    <motion.div
+                      className="svc-visibility-panel"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <p className="svc-visibility-hint">
+                        <Info size={14} />
+                        Controla exactamente que informacion ven tus clientes en el sitio publico.
+                      </p>
+
+                      {Object.entries(VISIBILITY_LABELS).map(([key, label]) => (
+                        <ToggleSwitch
+                          key={key}
+                          label={label}
+                          checked={formDisplay[key]}
+                          onChange={(value) => setDisplayField(key, value)}
+                        />
+                      ))}
+                    </motion.div>
+                  ) : null}
+                </AnimatePresence>
+              </div>
+
+              <div className="svc-modal-actions">
+                {saveError ? <p className="svc-save-error" role="alert">{saveError}</p> : null}
+                <button type="button" className="btn-ghost" onClick={resetEditState}>
+                  <X size={16} />
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className="btn-premium"
+                  onClick={handleSave}
+                  disabled={!form.name || !form.duration || isSaving}
+                >
+                  <Check size={16} />
+                  {isSaving ? "Guardando..." : isNew ? "Crear servicio" : "Guardar cambios"}
+                </button>
+              </div>
+            </div>
+          ) : null}
+        </Modal>
+
+        <Modal
+          isOpen={Boolean(editingGallery)}
+          onClose={closeGallery}
+          title={`Galeria: ${editingGallery?.name}`}
+          maxWidth="1000px"
+        >
+          {editingGallery ? (
+            <div className="gallery-manager-grid">
+              <div className="gallery-manager-main">
+                <Carousel images={editingGallery.gallery || []} />
+
+                <input ref={galleryInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden onChange={handleGalleryUpload} />
+                <button type="button" className="svc-upload-zone" onClick={() => galleryInputRef.current?.click()} disabled={isUploading}>
+                  <UploadCloud size={22} /><span><strong>{isUploading ? "Comprimiendo y subiendo..." : "Agregar imagenes"}</strong><small>JPG, PNG o WebP. Se optimizan automaticamente.</small></span>
+                </button>
+
+                {editingGallery.gallery?.length ? <div className="svc-gallery-list">{editingGallery.gallery.map((image, index) => <article className={`svc-gallery-item ${editingGallery.coverImageUrl === image.url ? "is-cover" : ""}`} key={image.url}>
+                  <img src={image.url} alt={image.label || `${editingGallery.name} ${index + 1}`} />
+                  <div><strong>{editingGallery.coverImageUrl === image.url ? "Portada" : `Imagen ${index + 1}`}</strong><span>{image.label || editingGallery.name}</span></div>
+                  <div className="svc-gallery-item-actions"><button type="button" onClick={() => handleMoveImage(index, -1)} disabled={index === 0} title="Mover a la izquierda"><ArrowLeft size={14} /></button><button type="button" onClick={() => handleMoveImage(index, 1)} disabled={index === editingGallery.gallery.length - 1} title="Mover a la derecha"><ArrowRight size={14} /></button>{editingGallery.coverImageUrl !== image.url ? <button type="button" onClick={() => handleSetCover(image)} title="Usar como portada"><ImageIcon size={14} /></button> : null}<button type="button" className="danger" onClick={() => handleDeleteGalleryImage(image)} title="Eliminar"><Trash2 size={14} /></button></div>
+                </article>)}</div> : <p className="svc-gallery-empty">Todavia no cargaste fotos propias. La tarjeta usa la imagen predeterminada del proyecto.</p>}
+
+                <div className="gallery-actions">
+                  <button type="button" className="btn-ghost gallery-clear-btn" onClick={clearGallery} disabled={!editingGallery.gallery?.length || isUploading}>
+                    <Trash2 size={16} />
+                    <span>Limpiar todo</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="dashboard-panel gallery-info-panel">
+                <h4>
+                  <Info size={18} className="gallery-info-title-icon" />
+                  Info de gestion
                 </h4>
-                <p style={{ fontSize: "0.9rem", color: "var(--color-text-soft)", lineHeight: "1.6" }}>
-                  Las fotos que subas aquí serán visibles en el carrusel público cuando un cliente haga clic en el servicio. <br/><br/>
-                  Se recomienda usar imágenes de alta calidad (JPG/PNG) y formato 16:9.
+                <p>
+                  Las fotos que subas aqui seran visibles en el carrusel publico cuando un cliente haga clic en el servicio.
+                  <br />
+                  <br />
+                  Se recomienda usar imagenes de alta calidad (JPG/PNG) y formato 16:9.
                 </p>
-                <div style={{ marginTop: "1.5rem", padding: "1rem", background: "rgba(0,0,0,0.2)", borderRadius: "12px", fontSize: "0.85rem" }}>
-                  <strong>Fotos actuales:</strong> {editingGallery.gallery.length}
+                <div className="gallery-stats-box">
+                  <strong>Fotos actuales:</strong> {editingGallery.gallery?.length || 0}
                 </div>
               </div>
             </div>
-          )}
+          ) : null}
         </Modal>
       </AdminLayout>
     </PageTransition>

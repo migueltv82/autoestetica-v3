@@ -1,0 +1,383 @@
+.client-fidelity-section {
+  margin-top: 1.5rem;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.client-fidelity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.client-fidelity-header h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text-main, #f8fafc);
+  margin: 0.2rem 0 0 0;
+}
+
+.client-fidelity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #38bdf8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.client-fidelity-history-chip {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #facc15;
+  background: rgba(250, 204, 21, 0.1);
+  border: 1px solid rgba(250, 204, 21, 0.25);
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+}
+
+.client-fidelity-loading {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  padding: 1rem;
+  text-align: center;
+}
+
+.client-fidelity-cards-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  align-items: start;
+  gap: 1rem;
+}
+
+.client-fidelity-card-preview {
+  padding: .75rem;
+  background: rgba(7, 14, 25, .72);
+}
+
+.client-fidelity-card-preview .cc-card-stage {
+  max-width: 360px;
+  margin: 0 auto 1.15rem;
+}
+
+.client-fidelity-card-preview .cc-card {
+  padding: .75rem .85rem .65rem;
+  border-radius: 13px;
+}
+
+.client-fidelity-card-preview .cc-card--back { padding: 0; }
+
+.client-fidelity-card-preview .cc-logo {
+  width: 27px;
+  height: 27px;
+}
+
+.client-fidelity-card-preview .cc-brand-name { font-size: .48rem; }
+.client-fidelity-card-preview .cc-plan-label { font-size: .58rem; }
+.client-fidelity-card-preview .cc-chip--vip,
+.client-fidelity-card-preview .cc-chip--reward { padding: .22rem .42rem; font-size: .45rem; }
+.client-fidelity-card-preview .cc-metal-chip { width: 35px; height: 27px; border-radius: 6px; }
+.client-fidelity-card-preview .cc-front-vehicle strong { font-size: .9rem; }
+.client-fidelity-card-preview .cc-front-vehicle span,
+.client-fidelity-card-preview .cc-holder-label { font-size: .43rem; }
+.client-fidelity-card-preview .cc-front-vehicle small,
+.client-fidelity-card-preview .cc-front-pass { font-size: .4rem; }
+.client-fidelity-card-preview .cc-holder-name { font-size: .68rem; }
+.client-fidelity-card-preview .cc-front-identity-meta { right:.85rem;bottom:2.35rem;gap:.42rem;max-width:68%; }
+.client-fidelity-card-preview .cc-front-identity-meta small { font-size:.3rem; }
+.client-fidelity-card-preview .cc-front-identity-meta strong { font-size:.4rem; }
+.client-fidelity-card-preview .cc-front-identity-meta .cc-front-plate { padding:.18rem .28rem; }
+.client-fidelity-card-preview .cc-front-identity-meta .cc-front-plate strong { font-size:.44rem; }
+.client-fidelity-card-preview .cc-flip-button { right: .4rem; bottom: -.75rem; padding: .3rem .5rem; font-size: .55rem; }
+.client-fidelity-card-preview .cc-back-heading { top: .4rem; right: .45rem; left: .45rem; padding: .3rem .45rem; }
+.client-fidelity-card-preview .cc-back-heading small { font-size: .4rem; }
+.client-fidelity-card-preview .cc-back-heading strong { font-size: .6rem; }
+.client-fidelity-card-preview .cc-back-heading > span { font-size: .85rem; }
+.client-fidelity-card-preview .cc-back-reward { bottom: .4rem; min-width: 58%; padding: .3rem .45rem; }
+.client-fidelity-card-preview .cc-back-reward small { font-size: .36rem; }
+.client-fidelity-card-preview .cc-back-reward strong { font-size: .55rem; }
+.client-fidelity-card-preview .cc-svg-piece text { font-size: 22px; }
+.client-fidelity-card-preview .client-fidelity-actions {
+  gap: .45rem;
+}
+
+.client-fidelity-card-preview .client-fidelity-actions :is(button, a) {
+  flex: 1 1 125px;
+  justify-content: center;
+  padding: .45rem .55rem;
+  font-size: .72rem;
+}
+
+.client-fidelity-card-preview .client-fidelity-actions .fidelity-manual-editor {
+  flex: 1 1 112px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .35rem;
+  padding: .25rem;
+  border: 1px solid rgba(56, 189, 248, .3);
+  border-radius: 8px;
+  background: rgba(56, 189, 248, .09);
+  color: #e0f2fe;
+}
+
+.client-fidelity-card-preview .client-fidelity-actions .fidelity-manual-editor button {
+  flex: 0 0 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(56, 189, 248, .18);
+  color: #7dd3fc;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.client-fidelity-card-preview .client-fidelity-actions .fidelity-manual-editor button:hover:not(:disabled) {
+  background: rgba(56, 189, 248, .32);
+}
+
+.client-fidelity-card-preview .client-fidelity-actions .fidelity-manual-editor button:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+.fidelity-manual-editor strong {
+  min-width: 34px;
+  text-align: center;
+  font-size: .76rem;
+}
+
+.client-fidelity-vehicle-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  margin: 0 0 .85rem;
+  padding: .65rem .75rem;
+  border: 1px solid rgba(148, 163, 184, .14);
+  border-radius: 9px;
+  color: #e2e8f0;
+  background: rgba(15, 23, 42, .56);
+  font-size: .78rem;
+}
+
+.client-fidelity-vehicle-caption span {
+  color: #7dd3fc;
+  font-family: 'Courier New', monospace;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.client-fidelity-card-box {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: all 0.25s ease;
+}
+
+.client-fidelity-card-box.reward-unlocked {
+  border-color: rgba(250, 204, 21, 0.5);
+  box-shadow: 0 0 20px rgba(250, 204, 21, 0.15);
+}
+
+.client-fidelity-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.client-fidelity-card-top small {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.client-fidelity-card-top h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #f8fafc;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.client-fidelity-card-top svg {
+  color: #38bdf8;
+}
+
+.client-fidelity-stamps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.client-fidelity-stamp-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 0.5rem;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.client-fidelity-stamp-slot.stamped {
+  background: rgba(56, 189, 248, 0.1);
+  border-style: solid;
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.icon-stamped {
+  color: #38bdf8;
+}
+
+.icon-pending {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.client-fidelity-stamp-slot small {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-top: 0.35rem;
+}
+
+.client-fidelity-progress-text {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  margin-bottom: 1rem;
+}
+
+.client-fidelity-reward-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(90deg, rgba(250, 204, 21, 0.15), rgba(234, 179, 8, 0.05));
+  border: 1px solid rgba(250, 204, 21, 0.4);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  color: #fef08a;
+}
+
+.client-fidelity-reward-banner svg {
+  color: #facc15;
+  flex-shrink: 0;
+}
+
+.client-fidelity-reward-banner strong {
+  display: block;
+  font-size: 0.95rem;
+  color: #fef08a;
+}
+
+.client-fidelity-reward-banner p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #fef9c3;
+}
+
+.client-fidelity-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn-fidelity-add-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-fidelity-add-stamp:hover:not(:disabled) {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: #38bdf8;
+}
+
+.btn-fidelity-redeem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #facc15;
+  color: #0f172a;
+  border: none;
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-fidelity-redeem:hover:not(:disabled) {
+  background: #eab308;
+  box-shadow: 0 0 12px rgba(250, 204, 21, 0.3);
+}
+
+.btn-fidelity-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  color: #4ade80;
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-fidelity-whatsapp:hover {
+  background: rgba(34, 197, 94, 0.25);
+  border-color: #4ade80;
+}
+
+.btn-fidelity-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-fidelity-share:hover {
+  background: rgba(56, 189, 248, 0.25);
+  border-color: #38bdf8;
+}
+
+.btn-fidelity-view { display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1rem;border:1px solid rgba(167,139,250,.34);border-radius:8px;color:#c4b5fd;background:rgba(124,58,237,.1);font-size:.85rem;font-weight:650;text-decoration:none;transition:all .2s ease; }
+.btn-fidelity-view:hover { border-color:#a78bfa;color:#ede9fe;background:rgba(124,58,237,.2); }

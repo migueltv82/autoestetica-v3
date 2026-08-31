@@ -1,10 +1,25 @@
 import EmptyState from "../ui/EmptyState";
-import { Edit2, Trash2, Calendar, Clock, User, Phone, Wrench, Car, Bike, Truck, Box } from "lucide-react";
+import { 
+  Trash2, 
+  Calendar, 
+  Clock, 
+  Phone, 
+  Wrench, 
+  Car, 
+  Bike, 
+  Truck, 
+  Box, 
+  User,
+  ReceiptText,
+  Pencil,
+  MessageCircle
+} from "lucide-react";
+import { appointmentWhatsAppLink } from "../../utils/whatsapp";
 import "./TurnsTable.css";
 
-const STATUS_OPTIONS = ["Pendiente", "Confirmado", "Finalizado", "Cancelado"];
+const STATUS_OPTIONS = ["Consulta", "Pendiente", "Seña pendiente", "Confirmado", "En proceso", "Listo", "Finalizado", "Cancelado", "No asistió"];
 
-function TurnsTable({ turns, onStatusChange, onDeleteTurn }) {
+function TurnsTable({ turns, onStatusChange, onDeleteTurn, onGenerateReceipt, onEditTurn, canUseOperationalActions = true }) {
   if (!turns.length) {
     return (
       <EmptyState
@@ -16,102 +31,102 @@ function TurnsTable({ turns, onStatusChange, onDeleteTurn }) {
 
   const getVehicleIcon = (type) => {
     switch (type?.toLowerCase()) {
-      case "moto": return <Bike size={14} />;
-      case "camioneta": return <Truck size={14} />;
-      case "suv": return <Box size={14} />;
-      default: return <Car size={14} />;
+      case "moto": return <Bike size={16} />;
+      case "camioneta": return <Truck size={16} />;
+      case "suv": return <Box size={16} />;
+      default: return <Car size={16} />;
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusClass = (status) => {
     switch (status) {
-      case "Confirmado": return "var(--color-primary)";
-      case "Pendiente": return "#facc15";
-      case "Finalizado": return "#38bdf8";
-      case "Cancelado": return "#f87171";
-      default: return "#94a3b8"; 
+      case "Confirmado": return "status-confirmed";
+      case "En proceso": return "status-progress";
+      case "Listo": return "status-ready";
+      case "Pendiente": return "status-pending";
+      case "Consulta": return "status-pending";
+      case "Seña pendiente": return "status-pending";
+      case "Finalizado": return "status-finished";
+      case "Cancelado": return "status-cancelled";
+      case "No asistió": return "status-cancelled";
+      default: return "";
     }
   };
+
+  const hasActions = Boolean((canUseOperationalActions && turns.some((turn) => turn.phone && !["Cancelado", "Finalizado"].includes(turn.status))) || onEditTurn || onGenerateReceipt || onDeleteTurn);
 
   return (
-    <div className="admin-table-wrap">
-      <table className="admin-table">
+    <div className="simple-table-container">
+      <table className="simple-admin-table">
         <thead>
           <tr>
-            <th style={{ width: "120px" }}>Agenda</th>
-            <th>Cliente y Contacto</th>
+            <th>Cliente</th>
             <th>Servicio</th>
-            <th>Vehículo</th>
-            <th style={{ textAlign: "center" }}>Estado Operativo</th>
-            <th style={{ textAlign: "right" }}>Gestión</th>
+            <th>Horario</th>
+            <th>Estado</th>
+            {hasActions ? <th className="turn-actions-header">Acciones</th> : null}
           </tr>
         </thead>
         <tbody>
           {turns.map((turn) => (
-            <tr key={turn.id} className={turn.status === "Finalizado" ? "row-finished" : ""}>
+            <tr key={turn.id} className={turn.status === "Finalizado" ? "row-muted" : ""}>
               <td>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-                   <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontWeight: 800, color: "var(--color-white)", fontSize: "1rem" }}>
-                     <Clock size={14} className="text-primary" /> {turn.time}
-                   </div>
-                   <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.8rem", color: "var(--color-text-soft)" }}>
-                     <Calendar size={12} /> {turn.date}
-                   </div>
-                </div>
-              </td>
-              <td>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-                  <div style={{ fontWeight: 700, display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "1.05rem", color: "var(--color-white)" }}>
-                    {turn.client}
+                <div className="client-info-cell">
+                  <div className="client-avatar">
+                    <User size={14} />
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.85rem", color: "var(--color-text-soft)" }}>
-                    <Phone size={12} /> {turn.phone || "N/A"}
+                  <div>
+                    <span className="client-name">{turn.client}</span>
+                    <span className="client-sub">{turn.vehicle}</span>
                   </div>
                 </div>
               </td>
               <td>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: "var(--color-text)", fontWeight: 500 }}>
-                  <Wrench size={16} className="text-secondary" style={{ opacity: 0.8 }} />
-                  {turn.service}
+                <div className="service-info-cell">
+                  <Wrench size={14} className="icon-sub" />
+                  <span>{turn.service}</span>
                 </div>
               </td>
               <td>
-                <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", background: "rgba(255,255,255,0.03)", padding: "0.4rem 0.75rem", borderRadius: "10px", fontSize: "0.85rem", fontWeight: 600, border: "1px solid rgba(255,255,255,0.05)" }}>
-                  {getVehicleIcon(turn.vehicle)}
-                  {turn.vehicle}
+                <div className="time-info-cell">
+                  <Clock size={14} className="icon-sub" />
+                  <span>{turn.time}</span>
+                  <span className="date-sub">{turn.date}</span>
                 </div>
               </td>
-              <td style={{ textAlign: "center" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem" }}>
-                  <div 
-                    style={{ 
-                      width: "8px", 
-                      height: "8px", 
-                      borderRadius: "50%", 
-                      background: getStatusColor(turn.status),
-                      boxShadow: `0 0 10px ${getStatusColor(turn.status)}`
-                    }} 
-                  />
-                  <select
-                    className="admin-input-minimal"
-                    style={{ color: getStatusColor(turn.status), fontWeight: 700 }}
-                    value={turn.status}
-                    onChange={(event) => onStatusChange(turn.id, event.target.value)}
+              <td>
+                {onStatusChange ? <select
+                  className={`status-select-simple ${getStatusClass(turn.status)}`}
+                  value={turn.status}
+                  onChange={(e) => onStatusChange(turn.id, e.target.value)}
+                >
+                  {STATUS_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select> : <span className={`status-pill-simple ${getStatusClass(turn.status)}`}>{turn.status}</span>}
+              </td>
+              {hasActions ? <td className="turn-actions-cell">
+                {canUseOperationalActions && turn.phone && !["Cancelado", "Finalizado"].includes(turn.status) ? <a className="btn-action-confirm" href={appointmentWhatsAppLink(turn)} target="_blank" rel="noreferrer" title={turn.status === "Listo" ? "Avisar por WhatsApp" : "Enviar confirmación por WhatsApp"}><MessageCircle size={16} /><span>{turn.status === "Listo" ? "Avisar listo" : "Confirmar turno"}</span></a> : null}
+                {onEditTurn ? <button type="button" className="btn-ghost btn-mini-action" onClick={() => onEditTurn(turn)} title="Editar turno"><Pencil size={16} /></button> : null}
+                {onGenerateReceipt ? (
+                  <button type="button"
+                    className="btn-action-receipt"
+                    onClick={() => onGenerateReceipt(turn)}
+                    title="Generar recibo"
                   >
-                    {STATUS_OPTIONS.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </td>
-              <td>
-                <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
-                  <button className="btn-ghost btn-mini-action" title="Editar"><Edit2 size={14} /></button>
-                  <button className="btn-danger btn-mini-action" onClick={() => onDeleteTurn(turn.id)} title="Borrar"><Trash2 size={14} /></button>
-                </div>
-              </td>
+                    <ReceiptText size={16} />
+                  </button>
+                ) : null}
+                {onDeleteTurn ? (
+                  <button type="button"
+                    className="btn-action-danger"
+                    onClick={() => onDeleteTurn(turn.id)}
+                    title="Eliminar"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                ) : null}
+              </td> : null}
             </tr>
           ))}
         </tbody>

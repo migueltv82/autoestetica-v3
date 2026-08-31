@@ -1,221 +1,118 @@
-import { useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowLeft } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { AlertTriangle, Check, MessageCircle, ShieldCheck, Sparkles } from "lucide-react";
+import { useServices } from "../../hooks/useServices";
+import { useSettings } from "../../hooks/useSettings";
+import { supabase } from "../../lib/supabase";
+import { ORGANIZATION_SLUG } from "../../lib/organization";
+import { Link } from "react-router-dom";
 import "./InquiryForm.css";
+import TurnstileWidget from "./TurnstileWidget";
 
 const VEHICLE_OPTIONS = ["Auto", "Camioneta", "SUV", "Moto", "Bicicleta"];
 
-const WHATSAPP_NUMBER = "5493815448147";
-
 function InquiryForm() {
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    vehicle: "",
-    service: "",
-    message: "",
-  });
+  const { services, isLoading: servicesLoading } = useServices();
+  const { settings } = useSettings();
+  const [formData, setFormData] = useState({ name: "", phone: "", vehicle: "", services: [], message: "", acceptedLegal: false });
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaResetKey, setCaptchaResetKey] = useState(0);
+  const honeypotRef = useRef(null);
 
-  const availableServices = useMemo(() => {
-    if (formData.vehicle === "Moto") {
-      return ["Lavado y detallado de motos"];
-    }
-    if (formData.vehicle === "Bicicleta") {
-      return ["Lavado y detallado de bicicletas"];
-    }
-    // Opciones generales para vehículos de 4 ruedas
-    return [
-      "Lavado premium",
-      "Limpieza de interior",
-      "Pulido y abrillantado",
-      "Lavado de motor",
-    ];
-  }, [formData.vehicle]);
+  const availableServices = useMemo(() => services.map((service) => service.name), [services]);
+  const whatsappText = useMemo(() => [
+    "Hola, quiero hacer una consulta.", "",
+    `*Nombre:* ${formData.name || "-"}`,
+    `*Teléfono:* ${formData.phone || "-"}`,
+    `*Vehículo:* ${formData.vehicle || "-"}`,
+    `*Servicios:* ${formData.services.length ? formData.services.join(", ") : "-"}`,
+    `*Consulta:* ${formData.message || "-"}`,
+  ].join("\n"), [formData]);
 
-  const whatsappUrl = useMemo(() => {
-    const text = [
-      "Hola, quiero hacer una consulta.",
-      "",
-      `Nombre: ${formData.name || "-"}`,
-      `Teléfono: ${formData.phone || "-"}`,
-      `Vehículo: ${formData.vehicle || "-"}`,
-      `Servicio de interés: ${formData.service || "-"}`,
-      `Consulta: ${formData.message || "-"}`,
-    ].join("\n");
-
-    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-  }, [formData]);
-
-  function handleNext() {
-    if (step === 1 && !formData.vehicle) return alert("Selecciona un vehículo");
-    if (step === 2 && !formData.service) return alert("Selecciona un servicio");
-    setStep((s) => s + 1);
+  function selectVehicle(vehicle) { setFormData((current) => ({ ...current, vehicle, services: [] })); }
+  function toggleService(service) {
+    setFormData((current) => ({ ...current, services: current.services.includes(service) ? current.services.filter((item) => item !== service) : [...current.services, service] }));
   }
 
-  function handleBack() {
-    setStep((s) => Math.max(1, s - 1));
-  }
-
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  }
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    if (!formData.name.trim() || !formData.phone.trim()) {
-      alert("Completa tu nombre y teléfono");
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setSubmitAttempted(true);
+    if (!formData.name.trim() || !formData.phone.trim() || !formData.vehicle || !formData.services.length || !formData.acceptedLegal || !captchaToken) return;
+    if (honeypotRef.current?.value) return;
+    setIsSubmitting(true);
+    setSubmitError("");
+    const whatsappWindow = window.open("", "_blank");
+    const { error } = await supabase.functions.invoke("submit-public-inquiry", { body: {
+      captchaToken,
+      businessSlug: ORGANIZATION_SLUG,
+      clientName: formData.name,
+      clientPhone: formData.phone,
+      vehicleType: formData.vehicle,
+      requestedServices: formData.services,
+      inquiryNotes: `${formData.message || "Consulta ingresada desde la web."}\nAceptó Política de Privacidad y Condiciones del Servicio (versión 2026-07-16).`,
+    },
+    });
+    setIsSubmitting(false);
+    if (error) {
+      whatsappWindow?.close();
+      console.error(error);
+      setSubmitError(error?.context?.error || error?.message || "No pudimos registrar la consulta. Intentá nuevamente.");
+      setCaptchaResetKey((current) => current + 1);
       return;
     }
-    window.open(whatsappUrl, "_blank");
+    const whatsapp = (settings.whatsapp || "5493815448147").replace(/\D/g, "");
+    const whatsappUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent(whatsappText)}`;
+    if (whatsappWindow) whatsappWindow.location.href = whatsappUrl;
+    else window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+    setFormData({ name: "", phone: "", vehicle: "", services: [], message: "", acceptedLegal: false });
+    setCaptchaResetKey((current) => current + 1);
+    setSubmitAttempted(false);
   }
 
+  const invalid = submitAttempted && (!formData.name.trim() || !formData.phone.trim() || !formData.vehicle || !formData.services.length || !formData.acceptedLegal || !captchaToken);
   return (
-    <section className="section">
-      <div className="container inquiry-grid">
-        <div className="inquiry-header">
-          <span className="section-kicker">Consulta (Paso {step} de 3)</span>
-          <h1 className="section-title">Contanos qué necesitás</h1>
-          <p className="section-text">
-            Completá unos breves pasos y abriremos WhatsApp con la info lista.
-          </p>
-
-          <div className="step-indicator">
-            <div className={`step-dot ${step >= 1 ? "active" : ""}`} />
-            <div className={`step-dot ${step >= 2 ? "active" : ""}`} />
-            <div className={`step-dot ${step >= 3 ? "active" : ""}`} />
+    <section className="section inquiry-page">
+      <div className="container inquiry-shell">
+        <div className="inquiry-intro">
+          <span className="section-kicker">Consulta personalizada</span>
+          <h1 className="section-title">Contanos qué necesita <span className="inquiry-title-accent">tu vehículo</span>.</h1>
+          <p className="section-text">Completá los datos principales y preparamos tu consulta para responderte con contexto.</p>
+          <div className="inquiry-feature-list">
+            <article className="inquiry-feature-card"><Sparkles size={18} /><div><strong>Asesoría clara</strong><span>Te orientamos según el estado y el uso real del vehículo.</span></div></article>
+            <article className="inquiry-feature-card"><MessageCircle size={18} /><div><strong>Respuesta directa</strong><span>La consulta queda lista para continuar por WhatsApp.</span></div></article>
+            <article className="inquiry-feature-card"><ShieldCheck size={18} /><div><strong>Datos protegidos</strong><span>Usamos tus datos únicamente para responder y coordinar el servicio.</span></div></article>
           </div>
         </div>
 
-        <div className="inquiry-form-container">
-          <AnimatePresence mode="wait">
-            {step === 1 && (
-              <motion.div
-                key="step1"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="form-step"
-              >
-                <h3>1. ¿Qué vehículo tienes?</h3>
-                <div className="options-grid">
-                  {VEHICLE_OPTIONS.map((v) => (
-                    <button
-                      key={v}
-                      type="button"
-                      className={`option-card ${formData.vehicle === v ? "selected" : ""}`}
-                      onClick={() => setFormData({ ...formData, vehicle: v, service: "" })}
-                    >
-                      {v}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  type="button"
-                  className="btn-primary mt-4"
-                  onClick={handleNext}
-                  disabled={!formData.vehicle}
-                >
-                  Continuar <ArrowRight size={18} />
-                </button>
-              </motion.div>
-            )}
-
-            {step === 2 && (
-              <motion.div
-                key="step2"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="form-step"
-              >
-                <h3>2. ¿Qué servicio te interesa para tu {formData.vehicle.toLowerCase()}?</h3>
-                <div className="options-grid">
-                  {availableServices.map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      className={`option-card ${formData.service === s ? "selected" : ""}`}
-                      onClick={() => setFormData({ ...formData, service: s })}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-                <div className="step-actions mt-4">
-                  <button type="button" className="btn-secondary" onClick={handleBack}>
-                    <ArrowLeft size={18} /> Volver
-                  </button>
-                  <button
-                    type="button"
-                    className="btn-primary"
-                    onClick={handleNext}
-                    disabled={!formData.service}
-                  >
-                    Continuar <ArrowRight size={18} />
-                  </button>
-                </div>
-              </motion.div>
-            )}
-
-            {step === 3 && (
-              <motion.form
-                key="step3"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="form-step"
-                onSubmit={handleSubmit}
-              >
-                <h3>3. Tus datos de contacto</h3>
-                <div className="inquiry-form-group">
-                  <label>Nombre y apellido</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Ej: Miguel Torres"
-                    required
-                  />
-                </div>
-                <div className="inquiry-form-group">
-                  <label>WhatsApp / Teléfono</label>
-                  <input
-                    type="text"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="381..."
-                    required
-                  />
-                </div>
-                <div className="inquiry-form-group">
-                  <label>Mensaje opcional</label>
-                  <textarea
-                    name="message"
-                    rows="3"
-                    value={formData.message}
-                    onChange={handleChange}
-                    placeholder="Escribí alguna aclaración"
-                  />
-                </div>
-                <div className="step-actions mt-4">
-                  <button type="button" className="btn-secondary" onClick={handleBack}>
-                    <ArrowLeft size={18} /> Volver
-                  </button>
-                  <button type="submit" className="btn-primary inquiry-submit">
-                    Enviar a WhatsApp
-                  </button>
-                </div>
-              </motion.form>
-            )}
-          </AnimatePresence>
-        </div>
+        <form className="inquiry-form-panel" onSubmit={handleSubmit} noValidate>
+          <input ref={honeypotRef} className="inquiry-honeypot" type="text" name="website" tabIndex="-1" autoComplete="off" aria-hidden="true" />
+          <div className="inquiry-form-heading"><span>Consulta rápida</span><strong>Completá los datos principales</strong><p>Los campos marcados son necesarios para poder asesorarte.</p></div>
+          {invalid ? <div className="inquiry-error" role="alert"><AlertTriangle size={16} />Completá los datos requeridos y aceptá la Política de Privacidad y las Condiciones del Servicio.</div> : null}
+          {submitError ? <div className="inquiry-error" role="alert"><AlertTriangle size={16} />{submitError}</div> : null}
+          <div className="inquiry-form-grid">
+            <div className={`inquiry-form-group${submitAttempted && !formData.name.trim() ? " has-error" : ""}`}>
+              <label>Nombre y apellido *</label><input type="text" value={formData.name} onChange={(event) => setFormData({ ...formData, name: event.target.value })} placeholder="Ej: Miguel Torres" autoComplete="name" aria-invalid={submitAttempted && !formData.name.trim()} />
+            </div>
+            <div className={`inquiry-form-group${submitAttempted && !formData.phone.trim() ? " has-error" : ""}`}>
+              <label>WhatsApp / Teléfono *</label><input type="tel" inputMode="tel" value={formData.phone} onChange={(event) => setFormData({ ...formData, phone: event.target.value })} placeholder="Código de área + número" autoComplete="tel" aria-invalid={submitAttempted && !formData.phone.trim()} />
+            </div>
+          </div>
+          <div className={`inquiry-form-group${submitAttempted && !formData.vehicle ? " has-error" : ""}`}>
+            <label>Vehículo *</label><div className="options-grid">{VEHICLE_OPTIONS.map((vehicle) => <button key={vehicle} type="button" className={`option-card ${formData.vehicle === vehicle ? "selected" : ""}`} onClick={() => selectVehicle(vehicle)} aria-pressed={formData.vehicle === vehicle}><span>{vehicle}</span>{formData.vehicle === vehicle ? <Check size={16} /> : null}</button>)}</div>
+          </div>
+          <div className={`inquiry-form-group${submitAttempted && !formData.services.length ? " has-error" : ""}`}>
+            <label>Servicios que te interesan *</label>
+            <div className="options-grid options-grid-services">
+              {servicesLoading ? <span>Cargando servicios…</span> : availableServices.map((service) => <button key={service} type="button" className={`option-card option-card-service ${formData.services.includes(service) ? "selected" : ""}`} onClick={() => toggleService(service)} aria-pressed={formData.services.includes(service)}><span>{service}</span>{formData.services.includes(service) ? <Check size={16} /> : null}</button>)}
+            </div>
+          </div>
+          <div className="inquiry-form-group"><label>Detalle adicional</label><textarea rows="5" value={formData.message} onChange={(event) => setFormData({ ...formData, message: event.target.value })} placeholder="Contanos el estado del vehículo o el resultado que buscás." /></div>
+          <label className={`inquiry-legal-consent${submitAttempted && !formData.acceptedLegal ? " has-error" : ""}`}><input type="checkbox" checked={formData.acceptedLegal} onChange={(event) => setFormData({ ...formData, acceptedLegal: event.target.checked })} /><span>Acepto la <Link to="/privacidad" target="_blank" rel="noreferrer">Política de Privacidad</Link> y las <Link to="/terminos" target="_blank" rel="noreferrer">Condiciones del Servicio</Link>.</span></label>
+          <TurnstileWidget onToken={setCaptchaToken} resetKey={captchaResetKey} />
+          <div className="inquiry-submit-row"><p className="inquiry-submit-note">Al enviar, registramos la consulta y abrimos WhatsApp con el resumen listo.</p><button type="submit" className="btn-primary inquiry-submit" disabled={isSubmitting || servicesLoading}><MessageCircle size={18} />{isSubmitting ? "Enviando…" : "Enviar consulta"}</button></div>
+        </form>
       </div>
     </section>
   );

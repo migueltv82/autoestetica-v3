@@ -1,63 +1,13 @@
-import { Sparkles, Droplets, ShieldCheck, Bike, CarFront } from "lucide-react";
+import { useMemo } from "react";
+import { motion } from "framer-motion";
+import { useServices } from "../../hooks/useServices";
+import { useSettings } from "../../hooks/useSettings";
+import ServiceSalesCard from "./ServiceSalesCard";
 import "./ServicesGrid.css";
 
-const servicesList = [
-  {
-    icon: <CarFront size={28} />,
-    title: "Lavado premium",
-    description: "Limpieza exterior con terminación prolija para una mejor presencia general.",
-    duration: "de 4 a 6 horas",
-    featured: true,
-    gallery: [
-      { url: "https://images.unsplash.com/photo-1601362840469-51e4d8d59085?q=80&w=1470&auto=format&fit=crop", label: "Finalizado" },
-      { url: "https://images.unsplash.com/photo-1542462662-e17ee96c262d?q=80&w=1470&auto=format&fit=crop", label: "Proceso" },
-      { url: "https://images.unsplash.com/photo-1574067332341-35f11e967a5b?q=80&w=1470&auto=format&fit=crop", label: "Detalle" },
-    ]
-  },
-  {
-    icon: <Droplets size={28} />,
-    title: "Limpieza de interior",
-    description: "Limpieza profunda de habitáculo, superficies y detalles internos.",
-    duration: "2 días",
-    gallery: [
-      { url: "https://images.unsplash.com/photo-1599256621730-535359e1ecbc?q=80&w=1470&auto=format&fit=crop", label: "Tapizados" },
-      { url: "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?q=80&w=1470&auto=format&fit=crop", label: "Consola" },
-    ]
-  },
-  {
-    icon: <ShieldCheck size={28} />,
-    title: "Pulido y abrillantado",
-    description: "Tratamiento estético para mejorar brillo, uniformidad y terminación.",
-    duration: "Según evaluación",
-    featured: true,
-    gallery: [
-      { url: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=1470&auto=format&fit=crop", label: "Brillo Espejo" },
-      { url: "https://images.unsplash.com/photo-1621360841013-c7683c312e90?q=80&w=1470&auto=format&fit=crop", label: "Antes/Después" },
-    ]
-  },
-  {
-    icon: <Sparkles size={28} />,
-    title: "Lavado de motor",
-    description: "Limpieza estética de motor con cuidado y criterio.",
-    duration: "2 horas",
-    gallery: []
-  },
-  {
-    icon: <Bike size={28} />,
-    title: "Lavado y detallado de motos",
-    description: "Trabajo detallado para motos, con limpieza estética y terminación cuidada.",
-    duration: "3 horas",
-    gallery: []
-  },
-  {
-    icon: <Bike size={28} />,
-    title: "Lavado y detallado de bicicletas",
-    description: "Limpieza y cuidado visual para bicicletas de uso urbano o deportivo.",
-    duration: "1:30 horas",
-    gallery: []
-  },
-];
+const FADE_UP = { initial: { opacity: 0, y: 20 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: "-50px" }, transition: { duration: .55, ease: [0.16, 1, .3, 1] } };
 
+<<<<<<< HEAD
 function ServicesGrid() {
   const [selectedService, setSelectedService] = useState(null);
 
@@ -111,6 +61,11 @@ function ServicesGrid() {
       </Modal>
     </section>
   );
+=======
+export default function ServicesGrid() {
+  const { services } = useServices();
+  const { settings } = useSettings();
+  const orderedServices = useMemo(() => [...(services || [])].sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured))), [services]);
+  return <div className="services-catalog-modern"><header className="catalog-header"><div className="container"><motion.span className="catalog-kicker" {...FADE_UP}>Servicios</motion.span><motion.h1 {...FADE_UP}>Tratamientos profesionales</motion.h1><motion.p {...FADE_UP}>Soluciones pensadas para proteger, realzar y mantener cada detalle de tu vehículo.</motion.p></div></header><section className="container catalog-grid">{orderedServices.map((service, index) => <motion.div key={service.id} {...FADE_UP} transition={{ delay: index * .05 }}><ServiceSalesCard service={service} whatsappNumber={settings.whatsapp} /></motion.div>)}</section></div>;
+>>>>>>> bfa79ac58071127e00bb2a4e0e7401427bd71dba
 }
-
-export default ServicesGrid;

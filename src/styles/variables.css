@@ -1,27 +1,46 @@
 :root {
-  --font-main: 'Outfit', sans-serif;
+  --font-main: "Inter", system-ui, -apple-system, sans-serif;
+  --font-display: "Outfit", system-ui, sans-serif;
+
+  /* Autoestetica Signature: verde ingles, marfil y champagne */
+  --color-bg: #04110e;
+  --color-bg-soft: #071a15;
+  --color-surface: #0a241d;
+  --color-surface-soft: #0e3027;
+  --color-surface-elevated: #17483a;
   
-  --color-bg: #0a0c10;
-  --color-surface: #12161d;
-  --color-surface-soft: #1a202c;
-  --color-text: #f5f7fb;
-  --color-text-soft: #a0aec0;
-  --color-primary: #00bfa6;
-  --color-primary-dark: #009688;
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-white: #ffffff;
+  --color-text: #fff8e8;
+  --color-text-soft: rgba(255, 248, 232, 0.78);
+  --color-text-muted: rgba(239, 224, 190, 0.6);
   
-  --gradient-primary: linear-gradient(135deg, #00bfa6 0%, #00d2ff 100%);
-  --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.015) 100%);
-  --gradient-surface: linear-gradient(180deg, rgba(25, 30, 40, 0.95), rgba(10, 12, 16, 0.98));
+  --color-primary: #d8b86a;
+  --color-primary-soft: rgba(216, 184, 106, 0.12);
+  --color-accent: #f0d99f;
   
-  --shadow-premium: 0 12px 40px rgba(0, 0, 0, 0.35);
-  --shadow-glow: 0 0 25px rgba(0, 191, 166, 0.15);
+  --rgb-primary: 216, 184, 106;
+  --rgb-accent: 240, 217, 159;
   
-  --radius-panel: 28px;
-  --radius-input: 16px;
-  --radius-badge: 10px;
-  
-  --container: 1280px;
-  --transition-premium: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --color-border: rgba(224, 198, 139, 0.14);
+  --color-border-strong: rgba(232, 210, 164, 0.38);
+  --color-white: #fffaf0;
+
+  --gradient-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.012) 100%);
+  --gradient-overlay: linear-gradient(0deg, var(--color-bg) 0%, rgba(5, 5, 5, 0.4) 100%);
+  --gradient-primary: linear-gradient(135deg, #fff3cf 0%, #d8b86a 48%, #a98236 100%);
+  --gradient-accent: linear-gradient(135deg, #fffaf0 0%, #e4c984 100%);
+
+  --shadow-premium: 0 30px 60px rgba(0, 0, 0, 0.9);
+  --shadow-soft: 0 20px 40px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 18px 42px rgba(0, 0, 0, 0.38);
+
+  --radius-panel: 32px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-badge: 100px;
+
+  --container: 1440px;
+  --spacing-section: clamp(6rem, 10vw, 10rem);
+
+  --transition-premium: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: 0.4s ease;
 }

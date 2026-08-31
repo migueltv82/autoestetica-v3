@@ -1,11 +1,14 @@
 import PublicLayout from "../../components/layout/PublicLayout";
 import InquiryForm from "../../components/contact/InquiryForm";
+import PageTransition from "../../components/ui/PageTransition";
 
 function Inquiry() {
   return (
-    <PublicLayout>
-      <InquiryForm />
-    </PublicLayout>
+    <PageTransition>
+      <PublicLayout>
+        <InquiryForm />
+      </PublicLayout>
+    </PageTransition>
   );
 }
 

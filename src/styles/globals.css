@@ -11,13 +11,33 @@ html {
   font-family: var(--font-main), Arial, sans-serif;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background: var(--color-bg);
+  background-color: var(--color-bg);
   color: var(--color-text);
   min-height: 100vh;
   font-weight: 400;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+.app-error{display:grid;min-height:100vh;place-items:center;padding:1.5rem;background:#090d13;color:#f8fafc;text-align:center}.app-error>div{max-width:560px}.app-error span{color:#5eead4;font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.app-error h1{margin:.7rem 0;font-size:clamp(1.8rem,5vw,3rem)}.app-error p{color:#94a3b8;line-height:1.6}.app-error button{margin-top:1rem;padding:.75rem 1rem;border:1px solid rgba(94,234,212,.3);border-radius:9px;background:rgba(20,184,166,.12);color:#99f6e4;font-weight:700;cursor:pointer}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(circle at 72% -15%, rgba(216,184,106,.09), transparent 38%),radial-gradient(circle at 10% 35%,rgba(30,96,77,.1),transparent 30%);
+}
+
+#root {
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
 a {
@@ -32,19 +52,48 @@ select {
   font: inherit;
 }
 
+button {
+  border: none;
+}
+
+:focus-visible{outline:3px solid #d8b86a;outline-offset:3px}.skip-link{position:fixed;top:.75rem;left:.75rem;z-index:9999;padding:.65rem .85rem;border-radius:8px;background:#fff3cf;color:#071a15;font-weight:800;transform:translateY(-150%);transition:transform .2s}.skip-link:focus{transform:translateY(0)}
+
+@media(max-width:640px){.admin-shell input,.admin-shell select,.admin-shell textarea{font-size:16px}.admin-shell button,.admin-shell a{touch-action:manipulation}.admin-form-actions{align-items:stretch;flex-direction:column}.admin-form-actions button{width:100%;min-height:46px}.admin-table-wrap,.simple-table-container{border-radius:14px}}
+
 img {
   max-width: 100%;
   display: block;
 }
+
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: rgba(var(--rgb-primary), 0.22);
+  color: var(--color-text);
 }
 
 body.menu-open {
   overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

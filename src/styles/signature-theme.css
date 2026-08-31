@@ -1,0 +1,1493 @@
+/*
+ * Autoestetica Signature
+ * Capa final de identidad visual para componentes publicos y administrativos.
+ * Los colores semanticos (error, exito, WhatsApp, servicios y estados) se conservan.
+ */
+:root {
+  --font-main: "Manrope", system-ui, -apple-system, sans-serif;
+  --font-display: "Manrope", system-ui, sans-serif;
+  --font-editorial: "Cormorant Garamond", Georgia, serif;
+  --signature-bg: #04110e;
+  --signature-bg-deep: #020c0a;
+  --signature-surface: #0a241d;
+  --signature-surface-soft: #0e3027;
+  --signature-surface-raised: #164538;
+  --signature-champagne: #d8b86a;
+  --signature-champagne-light: #f0d99f;
+  --signature-border: rgba(232, 205, 143, .42);
+  --signature-border-soft: rgba(224, 198, 139, .24);
+  --signature-border-strong: rgba(246, 222, 164, .68);
+  --signature-glow: rgba(216, 184, 106, .18);
+  --signature-panel: linear-gradient(145deg, rgba(14, 48, 39, .96), rgba(5, 22, 18, .98));
+  --signature-panel-soft: linear-gradient(145deg, rgba(12, 39, 32, .9), rgba(5, 20, 16, .94));
+}
+
+.public-layout,
+.admin-shell,
+.super-premium-login,
+.mfa-page {
+  --font-main: "Manrope", system-ui, -apple-system, sans-serif;
+  --font-display: "Manrope", system-ui, sans-serif;
+  font-family: var(--font-main);
+}
+
+body,
+.public-layout,
+.admin-shell,
+.admin-main {
+  background-color: var(--signature-bg);
+}
+
+/* Navegacion y estructura principal */
+.public-layout :where(.navbar, .navbar.is-scrolled, .mobile-menu, .footer),
+.admin-shell :where(.admin-navbar, .admin-sidebar, .admin-mobile-nav) {
+  border-color: var(--signature-border) !important;
+  background-color: rgba(4, 17, 14, .94) !important;
+}
+
+.public-layout :where(.navbar, .mobile-menu),
+.admin-shell :where(.admin-navbar, .admin-sidebar) {
+  box-shadow: 0 14px 38px rgba(0, 0, 0, .28), inset 0 -1px 0 rgba(216, 184, 106, .05);
+}
+
+/* Recuadros publicos */
+.public-layout :where(
+  .service-sales-card,
+  .club-membership-card,
+  .contact-direct-card,
+  .contact-info-grid article,
+  .inquiry-feature-card,
+  .inquiry-form-panel,
+  .option-card,
+  .inquiry-legal-consent,
+  .service-detail-content article,
+  .gallery-card,
+  .gallery-feature,
+  .fidelity-search-card,
+  .fidelity-explanation-card,
+  .fidelity-progress-panel,
+  .fidelity-garage,
+  .fidelity-reward-pass,
+  .legal-card,
+  .carousel-main,
+  .before-after-slider,
+  .modal-content
+) {
+  border-color: var(--signature-border) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 248, 226, .035), 0 18px 46px rgba(0, 0, 0, .22);
+}
+
+.public-layout :where(
+  .contact-direct-card,
+  .contact-info-grid article,
+  .inquiry-feature-card,
+  .inquiry-form-panel,
+  .service-detail-content article,
+  .fidelity-search-card,
+  .fidelity-explanation-card,
+  .fidelity-progress-panel,
+  .fidelity-garage,
+  .legal-card,
+  .modal-content
+) {
+  background: var(--signature-panel) !important;
+}
+
+/* Paneles, tarjetas y tablas administrativas */
+.admin-shell :where(
+  .dashboard-panel,
+  .admin-form-shell,
+  .stat-card,
+  .client-card,
+  .client-profile,
+  .client-profile-grid > section,
+  .client-profile-stats span,
+  .client-vehicle-list article,
+  .client-history-list article,
+  .cash-card,
+  .cash-summary-card,
+  .service-admin-card,
+  .gallery-admin-card,
+  .inquiry-card,
+  .settings-card,
+  .club-settings-card,
+  .turn-mobile-card,
+  .simple-table-container,
+  .admin-table-wrap,
+  .month-grid,
+  .week-grid,
+  .day-agenda,
+  .agenda-board,
+  .board-column,
+  .board-card,
+  .modal-content,
+  .receipt-modal,
+  .empty-state,
+  .admin-empty-state
+) {
+  border-color: var(--signature-border) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 248, 226, .035), 0 14px 34px rgba(0, 0, 0, .2);
+}
+
+.admin-shell :where(
+  .dashboard-panel,
+  .admin-form-shell,
+  .stat-card,
+  .client-card,
+  .client-profile,
+  .client-profile-grid > section,
+  .cash-card,
+  .cash-summary-card,
+  .service-admin-card,
+  .gallery-admin-card,
+  .inquiry-card,
+  .settings-card,
+  .club-settings-card,
+  .simple-table-container,
+  .admin-table-wrap,
+  .modal-content,
+  .receipt-modal
+) {
+  background: var(--signature-panel-soft) !important;
+}
+
+/* Campos y controles neutros */
+:where(.public-layout, .admin-shell) :where(input, textarea, select, fieldset) {
+  border-color: var(--signature-border-soft) !important;
+  background-color: rgba(3, 18, 14, .72);
+}
+
+:where(.public-layout, .admin-shell) :where(input, textarea, select):hover {
+  border-color: var(--signature-border) !important;
+}
+
+:where(.public-layout, .admin-shell) :where(input, textarea, select):focus {
+  border-color: var(--signature-border-strong) !important;
+  box-shadow: 0 0 0 3px var(--signature-glow) !important;
+}
+
+/* Bordes de acciones neutras; los estados semanticos quedan intactos. */
+:where(.public-layout, .admin-shell) :where(
+  button,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-pill-toggle,
+  .admin-action,
+  .client-open,
+  .fidelity-forget-access
+):not(.danger):not(.btn-danger):not(.is-error):not(.is-success) {
+  border-color: var(--signature-border) !important;
+}
+
+:where(.public-layout, .admin-shell) :where(
+  .admin-page-header-icon,
+  .contact-direct-icon,
+  .service-detail-content article > span,
+  .client-avatar
+) {
+  border-color: var(--signature-border) !important;
+  background: rgba(216, 184, 106, .1) !important;
+  color: var(--signature-champagne-light) !important;
+}
+
+/* Separadores y encabezados de tablas */
+:where(.public-layout, .admin-shell) :where(
+  header,
+  footer,
+  thead,
+  tr,
+  .section-divider,
+  .admin-form-actions,
+  .inquiry-submit-row
+) {
+  border-color: var(--signature-border-soft);
+}
+
+::selection {
+  background: rgba(216, 184, 106, .28);
+  color: #fffaf0;
+}
+
+@media (max-width: 640px) {
+  .admin-shell :where(.dashboard-panel, .admin-form-shell, .client-card, .modal-content),
+  .public-layout :where(.inquiry-form-panel, .contact-direct-card, .modal-content) {
+    box-shadow: inset 0 1px 0 rgba(255, 248, 226, .03), 0 10px 24px rgba(0, 0, 0, .18);
+  }
+}
+
+/* Escala de controles: textos e iconos legibles sin perder densidad. */
+.public-layout :where(
+  .btn-primary,
+  .btn-secondary,
+  .btn-premium,
+  .btn-ghost,
+  .home-btn,
+  .contact-actions a,
+  .contact-bottom-cta a,
+  .sales-card-actions a,
+  .service-detail-wa,
+  .service-detail-cta a,
+  .gallery-cta a,
+  .fidelity-cta,
+  .club-membership-cta,
+  .footer-wa-btn
+) {
+  min-height: 46px;
+  padding: .76rem 1.08rem;
+  border-radius: 12px;
+  font-size: max(.84rem, 13px) !important;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.admin-shell :where(a[href*="wa.me"], a[href*="api.whatsapp.com"]) {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  padding: .65rem .82rem;
+  border-radius: 9px;
+  font-size: max(.72rem, 12px) !important;
+  font-weight: 760;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.public-layout a[href*="wa.me"],
+.public-layout a[href*="api.whatsapp.com"] {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  padding: .76rem 1.08rem;
+  border-radius: 12px;
+  font-size: max(.84rem, 13px) !important;
+  font-weight: 800;
+  line-height: 1.25;
+  white-space: normal;
+  text-align: center;
+}
+
+.public-layout :where(a[href*="wa.me"], a[href*="api.whatsapp.com"]) svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+}
+
+.admin-shell :where(
+  .btn-premium,
+  .btn-primary-admin,
+  .btn-form-primary,
+  .admin-action,
+  .client-card-actions a,
+  .client-card-actions button,
+  .client-ready-actions a,
+  .client-ready-actions button,
+  .receipt-actions button,
+  .btn-fidelity-whatsapp,
+  .btn-fidelity-share,
+  .btn-action-confirm
+) {
+  min-height: 42px;
+  padding: .65rem .82rem;
+  font-size: max(.72rem, 12px) !important;
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.admin-shell :where(
+  .client-card-actions a,
+  .client-card-actions button,
+  .client-ready-actions a,
+  .receipt-actions button,
+  .btn-fidelity-whatsapp,
+  .btn-fidelity-share,
+  .btn-action-confirm
+) svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
+/* Acciones solo-icono de agenda: area tactil amplia, icono claro. */
+.admin-shell :where(.week-turn-actions, .month-span-heading, .day-turn-actions) :where(a, button),
+.admin-shell :where(.btn-action-whatsapp) {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  min-height: 38px;
+  padding: 0 !important;
+  border-radius: 9px;
+  font-size: 0 !important;
+}
+
+.admin-shell :where(.week-turn-actions, .month-span-heading, .day-turn-actions) :where(a, button) svg,
+.admin-shell .btn-action-whatsapp svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 640px) {
+  .public-layout :where(
+    .btn-primary,
+    .btn-secondary,
+    .btn-premium,
+    .btn-ghost,
+    .home-btn,
+    .contact-actions a,
+    .contact-bottom-cta a,
+    .sales-card-actions a,
+    .service-detail-wa,
+    .service-detail-cta a,
+    .gallery-cta a,
+    .fidelity-cta,
+    .club-membership-cta,
+    .footer-wa-btn,
+    a[href*="wa.me"],
+    a[href*="api.whatsapp.com"]
+  ) {
+    min-height: 48px;
+    padding: .82rem 1rem;
+    font-size: max(.88rem, 14px) !important;
+  }
+
+  .admin-shell :where(
+    .btn-premium,
+    .btn-primary-admin,
+    .btn-form-primary,
+    .admin-action,
+    .client-card-actions a,
+    .client-card-actions button,
+    .client-ready-actions a,
+    .client-ready-actions button,
+    .receipt-actions button,
+    .btn-fidelity-whatsapp,
+    .btn-fidelity-share,
+    .btn-action-confirm
+  ) {
+    min-height: 44px;
+    font-size: max(.76rem, 12px) !important;
+  }
+
+  .admin-shell :where(a[href*="wa.me"], a[href*="api.whatsapp.com"]) {
+    min-height: 44px;
+    font-size: max(.76rem, 12px) !important;
+  }
+
+  .admin-shell :where(.week-turn-actions, .month-span-heading, .day-turn-actions) :where(a, button),
+  .admin-shell .btn-action-whatsapp {
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+    min-height: 42px;
+    padding: 0 !important;
+    font-size: 0 !important;
+  }
+}
+
+/* Contraste editorial: serif premium para relato, sans para operacion. */
+.public-layout :where(
+  .home-hero-content h1,
+  .home-section-heading h2,
+  .contact-hero h1,
+  .contact-section-heading h2,
+  .catalog-header h1,
+  .gallery-heading h1,
+  .service-detail h1,
+  .legal-header h1,
+  .club-membership-heading h2
+) {
+  font-family: var(--font-editorial);
+  font-weight: 600;
+  letter-spacing: -.035em;
+  line-height: .98;
+}
+
+.public-layout :where(
+  .home-brand-card h2,
+  .home-transformation-copy h2,
+  .contact-direct-card h2,
+  .contact-bottom-cta h2,
+  .service-detail-cta h2,
+  .fidelity-client-welcome h1,
+  .fidelity-explanation-card h3
+) {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  line-height: 1.05;
+}
+
+.public-layout :where(
+  .home-kicker,
+  .contact-kicker,
+  .catalog-kicker,
+  .gallery-kicker,
+  .service-detail-kicker,
+  .legal-kicker,
+  .fidelity-client-welcome span
+) {
+  font-family: var(--font-main);
+  font-style: normal;
+  font-weight: 800 !important;
+}
+
+.public-layout :where(p, li) strong,
+.public-layout :where(.service-price, .sales-card-price, .fidelity-progress-copy strong) {
+  color: #fffaf0;
+  font-family: var(--font-main);
+  font-weight: 800;
+}
+
+.public-layout :where(p, blockquote, .section-quote) em {
+  color: var(--signature-champagne-light);
+  font-family: var(--font-editorial);
+  font-size: 1.08em;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.public-layout :where(.btn-primary, .btn-premium, .home-btn, a[href*="wa.me"]) {
+  font-family: var(--font-main);
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: .01em;
+}
+
+.admin-shell :where(
+  .admin-page-header-title,
+  .dashboard-title,
+  .admin-form-shell h2,
+  .dashboard-panel h2,
+  .modal-content h2
+) {
+  font-family: var(--font-main);
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: -.025em;
+}
+
+.admin-shell :where(
+  .stat-card-value,
+  .cash-amount,
+  .turn-form-total strong,
+  .service-price,
+  td strong
+) {
+  font-family: var(--font-main);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+
+.admin-shell :where(.admin-page-header-kicker, .admin-form-kicker, th) {
+  font-family: var(--font-main);
+  font-style: normal;
+  font-weight: 800 !important;
+}
+
+@media (max-width: 640px) {
+  .public-layout :where(
+    .home-hero-content h1,
+    .contact-hero h1,
+    .catalog-header h1,
+    .service-detail h1,
+    .legal-header h1
+  ) {
+    line-height: 1.02;
+  }
+
+  .public-layout :where(
+    .home-brand-card h2,
+    .contact-direct-card h2,
+    .service-detail-cta h2
+  ) {
+    font-size: clamp(1.55rem, 8vw, 2.1rem);
+  }
+}
+
+/* Escala tipografica integral: web publica, operacion y acceso. */
+:root {
+  --type-caption: .7rem;
+  --type-label: .75rem;
+  --type-small: .8rem;
+  --type-body: .94rem;
+  --type-body-large: 1.05rem;
+  --type-card-title: 1rem;
+  --type-section-title: clamp(1.8rem, 4vw, 3.2rem);
+  --leading-tight: 1.2;
+  --leading-copy: 1.65;
+}
+
+body {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+:where(.public-layout, .admin-shell, .super-premium-login, .mfa-page) :where(h1, h2, h3, h4) {
+  color: #fffaf0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  text-wrap: balance;
+}
+
+.public-layout :where(main, footer) p {
+  color: rgba(255, 248, 232, .76);
+  font-size: var(--type-body);
+  line-height: var(--leading-copy);
+  text-wrap: pretty;
+}
+
+.public-layout :where(.home-section-heading, .contact-section-heading, .catalog-header, .gallery-heading) h2 {
+  font-size: var(--type-section-title);
+  letter-spacing: -.035em;
+}
+
+.public-layout :where(.home-kicker, .contact-kicker, .catalog-kicker, .gallery-kicker, .service-detail-kicker, .legal-kicker) {
+  color: var(--signature-champagne-light) !important;
+  font-size: max(var(--type-label), 12px) !important;
+  font-weight: 800 !important;
+  letter-spacing: .12em;
+  line-height: 1.4;
+}
+
+.public-layout :where(.brand-text, .nav-links a, .btn-minimal) {
+  color: rgba(255, 248, 232, .86);
+  font-weight: 700;
+}
+
+.public-layout .nav-links a {
+  font-size: max(.82rem, 13px);
+}
+
+.public-layout :where(.footer-tagline, .footer-nav a, .footer-detail) {
+  color: rgba(255, 248, 232, .72) !important;
+  font-size: max(.84rem, 13px);
+  line-height: 1.62;
+}
+
+.public-layout :where(.footer-nav-title, .footer-bottom) {
+  color: rgba(240, 217, 159, .82);
+  font-size: max(.72rem, 11px);
+  font-weight: 750;
+}
+
+.admin-shell {
+  font-size: .875rem;
+}
+
+.admin-shell :where(.admin-page-header-title, .dashboard-title) {
+  color: #fffaf0 !important;
+  font-weight: 780;
+}
+
+.admin-shell :where(.admin-sidebar-link, .brand-copy strong) {
+  color: #d6d4cc;
+  font-size: max(.82rem, 13px);
+  font-weight: 680;
+}
+
+.admin-shell :where(.brand-copy span, .sidebar-user) {
+  color: #aaa99f;
+  font-size: max(.66rem, 11px);
+}
+
+.admin-shell :where(th, .table-head, .admin-table-head) {
+  color: #d9c994 !important;
+  font-size: max(.68rem, 11px) !important;
+  font-weight: 800 !important;
+  letter-spacing: .06em;
+}
+
+.admin-shell :where(td, .table-cell) {
+  color: #d8d6ce;
+  font-size: max(.74rem, 12px);
+  line-height: 1.48;
+}
+
+.admin-shell :where(.admin-form-group label, .settings-field label, .cash-controls label, .team-add-form label) {
+  color: #d5d0c3 !important;
+  font-size: max(.72rem, 12px) !important;
+  font-weight: 720;
+  line-height: 1.4;
+}
+
+.admin-shell :where(input, textarea, select) {
+  color: #fffaf0;
+  font-size: max(.78rem, 13px);
+  line-height: 1.4;
+}
+
+.admin-shell button,
+.admin-shell a {
+  font-weight: 680;
+}
+
+.admin-shell :where(.client-name-line h3, .cash-methods h3, .cash-panel h3, .dashboard-panel h3) {
+  font-size: max(.88rem, 14px);
+}
+
+.admin-shell :where(.client-card-facts small, .cash-operation-list small, .cash-movement-main small, .team-user-main small, .team-user-meta) {
+  color: #aaa99f !important;
+  font-size: max(.63rem, 10px) !important;
+  line-height: 1.45;
+}
+
+.admin-shell :where(.client-card-facts strong, .cash-operation-list strong, .cash-movement-main strong, .turn-service-option strong) {
+  color: #e8e3d8;
+  font-size: max(.7rem, 12px);
+  line-height: 1.42;
+}
+
+/* La agenda necesita densidad, pero nunca texto microscopico. */
+.admin-shell :where(.month-turn, .month-span-turn, .week-turn, .day-turn, .board-card) {
+  font-size: max(.64rem, 10px);
+  line-height: 1.35;
+}
+
+.admin-shell :where(.month-turn, .month-span-turn, .week-turn, .day-turn, .board-card) small {
+  color: #b0afa7 !important;
+  font-size: max(.6rem, 10px) !important;
+}
+
+.admin-shell :where(.month-turn, .month-span-turn, .week-turn, .day-turn, .board-card) strong {
+  color: #f4efe4;
+  font-size: max(.68rem, 11px);
+  font-weight: 750;
+}
+
+.admin-shell :where(.week-readonly-status, .status-pill, [class*="status-"]) {
+  font-size: max(.62rem, 10px);
+  font-weight: 780;
+  letter-spacing: .02em;
+}
+
+:where(.feedback-toast, .feedback-confirm, .super-premium-login, .mfa-card) {
+  font-family: var(--font-main);
+  color: #fffaf0;
+}
+
+:where(.feedback-toast, .feedback-confirm, .super-premium-login, .mfa-card) p {
+  color: #c7c3b8 !important;
+  font-size: max(.8rem, 13px);
+  line-height: 1.58;
+}
+
+:where(.super-premium-login, .mfa-card) :where(label, .login-forgot) {
+  color: #d8d2c4;
+  font-size: max(.78rem, 13px);
+  font-weight: 650;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --type-body: .9rem;
+    --type-body-large: 1rem;
+  }
+
+  .public-layout .brand-text {
+    font-size: max(.78rem, 12px);
+  }
+
+  .public-layout .mobile-nav-links a {
+    font-size: 1.08rem;
+    font-weight: 700;
+  }
+
+  .admin-shell :where(.admin-mobile-link small, .admin-mobile-more .link-label) {
+    color: #c9c4b7;
+    font-size: max(.62rem, 10px) !important;
+    font-weight: 760;
+  }
+
+  .admin-shell :where(button, a) {
+    line-height: 1.3;
+  }
+}
+
+/* Home hero: reemplaza la identidad azul propia de la portada. */
+.home-public-layout {
+  --home-bg: #04110e;
+  --home-panel: #071a15;
+  --home-surface: #0e3027;
+  --home-line: rgba(224, 198, 139, .18);
+  --home-line-strong: rgba(240, 217, 159, .4);
+  --home-text: #fff8e8;
+  --home-text-soft: rgba(255, 248, 232, .74);
+  --home-text-muted: rgba(239, 224, 190, .52);
+  --home-metal: #d8b86a;
+  --home-metal-soft: #f0d99f;
+  --color-primary: #d8b86a;
+  --color-primary-soft: rgba(216, 184, 106, .12);
+  --color-accent: #f0d99f;
+  --rgb-primary: 216, 184, 106;
+  --rgb-accent: 240, 217, 159;
+}
+
+.home-public-layout .home-hero {
+  background: linear-gradient(180deg, #020c0a 0%, #08251e 52%, #04110e 100%);
+}
+
+.home-public-layout .home-hero-media img {
+  filter: brightness(.63) saturate(.72) sepia(.08) hue-rotate(82deg) contrast(1.14);
+}
+
+.home-public-layout .home-hero-overlay {
+  background: linear-gradient(90deg,#04110e 0%,rgba(4,17,14,.97) 27%,rgba(5,30,24,.69) 58%,rgba(4,17,14,.12) 100%),linear-gradient(180deg,rgba(4,17,14,.03),rgba(4,24,19,.15) 55%,#04110e 100%),radial-gradient(circle at 70% 30%,rgba(216,184,106,.16),transparent 34%);
+}
+
+.home-public-layout .home-brand-card {
+  border-color: var(--signature-border-strong) !important;
+  background: linear-gradient(145deg,rgba(14,48,39,.78),rgba(3,17,14,.68)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,248,226,.06),0 24px 62px rgba(0,0,0,.38),0 0 34px rgba(216,184,106,.06);
+}
+
+.home-public-layout .home-brand-glow {
+  background: rgba(216,184,106,.18);
+}
+
+.home-public-layout :where(.home-brand-card > img, .home-hero-proof span) {
+  border-color: var(--signature-border) !important;
+}
+
+.home-public-layout :where(.home-brand-card > span, .home-kicker, .home-hero-proof svg) {
+  color: var(--signature-champagne-light) !important;
+}
+
+.home-public-layout .home-kicker::before {
+  background: linear-gradient(90deg,#d8b86a,transparent);
+}
+
+.home-public-layout .home-hero-proof span {
+  background: rgba(8,38,30,.62);
+  color: rgba(255,248,232,.78);
+}
+
+.home-public-layout .home-btn-primary {
+  border-color: var(--signature-border-strong) !important;
+  background: linear-gradient(135deg,#fff3cf,#d8b86a 52%,#a98236);
+  color: #071a15;
+  box-shadow: 0 12px 30px rgba(216,184,106,.22);
+}
+
+.home-public-layout .home-btn-primary:hover {
+  background: linear-gradient(135deg,#fff8e8,#e4c984 55%,#b58c3c);
+  box-shadow: 0 16px 36px rgba(216,184,106,.3);
+}
+
+/* Garantia final: cualquier contorno visible adopta champagne. */
+:where(.public-layout, .admin-shell) *,
+:where(.public-layout, .admin-shell) *::before,
+:where(.public-layout, .admin-shell) *::after {
+  border-color: var(--signature-border) !important;
+}
+
+:where(.public-layout, .admin-shell) :where(
+  article,
+  form,
+  fieldset,
+  .dashboard-panel,
+  .admin-form-shell,
+  .stat-card,
+  .client-card,
+  .modal-content,
+  .service-sales-card,
+  .contact-direct-card,
+  .inquiry-form-panel,
+  .fidelity-progress-panel,
+  .fidelity-garage
+) {
+  box-shadow: inset 0 0 0 1px rgba(255, 240, 198, .055), 0 14px 34px rgba(0, 0, 0, .22), 0 0 18px rgba(216, 184, 106, .045) !important;
+}
+
+:where(.public-layout, .admin-shell) :where(input, textarea, select, button, a):focus-visible,
+:where(.public-layout, .admin-shell) :where(.is-active, .is-selected, [aria-selected="true"]) {
+  border-color: var(--signature-border-strong) !important;
+}
+
+/* WhatsApp: acabado oscuro premium con contorno champagne en todo el producto. */
+:where(.public-layout, .admin-shell) :where(
+  a[href*="wa.me"],
+  a[href*="api.whatsapp.com"],
+  .receipt-whatsapp,
+  .btn-fidelity-whatsapp,
+  .btn-fidelity-share,
+  .btn-action-whatsapp,
+  .btn-action-confirm
+) {
+  border: 1px solid rgba(216,184,106,.48) !important;
+  background: linear-gradient(145deg,rgba(18,29,39,.96),rgba(7,14,20,.98)) !important;
+  color: #f0d99f !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05),0 9px 22px rgba(0,0,0,.2) !important;
+  text-shadow: none !important;
+}
+
+:where(.public-layout, .admin-shell) :where(
+  a[href*="wa.me"],
+  a[href*="api.whatsapp.com"],
+  .receipt-whatsapp,
+  .btn-fidelity-whatsapp,
+  .btn-fidelity-share,
+  .btn-action-whatsapp,
+  .btn-action-confirm
+):hover {
+  border-color: rgba(255,235,190,.82) !important;
+  background: linear-gradient(145deg,rgba(42,39,29,.98),rgba(14,20,22,.98)) !important;
+  color: #fff1c9 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08),0 13px 28px rgba(0,0,0,.28),0 0 18px rgba(216,184,106,.1) !important;
+  filter: brightness(1.04);
+}
+
+:where(.public-layout, .admin-shell) :where(
+  a[href*="wa.me"],
+  a[href*="api.whatsapp.com"],
+  .receipt-whatsapp,
+  .btn-fidelity-whatsapp,
+  .btn-fidelity-share,
+  .btn-action-whatsapp,
+  .btn-action-confirm
+) svg {
+  color: currentColor !important;
+  stroke: currentColor;
+}
+
+/* Sistema tipografico legible para tarjetas y paneles. */
+:where(.public-layout, .admin-shell) {
+  font-kerning: normal;
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
+}
+
+:where(.public-layout, .admin-shell) :where(
+  .dashboard-panel,
+  .admin-form-shell,
+  .stat-card,
+  .client-card,
+  .client-profile,
+  .cash-methods,
+  .cash-panel,
+  .service-admin-card,
+  .gallery-admin-card,
+  .inquiry-card,
+  .settings-card,
+  .club-settings-card,
+  .contact-direct-card,
+  .contact-info-grid article,
+  .inquiry-feature-card,
+  .inquiry-form-panel,
+  .service-detail-content article,
+  .service-sales-card,
+  .fidelity-progress-panel,
+  .fidelity-garage,
+  .legal-card,
+  .modal-content
+) :where(h2, h3, h4, strong) {
+  color: #fffaf0;
+  font-weight: 760;
+  line-height: 1.28;
+  text-wrap: pretty;
+}
+
+.public-layout :where(
+  .contact-direct-card,
+  .contact-info-grid article,
+  .inquiry-feature-card,
+  .inquiry-form-panel,
+  .service-detail-content article,
+  .service-sales-card,
+  .fidelity-progress-panel,
+  .fidelity-garage,
+  .legal-card,
+  .modal-content
+) :where(p, li, label) {
+  color: rgba(255, 248, 232, .78) !important;
+  font-size: max(.79rem, 13px);
+  line-height: 1.62;
+}
+
+.public-layout :where(
+  .contact-direct-card,
+  .contact-info-grid article,
+  .inquiry-feature-card,
+  .inquiry-form-panel,
+  .service-detail-content article,
+  .service-sales-card,
+  .fidelity-progress-panel,
+  .fidelity-garage,
+  .legal-card,
+  .modal-content
+) small {
+  color: rgba(239, 224, 190, .68) !important;
+  font-size: max(.68rem, 11px);
+  line-height: 1.5;
+}
+
+.admin-shell :where(
+  .dashboard-panel,
+  .admin-form-shell,
+  .stat-card,
+  .client-card,
+  .client-profile,
+  .cash-methods,
+  .cash-panel,
+  .service-admin-card,
+  .gallery-admin-card,
+  .inquiry-card,
+  .settings-card,
+  .club-settings-card,
+  .modal-content,
+  .receipt-modal
+) :where(p, li, label) {
+  color: #c9c4b7 !important;
+  font-size: max(.72rem, 12px);
+  line-height: 1.55;
+}
+
+.admin-shell :where(
+  .dashboard-panel,
+  .admin-form-shell,
+  .stat-card,
+  .client-card,
+  .client-profile,
+  .cash-methods,
+  .cash-panel,
+  .service-admin-card,
+  .gallery-admin-card,
+  .inquiry-card,
+  .settings-card,
+  .club-settings-card,
+  .modal-content,
+  .receipt-modal
+) small {
+  color: #aaa99f !important;
+  font-size: max(.63rem, 10px);
+  line-height: 1.48;
+}
+
+.admin-shell :where(.stat-card-label, .admin-page-header-kicker, .admin-form-kicker) {
+  color: #d9c994 !important;
+  font-size: max(.69rem, 11px);
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.admin-shell :where(.stat-card-trend, .admin-page-header-text) {
+  color: #b8b5aa !important;
+  font-size: max(.74rem, 12px);
+  line-height: 1.55;
+}
+
+:where(.public-layout, .admin-shell) :where(input, textarea, select, button) {
+  letter-spacing: .005em;
+}
+
+:where(.public-layout, .admin-shell) :where(input, textarea, select)::placeholder {
+  color: rgba(239, 224, 190, .5) !important;
+  opacity: 1;
+}
+
+@media (max-width: 640px) {
+  .public-layout :where(.service-sales-card, .contact-info-grid article, .inquiry-feature-card, .modal-content) :where(p, li, label),
+  .admin-shell :where(.client-card, .cash-panel, .admin-form-shell, .modal-content) :where(p, li, label) {
+    font-size: .8rem;
+    line-height: 1.58;
+  }
+
+  :where(.public-layout, .admin-shell) :where(input, textarea, select) {
+    font-size: 16px !important;
+  }
+}
+
+/* Footer: dos acciones WhatsApp separadas, alineadas con el sistema visual. */
+.public-layout .site-footer :where(.footer-wa-btn, .footer-phone-whatsapp) {
+  display: inline-flex;
+  width: 210px;
+  max-width: 100%;
+  min-height: 42px;
+  align-items: center;
+  justify-content: flex-start;
+  gap: .5rem;
+  padding: .58rem .72rem;
+  border: 1px solid rgba(216,184,106,.48) !important;
+  border-radius: 11px;
+  background: linear-gradient(145deg,rgba(18,29,39,.96),rgba(7,14,20,.98)) !important;
+  color: #f0d99f !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05),0 9px 22px rgba(0,0,0,.2) !important;
+  font-size: max(.82rem, 13px) !important;
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: left;
+}
+
+.public-layout .site-footer :where(.footer-wa-btn, .footer-phone-whatsapp) svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  color: currentColor !important;
+}
+
+.public-layout .site-footer :where(.footer-wa-btn, .footer-phone-whatsapp):hover {
+  border-color: rgba(255,235,190,.82) !important;
+  background: linear-gradient(145deg,rgba(42,39,29,.98),rgba(14,20,22,.98)) !important;
+  color: #fff1c9 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08),0 13px 28px rgba(0,0,0,.28),0 0 18px rgba(216,184,106,.1) !important;
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+  .public-layout .site-footer :where(.footer-wa-btn, .footer-phone-whatsapp) {
+    width: 210px;
+    max-width: 100%;
+    min-height: 44px;
+    padding: .64rem .76rem;
+    font-size: max(.86rem, 14px) !important;
+  }
+}
+
+/* Panel administrador: verde gris profundo con contornos champagne suaves. */
+.admin-shell,
+.admin-main {
+  background-color: #09110f !important;
+}
+
+.admin-shell :where(.admin-navbar, .admin-sidebar, .admin-mobile-nav) {
+  border-color: rgba(210, 187, 135, .2) !important;
+  background-color: rgba(13, 23, 20, .97) !important;
+  box-shadow: none;
+}
+
+.admin-shell *,
+.admin-shell *::before,
+.admin-shell *::after {
+  border-color: rgba(210, 187, 135, .18) !important;
+}
+
+.admin-shell :where(
+  .dashboard-panel,
+  .dashboard-kpi,
+  .admin-form-shell,
+  .stat-card,
+  .client-card,
+  .client-profile,
+  .cash-card,
+  .cash-summary-card,
+  .service-admin-card,
+  .gallery-admin-card,
+  .inquiry-card,
+  .settings-card,
+  .club-settings-card,
+  .turn-mobile-card,
+  .simple-table-container,
+  .admin-table-wrap,
+  .month-grid,
+  .week-grid,
+  .day-agenda,
+  .agenda-board,
+  .board-column,
+  .board-card,
+  .modal-content,
+  .receipt-modal
+) {
+  border-color: rgba(210, 187, 135, .18) !important;
+  background: #131d1a !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .15) !important;
+}
+
+.admin-shell :where(input, textarea, select) {
+  border-color: rgba(210, 187, 135, .2) !important;
+  background: #0d1714 !important;
+}
+
+.admin-shell :where(input, textarea, select, button, a):focus-visible,
+.admin-shell :where(.active, .is-active, .is-selected, [aria-selected="true"]) {
+  border-color: rgba(201, 174, 114, .48) !important;
+}
+
+.admin-shell :where(
+  .simple-admin-table thead,
+  .admin-table thead,
+  .week-header,
+  .month-header,
+  .board-column > header
+) {
+  background-color: rgba(25, 37, 33, .72);
+}
+
+.admin-shell :where(
+  .simple-admin-table tbody tr,
+  .admin-table tbody tr,
+  .movement-row,
+  .upcoming-row,
+  .priority-item
+) {
+  border-color: rgba(210, 187, 135, .13) !important;
+}
+
+.admin-shell :where(
+  .simple-admin-table tbody tr,
+  .admin-table tbody tr,
+  .board-card,
+  .quick-actions a
+):hover {
+  background-color: rgba(201, 174, 114, .055) !important;
+}
+
+/* Superficies internas: evita que los estilos locales azules rompan la paleta. */
+.admin-shell :where(
+  .simple-agenda-view-tabs,
+  .agenda-day-nav,
+  .agenda-summary-line span,
+  .agenda-quick-summary span,
+  .agenda-compact-filters label,
+  .schedule-block-list article,
+  .week-day,
+  .month-day,
+  .agenda-mobile-turn,
+  .week-turn,
+  .month-turn,
+  .month-span-turn,
+  .board-column,
+  .board-card,
+  .turn-service-option,
+  .turn-selected-services,
+  .turn-payment-toggle,
+  .team-row,
+  .settings-section,
+  .settings-transform-placeholder,
+  .settings-transform-preview
+) {
+  border-color: rgba(210, 187, 135, .18) !important;
+  background-color: #131d1a !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.admin-shell :where(
+  .week-day > header,
+  .month-day > header,
+  .agenda-mobile-turn > header,
+  .board-column > header,
+  .turn-selected-heading,
+  .settings-section > header
+) {
+  border-color: rgba(210, 187, 135, .15) !important;
+  background: rgba(25, 37, 33, .7) !important;
+}
+
+.admin-shell :where(
+  .week-controls button,
+  .agenda-day-nav > button,
+  .week-turn select,
+  .month-span-turn select,
+  .agenda-mobile-turn select,
+  .agenda-mobile-turn footer button,
+  .board-card button,
+  .month-turn-actions button,
+  .month-turn-actions a,
+  .week-turn-actions button,
+  .week-readonly-status,
+  .agenda-readonly-status,
+  .settings-visibility-switch,
+  .team-add-button,
+  .team-save-small,
+  .team-status,
+  .team-delete-small
+) {
+  border-color: rgba(210, 187, 135, .2) !important;
+  background-color: #192521 !important;
+  color: #d7ded9;
+}
+
+.admin-shell .simple-agenda-view-tabs button.active,
+.admin-shell :where(.week-day.is-today, .month-day.is-today) {
+  border-color: rgba(218, 193, 137, .48) !important;
+  background: rgba(201, 174, 114, .1) !important;
+  box-shadow: inset 0 0 0 1px rgba(218, 193, 137, .16) !important;
+}
+
+.admin-shell .month-day.outside {
+  background: #0d1714 !important;
+  opacity: .48;
+}
+
+.admin-shell .month-day.is-today > header strong {
+  background: #c9ae72 !important;
+  color: #14201c !important;
+}
+
+.admin-shell :where(
+  .agenda-turn-client > span,
+  .settings-section-icon,
+  .team-avatar,
+  .admin-page-header-icon
+) {
+  background: rgba(201, 174, 114, .09) !important;
+  color: #d9c994 !important;
+}
+
+.admin-shell :where(
+  .simple-agenda-view-tabs button,
+  .week-day > header span,
+  .week-day > header small,
+  .month-weekdays span,
+  .agenda-summary-line span,
+  .agenda-quick-summary span,
+  .agenda-turn-service,
+  .agenda-turn-client p,
+  .board-card p,
+  .board-card-top > span
+) {
+  color: #9ca9a3 !important;
+}
+
+.admin-shell :where(
+  .simple-agenda-view-tabs button:hover,
+  .week-controls button:hover,
+  .agenda-day-nav > button:hover,
+  .agenda-mobile-turn footer button:hover,
+  .board-card button:hover,
+  .week-turn-actions button:hover,
+  .month-turn-actions button:hover
+) {
+  border-color: rgba(218, 193, 137, .38) !important;
+  background-color: #23312d !important;
+  color: #fff8e8 !important;
+}
+
+/* Las tarjetas conservan el color identificador del servicio sobre una base verde gris. */
+.admin-shell :where(
+  .week-turn.is-shared-slot,
+  .month-turn.is-shared-slot,
+  .month-span-turn.is-shared-slot,
+  .agenda-mobile-turn.is-overlapping
+) {
+  background: linear-gradient(135deg, var(--service-tint, rgba(201, 174, 114, .06)), #131d1a 58%, #192521) !important;
+}
+
+.admin-shell :where(
+  .week-turn.is-shared-slot > span,
+  .month-span-turn.is-shared-slot > span,
+  .month-turn.is-shared-slot > strong,
+  .agenda-mobile-turn.is-overlapping > .agenda-turn-service
+) {
+  background-color: rgba(255, 255, 255, .025) !important;
+}
+
+@media (max-width: 640px) {
+  .admin-shell .simple-agenda-view-tabs {
+    background: rgba(13, 23, 20, .97) !important;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, .22) !important;
+  }
+}
+
+/* Caja: superficies contables integradas a la identidad del administrador. */
+.admin-shell :where(
+  .cash-controls,
+  .cash-methods,
+  .cash-panel,
+  .cash-movement-list article,
+  .cash-operation-list article
+) {
+  border-color: rgba(210, 187, 135, .18) !important;
+  background: #131d1a !important;
+  box-shadow: none !important;
+}
+
+.admin-shell :where(
+  .cash-controls input,
+  .cash-controls button,
+  .cash-methods article,
+  .cash-row-actions button
+) {
+  border-color: rgba(210, 187, 135, .16) !important;
+  background: #192521 !important;
+}
+
+.admin-shell .cash-close-button {
+  border-color: rgba(218, 193, 137, .38) !important;
+  background: rgba(201, 174, 114, .09) !important;
+  color: #e4ce98 !important;
+}
+
+.admin-shell :where(.cash-methods > header, .cash-panel > header) {
+  padding-bottom: .7rem;
+  border-bottom: 1px solid rgba(210, 187, 135, .13) !important;
+}
+
+.admin-shell :where(.cash-controls button, .cash-row-actions button):hover {
+  border-color: rgba(218, 193, 137, .38) !important;
+  background: #23312d !important;
+}
+
+/* Club: editor, planes y vista previa con verde gris y champagne. */
+.admin-shell :where(
+  .club-sidebar,
+  .club-editor-empty,
+  .club-editor-card,
+  .club-preview-card,
+  .club-plan-card,
+  .club-switch,
+  .club-form-actions,
+  .club-preview-notes
+) {
+  border-color: rgba(210, 187, 135, .18) !important;
+  background: #131d1a !important;
+  box-shadow: none !important;
+}
+
+.admin-shell :where(.club-editor-card, .club-preview-card, .club-sidebar) {
+  background: linear-gradient(145deg, #16211e, #101916) !important;
+}
+
+.admin-shell :where(.club-plan-card, .club-switch, .club-form-actions, .club-preview-notes) {
+  background: #192521 !important;
+}
+
+.admin-shell :where(.club-plan-card:hover, .club-plan-card.selected, .club-switch:hover) {
+  border-color: rgba(218, 193, 137, .4) !important;
+  background: #23312d !important;
+}
+
+.admin-shell .club-plan-card.selected {
+  box-shadow: inset 3px 0 0 #c9ae72 !important;
+}
+
+.admin-shell :where(.club-sidebar-header, .club-section-header) {
+  border-color: rgba(210, 187, 135, .16) !important;
+}
+
+.admin-shell :where(.club-kicker, .club-preview-features svg) {
+  color: #d9c994 !important;
+}
+
+.admin-shell :where(.club-plan-topline > strong, .club-preview-price strong) {
+  color: #fff1c9 !important;
+}
+
+.admin-shell :where(.club-field input, .club-field textarea, .club-feature-row input) {
+  border-color: rgba(210, 187, 135, .2) !important;
+  background: #0d1714 !important;
+}
+
+.admin-shell :where(.club-field input, .club-field textarea, .club-feature-row input):focus {
+  border-color: rgba(218, 193, 137, .5) !important;
+  box-shadow: 0 0 0 3px rgba(201, 174, 114, .09) !important;
+}
+
+.admin-shell .club-preview-price {
+  border-color: rgba(218, 193, 137, .24) !important;
+  background: rgba(201, 174, 114, .07) !important;
+}
+
+.admin-shell .club-empty-icon {
+  border-color: rgba(218, 193, 137, .24) !important;
+  background: rgba(201, 174, 114, .09) !important;
+  color: #d9c994 !important;
+}
+
+.admin-shell .club-switch-control {
+  background: #34443e !important;
+}
+
+.admin-shell .club-switch.is-on .club-switch-control {
+  background: #c9ae72 !important;
+}
+
+/* Contraste tipográfico reforzado para uso diario en tablet y móvil. */
+.admin-shell {
+  --color-text: #f7f9f8;
+  --color-text-soft: #d4dad6;
+  --color-text-muted: #aeb9b3;
+  --color-primary: #d5bd86;
+}
+
+.admin-shell :where(
+  p,
+  li,
+  label,
+  td,
+  .admin-page-header-text,
+  .stat-card-trend,
+  .club-plan-subtitle,
+  .club-switch-copy small,
+  .club-preview-card p,
+  .cash-methods article span,
+  .cash-panel p,
+  .cash-method,
+  .agenda-turn-service,
+  .agenda-turn-client p,
+  .agenda-compact-vehicle,
+  .board-card p
+) {
+  color: #cbd3ce !important;
+}
+
+.admin-shell :where(
+  small,
+  .admin-form-help,
+  .admin-field-help,
+  .cash-movement-main small,
+  .cash-operation-list small,
+  .week-day > header small,
+  .week-turn span,
+  .month-turn span,
+  .board-card-top > span,
+  .club-preview-price small
+) {
+  color: #b5c0ba !important;
+}
+
+.admin-shell :where(
+  h1,
+  h2,
+  h3,
+  h4,
+  th,
+  strong,
+  .admin-page-header-title,
+  .admin-form-title,
+  .client-name-line h3,
+  .club-plan-title
+) {
+  color: #f8faf9;
+}
+
+.admin-shell :where(input, textarea, select) {
+  color: #f3f6f4 !important;
+}
+
+.admin-shell :where(input, textarea, select)::placeholder {
+  color: #89968f !important;
+  opacity: 1;
+}
+
+.admin-shell :where(
+  .btn-ghost,
+  .btn-secondary-admin,
+  .week-controls button,
+  .agenda-day-nav > button,
+  .agenda-mobile-turn footer button,
+  .cash-controls button:not(.cash-close-button),
+  .cash-row-actions button:not(.danger),
+  .board-card button
+) {
+  color: #e3e8e5 !important;
+}
+
+.admin-shell :where(
+  .admin-page-header-kicker,
+  .admin-form-kicker,
+  .club-kicker,
+  .stat-card-label
+) {
+  color: #e2ce9e !important;
+}
+
+.admin-shell :where(.week-empty, .board-empty, .agenda-empty, .cash-empty, .cash-empty-small, .club-empty-list) {
+  color: #aeb9b3 !important;
+}
