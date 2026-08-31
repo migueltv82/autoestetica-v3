@@ -25,7 +25,7 @@ function ServicesPreview() {
   return (
     <section className="section services-preview">
       <div className="container">
-        <div className="section-heading">
+        <motion.div className="section-heading">
           <span className="section-kicker">Servicios</span>
           <h2 className="section-title">
             Soluciones pensadas para <span className="text-gradient">cada detalle</span>
@@ -44,7 +44,7 @@ function ServicesPreview() {
           viewport={{ once: true, margin: "-50px" }}
         >
           {featuredServices.map((service) => (
-            <article className="service-preview-card" key={service.title}>
+            <motion.article className="service-preview-card" key={service.title}>
               <div className="service-preview-icon">{service.icon}</div>
               <h3>{service.title}</h3>
               <p>{service.text}</p>

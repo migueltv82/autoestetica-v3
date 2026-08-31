@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import carImage from "../../assets/logo.jpg";
 import "./Hero.css";
 
 function Hero() {
@@ -23,7 +22,7 @@ function Hero() {
             Servicios de estética vehicular con atención personalizada, imagen
             profesional y una experiencia simple para consultar y coordinar por
             WhatsApp.
-          </motion.p>
+          </p>
 
           <div className="hero-actions">
             <Link to="/consulta" className="btn-primary">
@@ -43,7 +42,9 @@ function Hero() {
           transition={{ duration: 0.8, delay: 0.15 }}
         >
           <div className="hero-card hero-card-main">
-            <span className="hero-card-kicker">Detalle, prolijidad y presencia</span>
+            <span className="hero-card-kicker">
+              Detalle, prolijidad y presencia
+            </span>
             <h3>Tu vehículo, con otra imagen</h3>
             <p>
               Un espacio pensado para quienes valoran el cuidado visual y la

@@ -81,7 +81,7 @@ function ServicesGrid() {
           </p>
         </div>
 
-        <div className="services-grid">
+        <motion.div className="services-grid">
           {servicesList.map((service) => (
             <article className="service-card" key={service.title}>
               <div className="service-card-icon">{service.icon}</div>

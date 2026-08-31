@@ -16,22 +16,23 @@ function WhyChooseUs() {
         <div>
           <span className="section-kicker">Diferencial</span>
           <h2 className="section-title">
-            Una experiencia <span className="text-gradient">simple, clara y bien cuidada</span>
+            Una experiencia{" "}
+            <span className="text-gradient">simple, clara y bien cuidada</span>
           </h2>
           <p className="section-text">
             La idea no es solo que el vehículo quede bien. También buscamos que
             todo el proceso sea más cómodo, prolijo y confiable desde el primer contacto.
           </p>
-        </motion.div>
+        </div>
 
         <div className="why-list">
           {items.map((item) => (
             <div className="why-item" key={item}>
               <CheckCircle2 size={20} />
               <span>{item}</span>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
