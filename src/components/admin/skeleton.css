@@ -22,6 +22,25 @@
 .skeleton-w-80 { width: 80%; }
 .skeleton-w-60px { width: 60px; }
 
+.skeleton-avatar {
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px !important;
+}
+
+.skeleton-avatar-round {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px !important;
+}
+
+.skeleton-row {
+  height: 18px;
+  width: 100%;
+  border-radius: 8px;
+}
+
 @keyframes pulse-skeleton {
   0% {
     background-position: 200% 0;

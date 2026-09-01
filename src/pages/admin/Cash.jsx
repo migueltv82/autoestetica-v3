@@ -5,6 +5,8 @@ import PageTransition from "../../components/ui/PageTransition";
 import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import StatCard from "../../components/ui/StatCard";
 import ReceiptModal from "../../components/admin/ReceiptModal";
+import EmptyState from "../../components/ui/EmptyState";
+import CashMovementsSkeleton from "../../components/admin/CashMovementsSkeleton";
 import { useCash } from "../../hooks/useCash";
 import { useFeedback } from "../../hooks/useFeedback";
 import { useSettings } from "../../hooks/useSettings";
@@ -65,7 +67,15 @@ function Cash() {
     {showForm ? <section className="cash-inline-form admin-form-shell"><div className="admin-form-header"><div><span className="admin-form-kicker">{editingId ? "Edición" : "Nuevo asiento"}</span><h3 className="admin-form-title">{editingId ? "Editar movimiento" : "Registrar movimiento"}</h3></div></div><form onSubmit={handleSubmit}><div className="admin-form-grid wide"><div className="admin-form-group"><label><ClipboardList size={14} /> Concepto *</label><input required value={formData.description} onChange={(event) => setFormData({ ...formData, description: event.target.value })} placeholder="Ej: Compra de insumos" /></div><div className="admin-form-group"><label><Wallet size={14} /> Importe *</label><input type="number" min="1" required value={formData.amount} onChange={(event) => setFormData({ ...formData, amount: event.target.value })} placeholder="0" /></div><div className="admin-form-group"><label>Fecha *</label><input type="date" required value={formData.date} onChange={(event) => setFormData({ ...formData, date: event.target.value })} /></div><div className="admin-form-group"><label>Categoría *</label><input required value={formData.category} onChange={(event) => setFormData({ ...formData, category: event.target.value })} placeholder="Ej: Insumos" /></div><div className="admin-form-group"><label>Tipo</label><select value={formData.type} onChange={(event) => setFormData({ ...formData, type: event.target.value })}><option value="income">Ingreso (+)</option><option value="expense">Egreso (-)</option></select></div><div className="admin-form-group"><label>Medio de pago</label><select value={formData.method} onChange={(event) => setFormData({ ...formData, method: event.target.value })}>{METHODS.map((method) => <option key={method}>{method}</option>)}</select></div></div><div className="admin-form-actions"><button type="submit" className="btn-form-primary">{editingId ? "Guardar cambios" : "Registrar movimiento"}</button></div></form></section> : null}
 
     {!isLoading && filteredTransactions.length ? <section className="cash-movement-list" aria-label="Movimientos de caja">{filteredTransactions.map((item) => <article key={item.id} className={item.type}><span className="cash-flow-icon">{item.type === "income" ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}</span><div className="cash-movement-main"><strong>{item.description}</strong><small>{item.date} · {item.category || "Sin categoría"}</small></div><span className="cash-method"><MethodIcon method={item.method} /> {item.method}</span><strong className="cash-amount">{item.type === "income" ? "+" : "−"}{money(item.amount)}</strong><div className="cash-row-actions"><button type="button" onClick={() => handleEdit(item)} aria-label="Editar movimiento"><Edit2 size={15} /></button><button type="button" className="danger" onClick={() => handleDelete(item.id)} aria-label="Eliminar movimiento"><Trash2 size={15} /></button></div></article>)}</section> : null}
-    {isLoading ? <div className="cash-empty">Cargando movimientos…</div> : null}{!isLoading && !filteredTransactions.length ? <div className="cash-empty"><Wallet size={32} /><strong>Sin movimientos en este período</strong><span>Cambiá las fechas o registrá un nuevo movimiento.</span></div> : null}
+    {isLoading ? <CashMovementsSkeleton /> : null}
+    {!isLoading && !filteredTransactions.length ? (
+      <EmptyState
+        icon={<Wallet size={32} />}
+        title="Sin movimientos en este período"
+        text="Cambiá las fechas o registrá un nuevo movimiento."
+        action={<button type="button" className="btn-premium" onClick={openNewMovement}><Plus size={16} /> <span>Nuevo movimiento</span></button>}
+      />
+    ) : null}
   </AdminLayout>{receiptTurn ? <ReceiptModal turn={receiptTurn} services={services} settings={settings} onClose={() => setReceiptTurn(null)} onSave={(items) => updateReceipt(receiptTurn.receiptId, items)} onDelete={handleDeleteReceipt} /> : null}</PageTransition>;
 }
 export default Cash;

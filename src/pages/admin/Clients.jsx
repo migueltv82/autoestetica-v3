@@ -21,6 +21,8 @@ import AdminLayout from "../../components/admin/AdminLayout";
 import PageTransition from "../../components/ui/PageTransition";
 import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import StatCard from "../../components/ui/StatCard";
+import EmptyState from "../../components/ui/EmptyState";
+import ClientsGridSkeleton from "../../components/admin/ClientsGridSkeleton";
 import { useClients } from "../../hooks/useClients";
 import { useFeedback } from "../../hooks/useFeedback";
 import { useSettings } from "../../hooks/useSettings";
@@ -243,8 +245,19 @@ function Clients() {
           </section>
         ) : null}
 
-        {isLoading ? <div className="clients-empty">Cargando clientes...</div> : null}
-        {!isLoading && !clients.length ? <div className="clients-empty"><Users size={34} /><strong>{search ? "No encontramos coincidencias" : "Todavia no hay clientes"}</strong><span>{search ? "Proba con otro nombre, telefono o patente." : "Los clientes se guardan al crear un turno o desde Nuevo cliente."}</span></div> : null}
+        {isLoading ? <ClientsGridSkeleton /> : null}
+        {!isLoading && !clients.length ? (
+          <EmptyState
+            icon={<Users size={34} />}
+            title={search ? "No encontramos coincidencias" : "Todavia no hay clientes"}
+            text={search ? "Proba con otro nombre, telefono o patente." : "Los clientes se guardan al crear un turno o desde Nuevo cliente."}
+            action={!search && canManageClients ? (
+              <button type="button" className="btn-premium" onClick={() => setShowForm(true)}>
+                <Plus size={16} /> <span>Nuevo cliente</span>
+              </button>
+            ) : null}
+          />
+        ) : null}
 
         {selectedClient ? (
           <Modal isOpen onClose={() => setSelectedId(null)} title={`Ficha de ${selectedClient.name}`} maxWidth="1000px">
