@@ -53,34 +53,67 @@ function mapClient(client, canManageFinance) {
   };
 }
 
+const PAGE_SIZE = 50;
+
 export function useClients() {
   const { organizationId } = useAuth();
   const { canManageFinance, canManageClients } = usePermissions();
-  const [allClients, setAllClients] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [stats, setStats] = useState({ totalClients: 0, frequentClients: 0, newThisMonth: 0 });
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search.trim()), 350);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const fetchClientRows = useCallback(async (ids) => {
+    if (!ids.length) return [];
+    const orderSelect = canManageFinance
+      ? "work_orders(id,number,total,status,scheduled_start,work_order_items(description,total),payments(amount,kind,voided_at))"
+      : "work_orders(id,number,status,scheduled_start,work_order_items(description))";
+    const { data, error: rowsError } = await supabase
+      .from("clients")
+      .select(`id,name,phone,email,notes,tags,created_at,vehicles(id,type,brand,model,license_plate,color,year,notes,deleted_at,fidelity_cards(public_token,status)),${orderSelect}`)
+      .in("id", ids);
+    if (rowsError) throw rowsError;
+    const byId = new Map((data || []).map((client) => [client.id, mapClient(client, canManageFinance)]));
+    return ids.map((id) => byId.get(id)).filter(Boolean);
+  }, [canManageFinance]);
 
   const refresh = useCallback(async (options = {}) => {
     if (!organizationId) return;
     if (!options.silent) setIsLoading(true);
-    const orderSelect = canManageFinance
-      ? "work_orders(id,number,total,status,scheduled_start,work_order_items(description,total),payments(amount,kind,voided_at))"
-      : "work_orders(id,number,status,scheduled_start,work_order_items(description))";
-    const { data, error: queryError } = await supabase
-      .from("clients")
-      .select(`id,name,phone,email,notes,tags,created_at,vehicles(id,type,brand,model,license_plate,color,year,notes,deleted_at,fidelity_cards(public_token,status)),${orderSelect}`)
-      .eq("organization_id", organizationId)
-      .eq("directory_visible", true)
-      .is("deleted_at", null)
-      .order("created_at", { ascending: false });
-    if (queryError) setError(queryError.message);
-    else {
-      setAllClients((data || []).map((client) => mapClient(client, canManageFinance)));
+
+    const [matchResult, statsResult] = await Promise.all([
+      supabase.rpc("search_clients", { p_query: debouncedSearch || null, p_limit: PAGE_SIZE, p_offset: 0 }),
+      supabase.rpc("client_directory_stats").maybeSingle(),
+    ]);
+    if (matchResult.error) { setError(matchResult.error.message); setIsLoading(false); return; }
+
+    const matches = matchResult.data || [];
+    setTotalCount(matches[0]?.total_count ?? 0);
+    if (statsResult.data) {
+      setStats({
+        totalClients: Number(statsResult.data.total_clients || 0),
+        frequentClients: Number(statsResult.data.frequent_clients || 0),
+        newThisMonth: Number(statsResult.data.new_this_month || 0),
+      });
+    }
+
+    try {
+      setClients(await fetchClientRows(matches.map((row) => row.id)));
       setError("");
+    } catch (rowsError) {
+      setError(rowsError.message);
     }
     setIsLoading(false);
-  }, [organizationId, canManageFinance]);
+  }, [organizationId, debouncedSearch, fetchClientRows]);
 
   useEffect(() => {
     const timer = setTimeout(() => refresh(), 0);
@@ -91,6 +124,24 @@ export function useClients() {
     [canManageFinance],
   );
   useRealtimeRefresh(organizationId, realtimeTables, refresh);
+
+  async function loadMore() {
+    if (isLoadingMore) return;
+    setIsLoadingMore(true);
+    try {
+      const { data: matches, error: matchError } = await supabase.rpc("search_clients", {
+        p_query: debouncedSearch || null, p_limit: PAGE_SIZE, p_offset: clients.length,
+      });
+      if (matchError) throw matchError;
+      const nextRows = await fetchClientRows((matches || []).map((row) => row.id));
+      setClients((current) => [...current, ...nextRows]);
+    } catch (loadMoreError) {
+      setError(loadMoreError.message);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }
+  const hasMore = clients.length < totalCount;
 
   async function addClient(newClient) {
     if (!canManageClients) throw new Error("No tenes permiso para crear clientes.");
@@ -103,7 +154,7 @@ export function useClients() {
       email: newClient.email || null,
       notes: newClient.notes || null,
     }).select().single();
-    if (clientError) throw clientWriteError(clientError, normalizedPhone, null, allClients);
+    if (clientError) throw clientWriteError(clientError, normalizedPhone, null, clients);
     if (newClient.vehicle) {
       const { error: vehicleError } = await supabase.from("vehicles").insert({
         organization_id: organizationId, client_id: client.id, type: newClient.vehicle,
@@ -122,8 +173,8 @@ export function useClients() {
       name: updatedData.name.trim(), phone: normalizedPhone,
       email: updatedData.email?.trim() || null, notes: updatedData.notes?.trim() || null,
     }).eq("id", id).eq("organization_id", organizationId);
-    if (clientError) throw clientWriteError(clientError, normalizedPhone, id, allClients);
-    const existing = allClients.find((client) => client.id === id);
+    if (clientError) throw clientWriteError(clientError, normalizedPhone, id, clients);
+    const existing = clients.find((client) => client.id === id);
     if (existing?.vehicleId) {
       const { error: vehicleError } = await supabase.from("vehicles").update({ type: updatedData.vehicle })
         .eq("id", existing.vehicleId).eq("organization_id", organizationId);
@@ -158,10 +209,24 @@ export function useClients() {
     await refresh();
   }
 
-  const clients = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    return query ? allClients.filter((client) => client.name.toLowerCase().includes(query) || client.phone.includes(query) || client.email.toLowerCase().includes(query) || client.vehicles.some((vehicle) => [vehicle.brand, vehicle.model, vehicle.license_plate].some((value) => String(value || "").toLowerCase().includes(query)))) : allClients;
-  }, [allClients, search]);
-
-  return { clients, totalClients: allClients.length, search, setSearch, isLoading, error, refresh, addClient, updateClient, deleteClient, addVehicle, deleteVehicle };
+  return {
+    clients,
+    totalCount,
+    totalClients: stats.totalClients,
+    frequentClients: stats.frequentClients,
+    newThisMonth: stats.newThisMonth,
+    search,
+    setSearch,
+    hasMore,
+    loadMore,
+    isLoadingMore,
+    isLoading,
+    error,
+    refresh,
+    addClient,
+    updateClient,
+    deleteClient,
+    addVehicle,
+    deleteVehicle,
+  };
 }

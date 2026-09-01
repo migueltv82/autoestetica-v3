@@ -39,7 +39,7 @@ const EMPTY_VEHICLE = { type: "Auto", brand: "", model: "", licensePlate: "", co
 const money = (value) => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(value || 0);
 
 function Clients() {
-  const { clients, totalClients, search, setSearch, isLoading, error, addClient, updateClient, deleteClient, addVehicle, deleteVehicle } = useClients();
+  const { clients, totalClients, frequentClients, newThisMonth, totalCount, hasMore, loadMore, isLoadingMore, search, setSearch, isLoading, error, addClient, updateClient, deleteClient, addVehicle, deleteVehicle } = useClients();
   const { confirm, notify } = useFeedback();
   const { settings, updateSettings } = useSettings();
   const { canManageClients, canManageFinance, canManageSettings } = usePermissions();
@@ -63,14 +63,6 @@ function Clients() {
     [fidelityCards],
   );
 
-  const vipClients = useMemo(() => clients.filter((client) => Number(client.visits) >= 3).length, [clients]);
-  const newThisMonth = useMemo(() => {
-    const now = new Date();
-    return clients.filter((client) => {
-      const created = new Date(client.createdAt);
-      return created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear();
-    }).length;
-  }, [clients]);
 
   function resetForm() {
     setFormData(EMPTY_CLIENT);
@@ -167,7 +159,7 @@ function Clients() {
       <AdminLayout title="Directorio de clientes" subtitle="Contacto, vehiculos e historial en una sola vista.">
         <section className="admin-stats-grid clients-stats">
           <StatCard label="Total clientes" value={totalClients} icon={<Users size={22} />} color="var(--color-primary)" trend="Base activa" />
-          <StatCard label="Clientes frecuentes" value={vipClients} icon={<Star size={22} />} color="#facc15" trend="3 o mas visitas" />
+          <StatCard label="Clientes frecuentes" value={frequentClients} icon={<Star size={22} />} color="#facc15" trend="3 o mas visitas" />
           <StatCard label="Nuevos este mes" value={newThisMonth} icon={<UserPlus size={22} />} color="#38bdf8" trend="Altas registradas" />
         </section>
 
@@ -208,7 +200,7 @@ function Clients() {
             <input className="admin-search-input" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar cliente, telefono, patente..." aria-label="Buscar clientes" />
             {search ? <button type="button" onClick={() => setSearch("")} aria-label="Limpiar busqueda"><X size={16} /></button> : null}
           </div>
-          <span>{clients.length} {clients.length === 1 ? "resultado" : "resultados"}</span>
+          <span>{totalCount} {totalCount === 1 ? "resultado" : "resultados"}</span>
         </div>
         {error ? <div className="clients-error" role="alert">No pudimos actualizar el directorio. Revisa la conexion.</div> : null}
 
@@ -243,6 +235,14 @@ function Clients() {
               );
             })}
           </section>
+        ) : null}
+
+        {!isLoading && hasMore ? (
+          <div className="clients-load-more">
+            <button type="button" className="btn-ghost" onClick={loadMore} disabled={isLoadingMore}>
+              {isLoadingMore ? "Cargando…" : "Cargar más clientes"}
+            </button>
+          </div>
         ) : null}
 
         {isLoading ? <ClientsGridSkeleton /> : null}
