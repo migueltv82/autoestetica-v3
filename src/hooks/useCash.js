@@ -20,7 +20,7 @@ function mapMovement(movement) {
   };
 }
 
-export function useCash() {
+export function useCash(period) {
   const { organizationId, user } = useAuth();
   const { canManageFinance } = usePermissions();
   const [transactions, setTransactions] = useState([]);
@@ -42,8 +42,11 @@ export function useCash() {
       return;
     }
     if (!options.silent) setIsLoading(true);
+    let movementQuery = supabase.from("cash_movements").select("id,occurred_at,description,type,amount,method,category,work_order_id,payment_id").eq("organization_id", organizationId).is("voided_at", null).order("occurred_at", { ascending: false });
+    if (period?.from) movementQuery = movementQuery.gte("occurred_at", `${period.from}T00:00:00-03:00`);
+    if (period?.to) movementQuery = movementQuery.lte("occurred_at", `${period.to}T23:59:59-03:00`);
     const [movementResult, orderResult, closureResult, receiptResult] = await Promise.all([
-      supabase.from("cash_movements").select("id,occurred_at,description,type,amount,method,category,work_order_id,payment_id").eq("organization_id", organizationId).is("voided_at", null).order("occurred_at", { ascending: false }),
+      movementQuery,
       supabase.from("work_orders").select("id,number,status,total,scheduled_start,client_id,clients(name,phone),vehicles(type),work_order_items(total),payments(amount,kind,voided_at)").eq("organization_id", organizationId).is("deleted_at", null).not("status", "in", "(cancelled,no_show)").order("scheduled_start", { ascending: false }),
       supabase.from("cash_closures").select("*").eq("organization_id", organizationId).order("closure_date", { ascending: false }).limit(31),
       supabase.from("receipts").select("id,number,total,payment_status,issued_at,work_order_id,clients(name,phone),receipt_items(id,description,quantity,unit_price,total),work_orders(scheduled_start,scheduled_end,vehicles(type))").eq("organization_id", organizationId).eq("status", "issued").order("issued_at", { ascending: false }).limit(50),
@@ -64,7 +67,7 @@ export function useCash() {
       setError("");
     }
     setIsLoading(false);
-  }, [organizationId, canManageFinance]);
+  }, [organizationId, canManageFinance, period]);
 
   useEffect(() => {
     const timer = setTimeout(() => refresh(), 0);
