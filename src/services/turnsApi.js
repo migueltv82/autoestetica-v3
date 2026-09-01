@@ -105,11 +105,22 @@ async function syncClientDirectoryPreference(orderId, previousClient, saveClient
   if (error) throw error;
 }
 
+const TURNS_PAST_WINDOW_DAYS = 60;
+const TURNS_FUTURE_WINDOW_DAYS = 180;
+
 export async function fetchTurns(organizationId) {
+  const windowStart = new Date();
+  windowStart.setDate(windowStart.getDate() - TURNS_PAST_WINDOW_DAYS);
+  const windowEnd = new Date();
+  windowEnd.setDate(windowEnd.getDate() + TURNS_FUTURE_WINDOW_DAYS);
+
   const { data, error } = await supabase.from("work_orders")
     .select("id,number,client_id,vehicle_id,status,scheduled_start,scheduled_end,notes,inquiry_read_at,discount,total,clients(name,phone,directory_visible,vehicles(id,brand,model,deleted_at)),vehicles(type,brand,model,license_plate,fidelity_cards(public_token,status)),work_order_items(id,description,quantity,unit_price,total,service_id,services(estimated_minutes))")
     .eq("organization_id", organizationId)
     .is("deleted_at", null)
+    // Las consultas sin agendar tienen scheduled_start null: siempre se incluyen
+    // sin importar la ventana, para no perderlas de la bandeja de Consultas.
+    .or(`scheduled_start.is.null,and(scheduled_start.gte.${windowStart.toISOString()},scheduled_start.lte.${windowEnd.toISOString()})`)
     .order("scheduled_start", { ascending: true, nullsFirst: false });
 
   if (error) throw error;
