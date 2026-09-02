@@ -19,6 +19,7 @@ import AdminLayout from "../../components/admin/AdminLayout";
 import PageTransition from "../../components/ui/PageTransition";
 import TurnsTable from "../../components/admin/TurnsTable";
 import TurnsTableSkeleton from "../../components/admin/TurnsTableSkeleton";
+import ScheduleBlocks from "../../components/admin/ScheduleBlocks";
 import { useTurns } from "../../hooks/useTurns";
 import { useClients } from "../../hooks/useClients";
 import { useCash } from "../../hooks/useCash";
@@ -40,7 +41,7 @@ function Dashboard() {
   const { transactions, receivables, error: cashError } = useCash();
   const { settings } = useSettings();
   const { user, profile } = useAuth();
-  const { canManageFinance, canManageCatalog, canDeleteTurns } = usePermissions();
+  const { canManageFinance, canManageCatalog, canDeleteTurns, canManageScheduleBlocks } = usePermissions();
   const today = getTodayString();
   const yesterday = shiftDateByDays(-1);
 
@@ -246,6 +247,12 @@ function Dashboard() {
               ) : <div className="dashboard-empty small"><CalendarDays size={24} /><span>No hay turnos futuros cargados.</span></div>}
             </div>
           </section>
+
+          {canManageScheduleBlocks ? (
+            <section className="dashboard-lower-grid single">
+              <ScheduleBlocks />
+            </section>
+          ) : null}
         </div>
       </AdminLayout>
     </PageTransition>
