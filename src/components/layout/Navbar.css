@@ -29,7 +29,7 @@
   gap: 0.75rem;
 }
 
-.brand-logo{width:42px;height:42px;flex:0 0 42px;border:1px solid rgba(87,199,255,.34);border-radius:50%;object-fit:cover;box-shadow:0 0 0 4px rgba(87,199,255,.055),0 8px 22px rgba(0,0,0,.35)}
+.brand-logo{width:42px;height:42px;flex:0 0 42px;border:1px solid rgba(216,184,106,.4);border-radius:50%;object-fit:cover;box-shadow:0 0 0 4px rgba(216,184,106,.08),0 8px 22px rgba(0,0,0,.35)}
 
 .brand-text {
   font-family: var(--font-display);
@@ -58,7 +58,7 @@
 .nav-links a.active {
   color: var(--color-primary);
 }
-.nav-links a{position:relative}.nav-links a::after{position:absolute;right:50%;bottom:-.55rem;left:50%;height:2px;border-radius:2px;background:#57c7ff;content:"";transition:left .2s,right .2s}.nav-links a:hover::after,.nav-links a.active::after{right:0;left:0}
+.nav-links a{position:relative}.nav-links a::after{position:absolute;right:50%;bottom:-.55rem;left:50%;height:2px;border-radius:2px;background:var(--color-primary);content:"";transition:left .2s,right .2s}.nav-links a:hover::after,.nav-links a.active::after{right:0;left:0}
 
 .btn-minimal {
   padding: 0.58rem 1.08rem;

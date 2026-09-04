@@ -119,3 +119,9 @@ export function readyTurnWhatsAppLink(turn, template, openingHours) {
 
   return `https://wa.me/${normalizeArgentinaPhone(turn.phone)}?text=${encodeURIComponent(text)}`;
 }
+
+export function getTurnWhatsAppLink(turn, settings) {
+  return turn.status === "Listo"
+    ? readyTurnWhatsAppLink(turn, settings?.readyMessageTemplate, settings?.openingHours)
+    : turnConfirmationWhatsAppLink(turn, settings?.businessName, settings?.confirmationMessageTemplate);
+}

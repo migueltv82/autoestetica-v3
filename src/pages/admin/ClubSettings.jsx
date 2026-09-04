@@ -19,13 +19,9 @@ import PageTransition from "../../components/ui/PageTransition";
 import { DEFAULT_CLUB_PLAN, validateClubPlan } from "../../services/clubApi";
 import { useAdminClubPlans } from "../../hooks/useClubPlans";
 import { useFeedback } from "../../hooks/useFeedback";
+import { formatMoney } from "../../utils/money";
+import ToggleButton from "../../components/ui/ToggleButton";
 import "./ClubSettings.css";
-
-const currencyFormatter = (currency) => new Intl.NumberFormat("es-AR", {
-  style: "currency",
-  currency: currency || "ARS",
-  maximumFractionDigits: 0,
-});
 
 function createDraftPlan() {
   return {
@@ -36,7 +32,7 @@ function createDraftPlan() {
 
 function formatPlanPrice(plan) {
   return Number(plan.price) > 0
-    ? currencyFormatter(plan.currency).format(Number(plan.price))
+    ? formatMoney(Number(plan.price), plan.currency)
     : "Consultar";
 }
 
@@ -50,13 +46,7 @@ function StatusPill({ active }) {
 
 function ToggleSwitch({ checked, onChange, label, description }) {
   return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      onClick={() => onChange(!checked)}
-      className={`club-switch ${checked ? "is-on" : "is-off"}`}
-    >
+    <ToggleButton checked={checked} onChange={onChange} className={`club-switch ${checked ? "is-on" : "is-off"}`}>
       <span className="club-switch-copy">
         <strong>{label}</strong>
         <small>{description}</small>
@@ -64,7 +54,7 @@ function ToggleSwitch({ checked, onChange, label, description }) {
       <span className="club-switch-control" aria-hidden="true">
         <span />
       </span>
-    </button>
+    </ToggleButton>
   );
 }
 

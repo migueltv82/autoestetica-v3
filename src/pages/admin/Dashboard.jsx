@@ -27,13 +27,18 @@ import { useSettings } from "../../hooks/useSettings";
 import { usePermissions } from "../../hooks/usePermissions";
 import { useAuth } from "../../hooks/useAuth";
 import { getTodayString, shiftDateByDays } from "../../utils/date";
+import { formatMoney } from "../../utils/money";
 import "./Dashboard.css";
 
-const moneyFormatter = new Intl.NumberFormat("es-AR", {
-  style: "currency",
-  currency: "ARS",
-  maximumFractionDigits: 0,
-});
+function DashboardEmptyState({ icon, title, text }) {
+  return (
+    <div className={`dashboard-empty${title ? "" : " small"}`}>
+      {icon}
+      {title ? <strong>{title}</strong> : null}
+      <span>{text}</span>
+    </div>
+  );
+}
 
 function Dashboard() {
   const { turns, isLoading, error: turnsError, updateTurnStatus, deleteTurn } = useTurns();
@@ -132,15 +137,15 @@ function Dashboard() {
             </article>
             {canManageFinance ? <article className="dashboard-kpi kpi-income">
               <div className="kpi-topline"><span>Ingresos registrados</span><TrendingUp size={19} /></div>
-              <strong>{moneyFormatter.format(summary.income)}</strong>
+              <strong>{formatMoney(summary.income)}</strong>
               <p className={incomeVariation !== null && incomeVariation < 0 ? "negative" : "positive"}>
                 {incomeVariation === null ? "Sin base para comparar ayer" : `${incomeVariation >= 0 ? "+" : ""}${incomeVariation}% frente a ayer`}
               </p>
             </article> : null}
             {canManageFinance ? <article className="dashboard-kpi kpi-balance">
               <div className="kpi-topline"><span>Resultado neto de hoy</span><Wallet size={19} /></div>
-              <strong>{moneyFormatter.format(summary.net)}</strong>
-              <p>{moneyFormatter.format(summary.expenses)} en gastos registrados</p>
+              <strong>{formatMoney(summary.net)}</strong>
+              <p>{formatMoney(summary.expenses)} en gastos registrados</p>
             </article> : null}
             <article className="dashboard-kpi kpi-clients">
               <div className="kpi-topline"><span>Clientes registrados</span><Users size={19} /></div>
@@ -149,7 +154,7 @@ function Dashboard() {
             </article>
             {canManageFinance ? <article className="dashboard-kpi kpi-receivable">
               <div className="kpi-topline"><span>Saldo por cobrar</span><Banknote size={19} /></div>
-              <strong>{moneyFormatter.format(summary.outstanding)}</strong>
+              <strong>{formatMoney(summary.outstanding)}</strong>
               <p>{summary.pendingPayments} {summary.pendingPayments === 1 ? "orden pendiente" : "órdenes pendientes"}</p>
             </article> : null}
           </section>
@@ -178,7 +183,7 @@ function Dashboard() {
               ) : summary.todaysTurns.length ? (
                 <TurnsTable turns={summary.todaysTurns.slice(0, 5)} onStatusChange={updateTurnStatus} onDeleteTurn={canDeleteTurns ? deleteTurn : null} />
               ) : (
-                <div className="dashboard-empty"><CalendarDays size={28} /><strong>La agenda está libre</strong><span>No hay turnos cargados para hoy.</span></div>
+                <DashboardEmptyState icon={<CalendarDays size={28} />} title="La agenda está libre" text="No hay turnos cargados para hoy." />
               )}
             </div>
 
@@ -198,7 +203,7 @@ function Dashboard() {
                   </Link> : null}
                   {canManageFinance && summary.pendingPayments ? <Link to="/admin/caja" className="priority-item warning">
                     <span className="priority-icon"><Banknote size={18} /></span>
-                    <span><strong>{moneyFormatter.format(summary.outstanding)} por cobrar</strong><small>{summary.pendingPayments} {summary.pendingPayments === 1 ? "trabajo con saldo" : "trabajos con saldo"}</small></span>
+                    <span><strong>{formatMoney(summary.outstanding)} por cobrar</strong><small>{summary.pendingPayments} {summary.pendingPayments === 1 ? "trabajo con saldo" : "trabajos con saldo"}</small></span>
                     <ArrowRight size={15} />
                   </Link> : null}
                 </div>
@@ -225,11 +230,11 @@ function Dashboard() {
                     <div className="movement-row" key={transaction.id}>
                       <span className={`movement-icon ${transaction.type}`}>{transaction.type === "income" ? <ArrowUpRight size={17} /> : <ArrowDownRight size={17} />}</span>
                       <span className="movement-description"><strong>{transaction.description}</strong><small>{transaction.method}</small></span>
-                      <strong className={transaction.type}>{transaction.type === "income" ? "+" : "−"}{moneyFormatter.format(transaction.amount)}</strong>
+                      <strong className={transaction.type}>{transaction.type === "income" ? "+" : "−"}{formatMoney(transaction.amount)}</strong>
                     </div>
                   ))}
                 </div>
-              ) : <div className="dashboard-empty small"><Wallet size={24} /><span>Todavía no hay movimientos cargados hoy.</span></div>}
+              ) : <DashboardEmptyState icon={<Wallet size={24} />} text="Todavía no hay movimientos cargados hoy." />}
             </div> : null}
 
             <div className="dashboard-panel">
@@ -244,7 +249,7 @@ function Dashboard() {
                     </div>
                   ))}
                 </div>
-              ) : <div className="dashboard-empty small"><CalendarDays size={24} /><span>No hay turnos futuros cargados.</span></div>}
+              ) : <DashboardEmptyState icon={<CalendarDays size={24} />} text="No hay turnos futuros cargados." />}
             </div>
           </section>
 

@@ -1,14 +1,8 @@
 import EmptyState from "../ui/EmptyState";
-import { 
-  Trash2, 
-  Calendar, 
-  Clock, 
-  Phone, 
-  Wrench, 
-  Car, 
-  Bike, 
-  Truck, 
-  Box, 
+import {
+  Trash2,
+  Clock,
+  Wrench,
   User,
   ReceiptText,
   Pencil,
@@ -28,15 +22,6 @@ function TurnsTable({ turns, onStatusChange, onDeleteTurn, onGenerateReceipt, on
       />
     );
   }
-
-  const getVehicleIcon = (type) => {
-    switch (type?.toLowerCase()) {
-      case "moto": return <Bike size={16} />;
-      case "camioneta": return <Truck size={16} />;
-      case "suv": return <Box size={16} />;
-      default: return <Car size={16} />;
-    }
-  };
 
   const getStatusClass = (status) => {
     switch (status) {

@@ -11,15 +11,8 @@ import {
 } from "lucide-react";
 import { useClubPlans } from "../../hooks/useClubPlans";
 import { useSettings } from "../../hooks/useSettings";
+import { formatMoney } from "../../utils/money";
 import "./ClubMembershipSection.css";
-
-function formatMoney(value, currency = "ARS") {
-  return new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(value || 0);
-}
 
 function buildFidelityWhatsAppLink(settings) {
   const number = (settings?.whatsapp || "5493815448147").replace(/\D/g, "");

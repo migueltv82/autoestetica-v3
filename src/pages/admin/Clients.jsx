@@ -31,12 +31,12 @@ import { clientWhatsAppLink, readyVehicleWhatsAppLink } from "../../utils/whatsa
 import ClientFidelityCard from "../../components/admin/ClientFidelityCard";
 import Modal from "../../components/ui/Modal";
 import { useFidelitySummaries } from "../../hooks/useFidelitySummaries";
+import { formatMoney } from "../../utils/money";
 import "./Clients.css";
 import "./ClientProfileModal.css";
 
 const EMPTY_CLIENT = { name: "", phone: "", email: "", notes: "", vehicle: "Auto" };
 const EMPTY_VEHICLE = { type: "Auto", brand: "", model: "", licensePlate: "", color: "", year: "" };
-const money = (value) => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(value || 0);
 
 function Clients() {
   const { clients, totalClients, frequentClients, newThisMonth, totalCount, hasMore, loadMore, isLoadingMore, search, setSearch, isLoading, error, addClient, updateClient, deleteClient, addVehicle, deleteVehicle } = useClients();
@@ -222,8 +222,8 @@ function Clients() {
                     <span><small>Vehiculo</small><strong><Car size={14} /> {client.vehicle}</strong></span>
                     <span><small>Trabajos</small><strong>{client.history.length}</strong></span>
                     <span className={fidelityCard?.rewardReady ? "fidelity-ready" : ""}><small>Fidelity</small><strong><Stamp size={14} /> {fidelityCard ? `${fidelityCard.count} ${fidelityCard.count === 1 ? "tarjeta" : "tarjetas"}` : "Sin tarjeta"}</strong></span>
-                    {canManageFinance ? <span><small>Facturado</small><strong>{money(client.billed)}</strong></span> : null}
-                    {canManageFinance ? <span><small>Saldo</small><strong className={client.balance ? "has-balance" : ""}>{money(client.balance)}</strong></span> : null}
+                    {canManageFinance ? <span><small>Facturado</small><strong>{formatMoney(client.billed)}</strong></span> : null}
+                    {canManageFinance ? <span><small>Saldo</small><strong className={client.balance ? "has-balance" : ""}>{formatMoney(client.balance)}</strong></span> : null}
                   </div>
                   <div className={`client-card-actions${canManageClients ? "" : " read-only"}`}>
                     <button type="button" className="client-open" onClick={() => openClientProfile(client)}><Eye size={15} /> Ver ficha</button>
@@ -268,9 +268,9 @@ function Clients() {
             </header>
 
             <div className="client-profile-stats">
-              {canManageFinance ? <span><small>Facturado</small><strong>{money(selectedClient.billed)}</strong></span> : null}
-              {canManageFinance ? <span><small>Pagado</small><strong>{money(selectedClient.paid)}</strong></span> : null}
-              {canManageFinance ? <span><small>Saldo</small><strong className={selectedClient.balance ? "has-balance" : ""}>{money(selectedClient.balance)}</strong></span> : null}
+              {canManageFinance ? <span><small>Facturado</small><strong>{formatMoney(selectedClient.billed)}</strong></span> : null}
+              {canManageFinance ? <span><small>Pagado</small><strong>{formatMoney(selectedClient.paid)}</strong></span> : null}
+              {canManageFinance ? <span><small>Saldo</small><strong className={selectedClient.balance ? "has-balance" : ""}>{formatMoney(selectedClient.balance)}</strong></span> : null}
               <span><small>Trabajos</small><strong>{selectedClient.history.length}</strong></span>
             </div>
 
@@ -314,7 +314,7 @@ function Clients() {
                   {selectedClient.history.length ? selectedClient.history.map((order) => (
                     <article key={order.id}>
                       <div><strong>#{order.number} · {order.services || "Sin detalle"}</strong><small>{order.date} · {order.status}</small></div>
-                      {canManageFinance ? <span><strong>{money(order.total)}</strong>{order.balance ? <small className="has-balance"><CircleDollarSign size={12} /> Debe {money(order.balance)}</small> : <small>Pagado</small>}</span> : null}
+                      {canManageFinance ? <span><strong>{formatMoney(order.total)}</strong>{order.balance ? <small className="has-balance"><CircleDollarSign size={12} /> Debe {formatMoney(order.balance)}</small> : <small>Pagado</small>}</span> : null}
                     </article>
                   )) : <p>Sin trabajos registrados.</p>}
                 </div>

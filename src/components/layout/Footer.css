@@ -14,7 +14,7 @@
   width: min(680px, 90vw);
   height: 1px;
   transform: translateX(-50%);
-  background:linear-gradient(90deg,transparent,rgba(87,199,255,.48),transparent);
+  background:linear-gradient(90deg,transparent,rgba(216, 184, 106,.48),transparent);
   pointer-events: none;
 }
 

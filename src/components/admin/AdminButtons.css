@@ -34,14 +34,6 @@
     color 160ms ease, box-shadow 160ms ease;
 }
 
-.admin-shell :is(.btn-primary-admin, .btn-premium, .btn-form-primary) {
-  border-color:#75d3ff;background:linear-gradient(135deg,#dff6ff,#57c7ff 55%,#249fe5);color:#04131d;
-}
-
-.admin-shell :is(.btn-primary-admin, .btn-premium, .btn-form-primary):hover:not(:disabled) {
-  border-color:#b9e8ff;background:linear-gradient(135deg,#fff,#7bd7ff 55%,#32aceb);color:#020d14;box-shadow:0 10px 26px rgba(36,159,229,.24);
-}
-
 .admin-shell :is(.btn-ghost, .btn-form-secondary) {
   border-color: #344152;
   background: #1a2330;
@@ -64,11 +56,6 @@
   border-color: rgba(251, 113, 133, 0.55);
   background: rgba(244, 63, 94, 0.17);
   color: #fda4af;
-}
-
-.admin-shell :is(button, a):focus-visible {
-  outline: 3px solid rgba(147, 197, 253, 0.35);
-  outline-offset: 2px;
 }
 
 .admin-shell button:disabled,

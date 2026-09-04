@@ -22,6 +22,7 @@ export default function ServicesGrid() {
       ),
     [services],
   );
+  const firstFeaturedId = orderedServices.find((service) => service.featured)?.id;
 
   return (
     <div className="services-catalog-modern">
@@ -44,7 +45,7 @@ export default function ServicesGrid() {
             {...FADE_UP}
             transition={{ ...FADE_UP.transition, delay: index * 0.05 }}
           >
-            <ServiceSalesCard service={service} whatsappNumber={settings.whatsapp} />
+            <ServiceSalesCard service={service} whatsappNumber={settings.whatsapp} showFeaturedBadge={service.id === firstFeaturedId} />
           </motion.div>
         ))}
       </section>

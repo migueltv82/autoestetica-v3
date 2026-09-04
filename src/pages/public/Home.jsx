@@ -143,7 +143,7 @@ function Home() {
                     {...FADE_UP}
                     transition={{ ...FADE_UP.transition, delay: index * 0.06 }}
                   >
-                    <ServiceSalesCard service={service} whatsappNumber={settings.whatsapp} compact />
+                    <ServiceSalesCard service={service} whatsappNumber={settings.whatsapp} compact showFeaturedBadge={index === 0} />
                   </motion.div>
                 ))}
               </div>
@@ -169,6 +169,21 @@ function Home() {
               </motion.article>
               );
             })}
+          </section>
+
+          <section className="home-final-cta" aria-labelledby="home-final-cta-title">
+            <div className="container home-final-cta-shell">
+              <motion.div {...FADE_UP} className="home-final-cta-copy">
+                <span className="home-kicker">Empecemos</span>
+                <h2 id="home-final-cta-title">¿Le damos el tratamiento que tu vehículo necesita?</h2>
+                <p>Contanos el estado de tu vehículo y te recomendamos el servicio justo, sin vueltas.</p>
+              </motion.div>
+              <motion.div {...FADE_UP} transition={{ ...FADE_UP.transition, delay: 0.08 }}>
+                <a href={whatsappLink} target="_blank" rel="noreferrer" className="home-btn home-btn-primary">
+                  <MessageCircle size={18} /> Escribir por WhatsApp
+                </a>
+              </motion.div>
+            </div>
           </section>
         </div>
       </PublicLayout>

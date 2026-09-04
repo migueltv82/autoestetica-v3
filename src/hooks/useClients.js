@@ -3,6 +3,7 @@ import { supabase } from "../lib/supabase";
 import { useAuth } from "./useAuth";
 import { useRealtimeRefresh } from "./useRealtimeRefresh";
 import { normalizeStoredArgentinaPhone } from "../utils/whatsapp";
+import { formatMoney } from "../utils/money";
 import { usePermissions } from "./usePermissions";
 
 const CLIENT_REALTIME_TABLES = ["clients", "vehicles", "work_orders", "work_order_items"];
@@ -17,10 +18,6 @@ function clientWriteError(error, phone, currentClientId = null, clients = []) {
   const detail = duplicate?.name ? ` Ya pertenece a ${duplicate.name}.` : "";
   return new Error(`Ya existe un cliente activo con ese numero de WhatsApp.${detail}`);
 }
-
-const formatMoney = (value) => new Intl.NumberFormat("es-AR", {
-  style: "currency", currency: "ARS", maximumFractionDigits: 0,
-}).format(value || 0);
 
 function mapClient(client, canManageFinance) {
   const vehicles = (client.vehicles || []).filter((vehicle) => !vehicle.deleted_at);

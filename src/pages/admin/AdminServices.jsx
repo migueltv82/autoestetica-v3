@@ -28,6 +28,8 @@ import { getAvailableIcons, getIcon } from "../../utils/iconMapper";
 import { isTwoWheelService } from "../../utils/servicePricing";
 import { getServiceCoverUrl } from "../../utils/serviceMedia";
 import { useFeedback } from "../../hooks/useFeedback";
+import { formatMoney } from "../../utils/money";
+import ToggleButton from "../../components/ui/ToggleButton";
 import "./AdminServices.css";
 
 const containerVariants = {
@@ -86,14 +88,9 @@ function ToggleSwitch({ checked, onChange, label }) {
   return (
     <label className="svc-toggle-row">
       <span className="svc-toggle-label">{label}</span>
-      <button
-        type="button"
-        className={`svc-toggle ${checked ? "on" : "off"}`}
-        onClick={() => onChange(!checked)}
-        aria-pressed={checked}
-      >
+      <ToggleButton checked={checked} onChange={onChange} className={`svc-toggle ${checked ? "on" : "off"}`}>
         <span className="svc-toggle-knob" />
-      </button>
+      </ToggleButton>
       <span className={`svc-toggle-status ${checked ? "visible" : "hidden"}`}>
         {checked ? <Eye size={14} /> : <EyeOff size={14} />}
         {checked ? "Visible" : "Oculto"}
@@ -135,13 +132,6 @@ function AdminServices() {
   const isNew = editingService === "new";
   const currentService = isNew ? null : services.find((service) => service.id === editingService);
   const usesSinglePrice = isTwoWheelService(form.name);
-
-  const formatMoney = (value) =>
-    new Intl.NumberFormat("es-AR", {
-      style: "currency",
-      currency: "ARS",
-      minimumFractionDigits: 0,
-    }).format(value);
 
   const resetEditState = () => {
     setEditingService(null);

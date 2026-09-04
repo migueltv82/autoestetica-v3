@@ -7,7 +7,7 @@ import {
   Wrench,
   Crown,
   Settings,
-  LogIn,
+  LogOut,
   Globe,
   Image as ImageIcon,
   MoreHorizontal,
@@ -20,6 +20,21 @@ import { useSettings } from "../../hooks/useSettings";
 import defaultLogo from "../../assets/logo.webp";
 import { useState } from "react";
 import { OWNER_ADMIN_ROLES, OWNER_ROLES, hasRole } from "../../utils/permissions";
+
+function SidebarFooterLinks({ onSignOut, onLinkClick }) {
+  return (
+    <>
+      <Link to="/" className="admin-sidebar-link" onClick={onLinkClick}>
+        <span className="link-icon"><Globe size={20} /></span>
+        <span className="link-label">Ver sitio público</span>
+      </Link>
+      <button type="button" className="admin-sidebar-link logout sidebar-logout" onClick={onSignOut}>
+        <span className="link-icon"><LogOut size={20} /></span>
+        <span className="link-label">Cerrar sesión</span>
+      </button>
+    </>
+  );
+}
 
 const items = [
   { to: "/admin/dashboard", label: "Inicio", icon: <LayoutDashboard size={20} />, roles: OWNER_ADMIN_ROLES },
@@ -73,18 +88,11 @@ function AdminNavbar() {
         {secondaryItems.length ? <button type="button" className={`admin-mobile-link mobile-more-trigger ${secondaryItems.some((item) => location.pathname.startsWith(item.to)) ? "active" : ""}`} onClick={() => setShowMore((current) => !current)} aria-expanded={showMore}><span>{showMore ? <X size={20} /> : <MoreHorizontal size={20} />}</span><small>Más</small></button> : null}
       </nav>
 
-      {showMore && secondaryItems.length ? <div className="admin-mobile-more" role="dialog" aria-label="Más opciones"><header><div><strong>Más opciones</strong><span>{user?.email}</span></div><button type="button" onClick={() => setShowMore(false)} aria-label="Cerrar"><X size={20} /></button></header><div>{secondaryItems.map((item) => <NavLink key={`more-${item.to}`} to={item.to} className={getLinkClassName} onClick={() => setShowMore(false)}><span className="link-icon">{item.icon}</span><span className="link-label">{item.label}</span></NavLink>)}</div><Link to="/" className="admin-sidebar-link" onClick={() => setShowMore(false)}><span className="link-icon"><Globe size={20} /></span><span className="link-label">Ver sitio público</span></Link><button type="button" className="admin-sidebar-link logout sidebar-logout" onClick={handleSignOut}><span className="link-icon"><LogIn size={20} /></span><span className="link-label">Cerrar sesión</span></button></div> : null}
+      {showMore && secondaryItems.length ? <div className="admin-mobile-more" role="dialog" aria-label="Más opciones"><header><div><strong>Más opciones</strong><span>{user?.email}</span></div><button type="button" onClick={() => setShowMore(false)} aria-label="Cerrar"><X size={20} /></button></header><div>{secondaryItems.map((item) => <NavLink key={`more-${item.to}`} to={item.to} className={getLinkClassName} onClick={() => setShowMore(false)}><span className="link-icon">{item.icon}</span><span className="link-label">{item.label}</span></NavLink>)}</div><SidebarFooterLinks onSignOut={handleSignOut} onLinkClick={() => setShowMore(false)} /></div> : null}
 
       <div className="sidebar-footer">
         {user?.email ? <span className="sidebar-user" title={user.email}>{user.email}</span> : null}
-        <Link to="/" className="admin-sidebar-link">
-          <span className="link-icon"><Globe size={20} /></span>
-          <span className="link-label">Ver sitio público</span>
-        </Link>
-        <button type="button" className="admin-sidebar-link logout sidebar-logout" onClick={handleSignOut}>
-          <span className="link-icon"><LogIn size={20} /></span>
-          <span className="link-label">Cerrar sesión</span>
-        </button>
+        <SidebarFooterLinks onSignOut={handleSignOut} />
       </div>
     </aside>
   );

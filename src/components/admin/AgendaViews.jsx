@@ -2,14 +2,14 @@ import { useMemo } from "react";
 import { ArrowRight, CalendarDays, Car, ChevronLeft, ChevronRight, Clock3, MessageCircle, Pencil, Trash2, User } from "lucide-react";
 import TurnsTable from "./TurnsTable";
 import { getTodayString, turnOccupiesDate } from "../../utils/date";
-import { appointmentWhatsAppLink, readyTurnWhatsAppLink, turnConfirmationWhatsAppLink } from "../../utils/whatsapp";
+import { appointmentWhatsAppLink, getTurnWhatsAppLink } from "../../utils/whatsapp";
 import { getServiceTone } from "../../utils/serviceTone";
-import { getTurnStatusClass, getTurnVehicleLabel } from "../../utils/turnPresentation";
+import { getTurnCardInteractionProps, getTurnStatusClass, getTurnVehicleLabel } from "../../utils/turnPresentation";
+import { formatMoney } from "../../utils/money";
 import "./AgendaViews.css";
 import "./MonthAgenda.css";
 import "./ServiceTone.css";
 
-const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
 const BOARD_COLUMNS = [
   { key: "pending", label: "Por confirmar", statuses: ["Consulta", "Pendiente", "Seña pendiente"], next: "Confirmado", tone: "amber" },
   { key: "confirmed", label: "Confirmados", statuses: ["Confirmado"], next: "En proceso", tone: "blue" },
@@ -108,14 +108,14 @@ export function WeekAgenda({ turns, weekOffset, onWeekChange, onStatusChange, on
               </header>
               <div className="week-day-list">
                 {dayTurns.length ? dayTurns.map((turn) => (
-                  <article className={`week-turn is-shared-slot ${getServiceTone(turn)}${(turn.lastOccupiedDate || turn.endDate || turn.date) > turn.date ? " is-spanning" : ""} status-${getTurnStatusClass(turn.status)}`} style={{ "--week-span": Math.max(1, dayDistance(key, (turn.lastOccupiedDate || turn.endDate) > weekEndKey ? weekEndKey : (turn.lastOccupiedDate || turn.endDate || turn.date)) + 1) }} key={turn.id} role="button" tabIndex={0} onClick={(event) => { if (!event.target.closest("a,button,select")) onViewTurn?.(turn); }} onKeyDown={(event) => { if (!event.target.closest("a,button,select") && (event.key === "Enter" || event.key === " ")) onViewTurn?.(turn); }}>
+                  <article className={`week-turn is-shared-slot ${getServiceTone(turn)}${(turn.lastOccupiedDate || turn.endDate || turn.date) > turn.date ? " is-spanning" : ""} status-${getTurnStatusClass(turn.status)}`} style={{ "--week-span": Math.max(1, dayDistance(key, (turn.lastOccupiedDate || turn.endDate) > weekEndKey ? weekEndKey : (turn.lastOccupiedDate || turn.endDate || turn.date)) + 1) }} key={turn.id} {...getTurnCardInteractionProps(turn, onViewTurn)}>
                     <div className="week-turn-heading">
                       <div className="week-turn-time"><Clock3 size={12} />{turn.date === key ? turn.time : "En curso"}{turn.endDate === key ? `–${turn.endTime}` : turn.endDate !== turn.date ? ` · hasta ${turn.endDate}` : `–${turn.endTime}`}</div>
                       {canUseOperationalActions || onEditTurn || onDeleteTurn ? (
                         <div className="week-turn-actions">
                           {canUseOperationalActions ? (
                             <a
-                              href={turn.status === "Listo" ? readyTurnWhatsAppLink(turn, settings?.readyMessageTemplate, settings?.openingHours) : turnConfirmationWhatsAppLink(turn, settings?.businessName, settings?.confirmationMessageTemplate)}
+                              href={getTurnWhatsAppLink(turn, settings)}
                               target="_blank"
                               rel="noreferrer"
                               title={turn.status === "Listo" ? "Avisar vehículo listo" : "Confirmar turno"}
@@ -211,8 +211,8 @@ export function MonthAgenda({ turns, monthOffset, onMonthChange, onStatusChange,
               {startingSegments.map(({ turn, lane, startColumn, endColumn }) => {
                 const className = `month-span-turn is-shared-slot ${getServiceTone(turn)} status-${getTurnStatusClass(turn.status)}`;
                 const style = { "--month-span": endColumn - startColumn, "--month-lane": Math.min(lane, 2) };
-                return <article key={`${turn.id}-${row}`} className={className} style={style} role="button" tabIndex={0} onClick={(event) => { if (!event.target.closest("a,button,select")) onViewTurn?.(turn); }} onKeyDown={(event) => { if (!event.target.closest("a,button,select") && (event.key === "Enter" || event.key === " ")) onViewTurn?.(turn); }}>
-                  <div className="month-span-heading"><div className="week-turn-time"><Clock3 size={12} />{turn.date} {turn.time} → {turn.endDate} {turn.endTime}</div><div className="week-turn-actions">{canUseOperationalActions ? <a href={turn.status === "Listo" ? readyTurnWhatsAppLink(turn, settings?.readyMessageTemplate, settings?.openingHours) : turnConfirmationWhatsAppLink(turn, settings?.businessName, settings?.confirmationMessageTemplate)} target="_blank" rel="noreferrer" title="Abrir WhatsApp"><MessageCircle size={13} /></a> : null}{onEditTurn ? <button type="button" onClick={() => onEditTurn(turn)} title="Editar turno"><Pencil size={13} /></button> : null}{onDeleteTurn ? <button type="button" className="danger" onClick={() => onDeleteTurn(turn.id)} title="Eliminar turno"><Trash2 size={13} /></button> : null}</div></div>
+                return <article key={`${turn.id}-${row}`} className={className} style={style} {...getTurnCardInteractionProps(turn, onViewTurn)}>
+                  <div className="month-span-heading"><div className="week-turn-time"><Clock3 size={12} />{turn.date} {turn.time} → {turn.endDate} {turn.endTime}</div><div className="week-turn-actions">{canUseOperationalActions ? <a href={getTurnWhatsAppLink(turn, settings)} target="_blank" rel="noreferrer" title="Abrir WhatsApp"><MessageCircle size={13} /></a> : null}{onEditTurn ? <button type="button" onClick={() => onEditTurn(turn)} title="Editar turno"><Pencil size={13} /></button> : null}{onDeleteTurn ? <button type="button" className="danger" onClick={() => onDeleteTurn(turn.id)} title="Eliminar turno"><Trash2 size={13} /></button> : null}</div></div>
                   <strong>{turn.client}</strong><span>{turn.service}</span><small className="agenda-compact-vehicle"><Car size={11} />{getTurnVehicleLabel(turn) || "Sin vehículo"}</small>
                   {onStatusChange ? <select value={turn.status} onChange={(event) => onStatusChange(turn.id, event.target.value)}>{WEEK_STATUS_OPTIONS.map((status) => <option key={status}>{status}</option>)}</select> : <span className="week-readonly-status">{turn.status}</span>}
                 </article>;
@@ -222,11 +222,11 @@ export function MonthAgenda({ turns, monthOffset, onMonthChange, onStatusChange,
                   const className = `month-turn ${getServiceTone(turn)} status-${getTurnStatusClass(turn.status)}`;
                   const title = `${turn.time} · ${turn.client} · ${turn.service}`;
                   if (onViewTurn) return (
-                    <article key={turn.id} className={`${className} is-shared-slot`} title={title} role="button" tabIndex={0} onClick={(event) => { if (!event.target.closest("a,button")) onViewTurn?.(turn); }} onKeyDown={(event) => { if (!event.target.closest("a,button") && (event.key === "Enter" || event.key === " ")) onViewTurn?.(turn); }}>
+                    <article key={turn.id} className={`${className} is-shared-slot`} title={title} {...getTurnCardInteractionProps(turn, onViewTurn)}>
                       <strong>{turn.service}</strong>
                       <small className="agenda-compact-vehicle"><Car size={10} />{getTurnVehicleLabel(turn) || "Sin vehículo"}</small>
                       <span className="month-turn-actions">
-                        {canUseOperationalActions ? <a href={turn.status === "Listo" ? readyTurnWhatsAppLink(turn, settings?.readyMessageTemplate, settings?.openingHours) : turnConfirmationWhatsAppLink(turn, settings?.businessName, settings?.confirmationMessageTemplate)} target="_blank" rel="noreferrer" title="Abrir WhatsApp"><MessageCircle size={12} /></a> : null}
+                        {canUseOperationalActions ? <a href={getTurnWhatsAppLink(turn, settings)} target="_blank" rel="noreferrer" title="Abrir WhatsApp"><MessageCircle size={12} /></a> : null}
                         {onEditTurn ? <button type="button" onClick={() => onEditTurn(turn)} title="Editar turno"><Pencil size={12} /></button> : null}
                         {onDeleteTurn ? <button type="button" onClick={() => onDeleteTurn(turn.id)} title="Eliminar turno"><Trash2 size={12} /></button> : null}
                       </span>
@@ -272,7 +272,7 @@ export function BoardAgenda({ turns, onStatusChange, canUseOperationalActions = 
                     <h3>{turn.client}</h3>
                     <p><Car size={14} />{getTurnVehicleLabel(turn)}</p>
                     <p className="board-service">{turn.service}</p>
-                    {turn.amount > 0 ? <strong className="board-price">{money.format(turn.amount)}</strong> : null}
+                    {turn.amount > 0 ? <strong className="board-price">{formatMoney(turn.amount)}</strong> : null}
                     {column.next && onStatusChange ? <button type="button" onClick={() => onStatusChange(turn.id, column.next)}>{column.next}<ArrowRight size={14} /></button> : <span className="board-complete"><User size={14} /> Trabajo entregado</span>}
                   </article>
                 ))}

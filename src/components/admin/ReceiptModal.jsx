@@ -5,12 +5,7 @@ import defaultLogoUrl from "../../assets/logo.webp";
 import "./ReceiptModal.css";
 import { useFeedback } from "../../hooks/useFeedback";
 import { normalizeArgentinaPhone } from "../../utils/whatsapp";
-
-const money = new Intl.NumberFormat("es-AR", {
-  style: "currency",
-  currency: "ARS",
-  maximumFractionDigits: 0,
-});
+import { formatMoney } from "../../utils/money";
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -146,9 +141,9 @@ function ReceiptModal({ turn, services, settings, onClose, onSave, onDelete }) {
       ctx.textAlign = "center";
       ctx.fillText(String(item.quantity || 0), 700, y);
       ctx.textAlign = "right";
-      ctx.fillText(money.format(Number(item.price || 0)), 850, y);
+      ctx.fillText(formatMoney(Number(item.price || 0)), 850, y);
       ctx.font = "bold 23px Arial";
-      ctx.fillText(money.format(Number(item.quantity || 0) * Number(item.price || 0)), width - 64, y);
+      ctx.fillText(formatMoney(Number(item.quantity || 0) * Number(item.price || 0)), width - 64, y);
       ctx.strokeStyle = "#e0e0dc";
       ctx.beginPath(); ctx.moveTo(64, y + 35); ctx.lineTo(width - 64, y + 35); ctx.stroke();
       y += rowHeight;
@@ -163,7 +158,7 @@ function ReceiptModal({ turn, services, settings, onClose, onSave, onDelete }) {
     ctx.fillText("TOTAL", 590, y + 55);
     ctx.textAlign = "right";
     ctx.font = "bold 32px Arial";
-    ctx.fillText(money.format(total), width - 88, y + 58);
+    ctx.fillText(formatMoney(total), width - 88, y + 58);
 
     ctx.textAlign = "center";
     ctx.fillStyle = "#666660";
@@ -196,7 +191,7 @@ function ReceiptModal({ turn, services, settings, onClose, onSave, onDelete }) {
     setIsWorking(true);
     try {
       const file = await createReceiptFile();
-      const text = `Hola ${turn.client}, te enviamos el recibo ${receiptNumber} de ${settings.businessName || "Autoestética Tucumán"}. Total: ${money.format(total)}. ¡Gracias por elegirnos!`;
+      const text = `Hola ${turn.client}, te enviamos el recibo ${receiptNumber} de ${settings.businessName || "Autoestética Tucumán"}. Total: ${formatMoney(total)}. ¡Gracias por elegirnos!`;
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         await navigator.share({ title: `Recibo ${receiptNumber}`, text, files: [file] });
       } else {
@@ -246,7 +241,7 @@ function ReceiptModal({ turn, services, settings, onClose, onSave, onDelete }) {
             </div>
           ))}
         </div>
-        <div className="receipt-total"><span>Total a pagar</span><strong>{money.format(total)}</strong></div>
+        <div className="receipt-total"><span>Total a pagar</span><strong>{formatMoney(total)}</strong></div>
         {total <= 0 ? <p className="receipt-warning">Ingresá el precio de al menos un servicio para generar el recibo.</p> : null}
         <div className="receipt-actions">
           {onDelete ? <button type="button" className="receipt-delete" onClick={onDelete} disabled={isWorking}><Trash2 size={18} /> Eliminar recibo</button> : null}

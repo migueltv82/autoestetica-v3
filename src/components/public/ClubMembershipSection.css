@@ -1,7 +1,7 @@
 .club-public-section {
   padding: clamp(3.5rem, 6vw, 5.5rem) 0;
   background:
-    radial-gradient(circle at 18% 0%, rgba(87, 199, 255, 0.08), transparent 28%),
+    radial-gradient(circle at 18% 0%, rgba(216, 184, 106, 0.08), transparent 28%),
     radial-gradient(circle at 86% 42%, rgba(255, 255, 255, 0.035), transparent 30%),
     #05070a;
 }
@@ -28,7 +28,7 @@
   right: 8%;
   left: 8%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(113, 208, 255, 0.52), transparent);
+  background: linear-gradient(90deg, transparent, rgba(240, 217, 159, 0.52), transparent);
   content: "";
 }
 
@@ -82,9 +82,9 @@
 
 .club-public-badge {
   padding: 0.45rem 0.72rem;
-  border: 1px solid rgba(113, 208, 255, 0.22);
-  background: rgba(87, 199, 255, 0.08);
-  color: #b9e8ff;
+  border: 1px solid rgba(216, 184, 106, 0.28);
+  background: rgba(216, 184, 106, 0.1);
+  color: #f0d99f;
 }
 
 .club-public-badge.accent {
@@ -103,7 +103,7 @@
 
 .club-payment-chip {
   flex: 0 0 auto;
-  color: #dff6ff;
+  color: #fff3cf;
 }
 
 .club-public-grid {
@@ -133,7 +133,7 @@
   border: 1px solid rgba(255, 255, 255, 0.105);
   border-radius: 26px;
   background:
-    radial-gradient(circle at 14% 0%, rgba(87, 199, 255, 0.1), transparent 34%),
+    radial-gradient(circle at 14% 0%, rgba(216, 184, 106, 0.1), transparent 34%),
     linear-gradient(145deg, rgba(17, 27, 38, 0.94), rgba(6, 10, 15, 0.98));
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
 }
@@ -227,9 +227,9 @@
 
 .club-plan-price {
   padding: 1rem;
-  border: 1px solid rgba(113, 208, 255, 0.15);
+  border: 1px solid rgba(240, 217, 159, 0.15);
   border-radius: 20px;
-  background: rgba(87, 199, 255, 0.06);
+  background: rgba(216, 184, 106, 0.06);
 }
 
 .club-plan-price small {
@@ -260,7 +260,7 @@
 .club-includes-title {
   display: block;
   margin-bottom: 0.75rem;
-  color: #dff6ff;
+  color: #fff3cf;
   font-size: 0.72rem;
   font-weight: 850;
   letter-spacing: 0.12em;
@@ -293,7 +293,7 @@
 .club-includes-list svg {
   flex: 0 0 auto;
   margin-top: 0.08rem;
-  color: #71d0ff;
+  color: #f0d99f;
 }
 
 .club-public-cta {
@@ -304,23 +304,23 @@
   gap: 0.5rem;
   margin-top: 1.25rem;
   padding: 0.86rem 1.2rem;
-  border: 1px solid rgba(148, 222, 255, 0.72);
+  border: 1px solid rgba(232, 205, 143, 0.72);
   border-radius: 999px;
-  background: linear-gradient(135deg, #dff6ff, #57c7ff 52%, #249fe5);
-  color: #03111a;
+  background: linear-gradient(135deg, #fff3cf, #d8b86a 52%, #a98236);
+  color: #071a15;
   font-size: 0.78rem;
   font-weight: 850;
   letter-spacing: 0.12em;
   line-height: 1;
   text-transform: uppercase;
-  box-shadow: 0 14px 34px rgba(36, 159, 229, 0.22);
+  box-shadow: 0 14px 34px rgba(216, 184, 106, 0.22);
   transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
 }
 
 .club-public-cta:hover {
   transform: translateY(-1px);
-  background: linear-gradient(135deg, #fff, #7bd7ff 55%, #32aceb);
-  box-shadow: 0 18px 44px rgba(36, 159, 229, 0.3);
+  background: linear-gradient(135deg, #fff8e8, #e4c984 55%, #c9ae72);
+  box-shadow: 0 18px 44px rgba(216, 184, 106, 0.3);
 }
 
 .club-public-cta.secondary {
@@ -389,7 +389,7 @@
 }
 
 .club-fidelity-pass-header svg {
-  color: #71d0ff;
+  color: #f0d99f;
 }
 
 .club-stamps {
@@ -407,10 +407,10 @@
 }
 
 .club-stamp.done {
-  border: 1px solid #71d0ff;
-  background: #71d0ff;
-  color: #04131d;
-  box-shadow: 0 0 26px rgba(87, 199, 255, 0.22);
+  border: 1px solid #d8b86a;
+  background: #d8b86a;
+  color: #071a15;
+  box-shadow: 0 0 26px rgba(216, 184, 106, 0.22);
 }
 
 .club-stamp.pending {

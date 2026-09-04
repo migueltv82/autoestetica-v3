@@ -27,6 +27,7 @@ import { useFeedback } from "../../hooks/useFeedback";
 import { useSettings } from "../../hooks/useSettings";
 import { useTeamMembers } from "../../hooks/useTeamMembers";
 import { compressImageFile } from "../../utils/imageUpload";
+import ToggleButton from "../../components/ui/ToggleButton";
 import "./Settings.css";
 
 const ROLE_LABELS = {
@@ -198,16 +199,14 @@ function SettingsForm({ initialSettings, onSave }) {
                 <strong>Publicar sección del Club</strong>
                 <small>{form.clubSectionEnabled ? "Visible para todos los visitantes." : "Oculta en el sitio público; la configuración se conserva."}</small>
               </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={form.clubSectionEnabled}
+              <ToggleButton
+                checked={form.clubSectionEnabled}
+                onChange={() => setForm((current) => ({ ...current, clubSectionEnabled: !current.clubSectionEnabled }))}
                 className={`settings-visibility-switch${form.clubSectionEnabled ? " active" : ""}`}
-                onClick={() => setForm((current) => ({ ...current, clubSectionEnabled: !current.clubSectionEnabled }))}
               >
                 <span aria-hidden="true" />
                 <b>{form.clubSectionEnabled ? "Activa" : "Oculta"}</b>
-              </button>
+              </ToggleButton>
             </div>
           </SettingsSection>
 

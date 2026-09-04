@@ -46,7 +46,7 @@
 }
 
 .club-kicker {
-  color: #71d0ff;
+  color: #d9c994;
   font-size: 0.6rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -78,7 +78,7 @@
 
 .club-plan-card:hover,
 .club-plan-card.selected {
-  border-color: rgba(87, 199, 255, 0.3);
+  border-color: rgba(216, 184, 106, 0.3);
   background: rgba(23, 34, 48, 0.9);
 }
 
@@ -102,7 +102,7 @@
 }
 
 .club-plan-topline > strong {
-  color: #dff6ff;
+  color: #fff1c9;
   font-size: 0.68rem;
   white-space: nowrap;
 }
@@ -185,10 +185,10 @@
   height: 54px;
   place-items: center;
   margin: 0 auto 1rem;
-  border: 1px solid rgba(87, 199, 255, 0.18);
+  border: 1px solid rgba(216, 184, 106, 0.2);
   border-radius: 14px;
-  background: rgba(87, 199, 255, 0.1);
-  color: #71d0ff;
+  background: rgba(216, 184, 106, 0.1);
+  color: #d9c994;
 }
 
 .club-editor-empty h2 {
@@ -318,8 +318,8 @@
 .club-field input:focus,
 .club-field textarea:focus,
 .club-feature-row input:focus {
-  border-color: rgba(87, 199, 255, 0.5);
-  box-shadow: 0 0 0 3px rgba(87, 199, 255, 0.08);
+  border-color: rgba(216, 184, 106, 0.5);
+  box-shadow: 0 0 0 3px rgba(216, 184, 106, 0.08);
 }
 
 .club-input-icon {
@@ -356,7 +356,7 @@
 }
 
 .club-switch:hover {
-  border-color: rgba(87, 199, 255, 0.28);
+  border-color: rgba(216, 184, 106, 0.28);
   background: rgba(23, 34, 48, 0.9);
 }
 
@@ -400,7 +400,7 @@
 }
 
 .club-switch.is-on .club-switch-control {
-  background: #57c7ff;
+  background: #c9ae72;
 }
 
 .club-switch.is-on .club-switch-control span {
@@ -463,9 +463,9 @@
 
 .club-preview-price {
   padding: 0.85rem;
-  border: 1px solid rgba(87, 199, 255, 0.14);
+  border: 1px solid rgba(216, 184, 106, 0.14);
   border-radius: 13px;
-  background: rgba(87, 199, 255, 0.055);
+  background: rgba(216, 184, 106, 0.055);
 }
 
 .club-preview-price small {
@@ -478,7 +478,7 @@
 }
 
 .club-preview-price strong {
-  color: #dff6ff;
+  color: #fff1c9;
   font-size: 1.5rem;
 }
 
@@ -500,7 +500,7 @@
 
 .club-preview-features svg {
   flex: 0 0 auto;
-  color: #71d0ff;
+  color: #d9c994;
 }
 
 .club-preview-notes {

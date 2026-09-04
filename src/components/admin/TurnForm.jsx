@@ -4,10 +4,10 @@ import { useServices } from "../../hooks/useServices";
 import { usePermissions } from "../../hooks/usePermissions";
 import { getServicePriceForVehicle } from "../../utils/servicePricing";
 import { useFeedback } from "../../hooks/useFeedback";
+import { formatMoney } from "../../utils/money";
 import "./TurnForm.css";
 
 const VEHICLE_OPTIONS = ["Auto", "Camioneta", "SUV", "Moto", "Bicicleta"];
-const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
 
 const buildInitialForm = (canManageFinance) => ({
   date: "",
@@ -208,7 +208,7 @@ function TurnForm({ onAddTurn, initialData = null }) {
                   <button type="button" key={service.id} className={`turn-service-option ${selected ? "selected" : ""}`} onClick={() => toggleService(service)}>
                     <span className="turn-service-check">{selected ? <Check size={14} /> : null}</span>
                     <span><strong>{service.name}</strong><small>{service.duration}</small></span>
-                    <b>{vehiclePrice > 0 ? money.format(vehiclePrice) : "Definir precio"}</b>
+                    <b>{vehiclePrice > 0 ? formatMoney(vehiclePrice) : "Definir precio"}</b>
                   </button>
                 );
               })}
@@ -219,7 +219,7 @@ function TurnForm({ onAddTurn, initialData = null }) {
             <div className="turn-selected-services full-width">
               <div className="turn-selected-heading">
                 <span>Detalle seleccionado · {Math.floor(durationMinutes / 60) ? `${Math.floor(durationMinutes / 60)} h ` : ""}{durationMinutes % 60 ? `${durationMinutes % 60} min` : ""}</span>
-                <strong>Total: {money.format(total)}</strong>
+                <strong>Total: {formatMoney(total)}</strong>
               </div>
               {formData.services.map((service) => (
                 <div className="turn-selected-row" key={service.serviceId}>
@@ -231,7 +231,7 @@ function TurnForm({ onAddTurn, initialData = null }) {
                 <span>Descuento general</span>
                 <label>Descuento<input type="number" min="0" max={subtotal} value={formData.discount} onChange={(event) => setFormData((current) => ({ ...current, discount: event.target.value }))} /></label>
               </div>
-              <div className="turn-discount-summary"><span>Subtotal <strong>{money.format(subtotal)}</strong></span><span>Descuento <strong>- {money.format(discount)}</strong></span></div>
+              <div className="turn-discount-summary"><span>Subtotal <strong>{formatMoney(subtotal)}</strong></span><span>Descuento <strong>- {formatMoney(discount)}</strong></span></div>
             </div>
           ) : null}
 
@@ -267,7 +267,7 @@ function TurnForm({ onAddTurn, initialData = null }) {
         </div>
 
         <div className="admin-form-actions">
-          <div className="turn-form-total"><span>Total del turno</span><strong>{money.format(total)}</strong></div>
+          <div className="turn-form-total"><span>Total del turno</span><strong>{formatMoney(total)}</strong></div>
           <button type="submit" className="btn-primary-admin" disabled={isSubmitting}><CheckCircle2 size={18} />{isSubmitting ? "Guardando…" : initialData?.status === "Consulta" ? "Agregar a la agenda" : "Guardar turno"}</button>
         </div>
       </form>
