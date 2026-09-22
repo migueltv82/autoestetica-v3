@@ -112,14 +112,18 @@ describe("InquiryForm", () => {
 
   it("no muestra éxito si invoke devuelve error", async () => {
     const user = renderForm();
-    invoke.mockResolvedValueOnce({ error: { message: "token-secreto-db-url" } });
+    invoke.mockResolvedValueOnce({ error: { name: "FunctionsFetchError", message: "Failed to fetch internal-url" } });
     vi.spyOn(console, "error").mockImplementation(() => {});
     await completeRequiredFields(user);
     await user.click(legalCheckbox());
 
     await user.click(screen.getByRole("button", { name: "Enviar consulta" }));
 
-    expect(screen.getByRole("alert")).toHaveTextContent("No pudimos registrar la consulta. Intentá nuevamente.");
+    expect(screen.getByRole("alert")).toHaveTextContent("No pudimos conectar con el servicio de consultas. Intentá nuevamente o escribinos por WhatsApp.");
+    expect(screen.getByRole("alert")).not.toHaveTextContent("Sin conexión");
+    expect(screen.getByRole("alert")).not.toHaveTextContent("internal-url");
+    expect(screen.getByRole("alert")).toHaveFocus();
+    expect(screen.getByRole("link", { name: "Escribir por WhatsApp (se abre en una nueva pestaña)" })).toHaveAttribute("href", expect.stringContaining("https://wa.me/5493815550101?text="));
     expect(screen.queryByText("Tu consulta quedó registrada")).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Abrir WhatsApp" })).not.toBeInTheDocument();
     expect(window.open).not.toHaveBeenCalled();

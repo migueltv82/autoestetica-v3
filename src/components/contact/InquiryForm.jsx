@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AlertTriangle, Check, MessageCircle, ShieldCheck, Sparkles } from "lucide-react";
 import { useServices } from "../../hooks/useServices";
 import { useSettings } from "../../hooks/useSettings";
@@ -22,8 +22,8 @@ function getInquirySubmitErrorMessage(error) {
     return "No se pudo enviar desde este dominio. Revisá PUBLIC_SITE_ORIGINS.";
   }
 
-  if (error?.name === "FunctionsFetchError" || errorText.includes("fetch") || errorText.includes("network") || errorText.includes("red")) {
-    return "Sin conexión. Revisá internet e intentá de nuevo.";
+  if (error?.name === "FunctionsFetchError" || errorText.includes("fetch") || errorText.includes("network")) {
+    return "No pudimos conectar con el servicio de consultas. Intentá nuevamente o escribinos por WhatsApp.";
   }
 
   return GENERIC_SUBMIT_ERROR;
@@ -37,9 +37,9 @@ function InquiryForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [submittedWhatsappUrl, setSubmittedWhatsappUrl] = useState("");
-  const [whatsappOpened, setWhatsappOpened] = useState(false);
   const honeypotRef = useRef(null);
   const focusNameOnReset = useRef(false);
+  const submitErrorRef = useRef(null);
   const focusSuccess = useCallback((node) => node?.focus(), []);
   const availableServices = useMemo(() => services.map((service) => service.name), [services]);
   const noServicesAvailable = !servicesLoading && !availableServices.length;
@@ -67,6 +67,10 @@ function InquiryForm() {
     `*Consulta:* ${formData.message || "-"}`,
   ].join("\n"), [formData]);
   const errorWhatsappUrl = configuredWhatsapp ? `https://wa.me/${configuredWhatsapp}?text=${encodeURIComponent(whatsappText)}` : "";
+
+  useEffect(() => {
+    if (submitError) submitErrorRef.current?.focus();
+  }, [submitError]);
 
   function selectVehicle(vehicle) { setFormData((current) => ({ ...current, vehicle, services: [] })); }
   function toggleService(service) {
@@ -104,8 +108,6 @@ function InquiryForm() {
     const whatsapp = configuredWhatsapp || "5493815448147";
     const whatsappUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent(whatsappText)}`;
     setSubmittedWhatsappUrl(whatsappUrl);
-    const whatsappWindow = window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-    setWhatsappOpened(Boolean(whatsappWindow && !whatsappWindow.closed));
   }
 
   const invalid = submitAttempted && Boolean(validationMessage);
@@ -127,7 +129,7 @@ function InquiryForm() {
           <div className="inquiry-form-panel">
             <div className="inquiry-form-heading">
               <h2 tabIndex={-1} ref={focusSuccess}>Tu consulta quedó registrada</h2>
-              <p>{whatsappOpened ? "Abrimos WhatsApp con el resumen de tu consulta. También podés volver a abrirlo desde acá." : "Podés continuar por WhatsApp. Si no se abrió, usá el botón para abrirlo con el resumen de tu consulta."}</p>
+              <p>Registramos tu consulta para responderte con seguimiento. Si querés continuar ahora, abrí WhatsApp desde el botón con el resumen listo.</p>
             </div>
             <div className="inquiry-submit-row">
               <a className="btn-primary inquiry-submit" href={submittedWhatsappUrl} target="_blank" rel="noopener noreferrer"><MessageCircle size={18} aria-hidden="true" />Abrir WhatsApp</a>
@@ -137,7 +139,6 @@ function InquiryForm() {
                 setSubmitAttempted(false);
                 setSubmitError("");
                 setSubmittedWhatsappUrl("");
-                setWhatsappOpened(false);
               }}>Enviar otra consulta</button>
             </div>
           </div>
@@ -150,7 +151,7 @@ function InquiryForm() {
           <input ref={honeypotRef} className="inquiry-honeypot" type="text" name="website" tabIndex="-1" autoComplete="off" aria-hidden="true" />
           <div className="inquiry-form-heading"><span>Consulta rápida</span><strong>Completá los datos principales</strong><p>Los campos marcados son necesarios para poder asesorarte.</p></div>
           {invalid ? <div className="inquiry-error" role="alert"><AlertTriangle size={16} />{validationMessage}</div> : null}
-          {submitError ? <div className="inquiry-error" role="alert"><AlertTriangle size={16} /><span>{submitError}{errorWhatsappUrl ? <> <a href={errorWhatsappUrl} target="_blank" rel="noopener noreferrer">Escribir por WhatsApp</a></> : null}</span></div> : null}
+          {submitError ? <div className="inquiry-error" role="alert" tabIndex={-1} ref={submitErrorRef}><AlertTriangle size={16} /><span className="inquiry-error-content"><span>{submitError}</span>{errorWhatsappUrl ? <a className="inquiry-error-link" href={errorWhatsappUrl} target="_blank" rel="noopener noreferrer">Escribir por WhatsApp (se abre en una nueva pestaña)</a> : null}</span></div> : null}
           <div className="inquiry-form-grid">
             <div className={`inquiry-form-group${submitAttempted && !formData.name.trim() ? " has-error" : ""}`}>
               <label htmlFor="inquiry-name">Nombre y apellido *</label><input id="inquiry-name" type="text" required value={formData.name} onChange={(event) => setFormData({ ...formData, name: event.target.value })} placeholder="Ej: Miguel Torres" autoComplete="name" aria-invalid={submitAttempted && !formData.name.trim()} />
@@ -173,7 +174,7 @@ function InquiryForm() {
           </div>
           <div className="inquiry-form-group"><label htmlFor="inquiry-message">Detalle adicional</label><textarea id="inquiry-message" rows="5" value={formData.message} onChange={(event) => setFormData({ ...formData, message: event.target.value })} placeholder="Contanos el estado del vehículo o el resultado que buscás." /></div>
           <label className={`inquiry-legal-consent${submitAttempted && !formData.acceptedLegal ? " has-error" : ""}`}><input type="checkbox" required checked={formData.acceptedLegal} aria-invalid={submitAttempted && !formData.acceptedLegal} onChange={(event) => setFormData({ ...formData, acceptedLegal: event.target.checked })} /><span>Acepto la <Link to="/privacidad" target="_blank" rel="noreferrer">Política de Privacidad</Link> y las <Link to="/terminos" target="_blank" rel="noreferrer">Condiciones del Servicio</Link>.</span></label>
-          <div className="inquiry-submit-row"><p className="inquiry-submit-note">Al enviar, registramos la consulta y abrimos WhatsApp con el resumen listo.</p><button type="submit" className="btn-primary inquiry-submit" disabled={isSubmitting || servicesLoading || noServicesAvailable}><MessageCircle size={18} />{isSubmitting ? "Enviando…" : "Enviar consulta"}</button></div>
+          <div className="inquiry-submit-row"><p className="inquiry-submit-note">Al enviar, registramos la consulta y dejamos WhatsApp listo por si querés continuar.</p><button type="submit" className="btn-primary inquiry-submit" disabled={isSubmitting || servicesLoading || noServicesAvailable}><MessageCircle size={18} />{isSubmitting ? "Enviando…" : "Enviar consulta"}</button></div>
         </form>}
       </div>
     </section>
