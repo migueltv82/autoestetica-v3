@@ -41,7 +41,7 @@ El nombre sigue `AAAAMMDDNNNN_descripcion.sql`. Una migración aplicada no se ed
 ## Instalación limpia
 
 1. Crear un proyecto Supabase y esperar a que esté operativo.
-2. Configurar las variables Supabase, `VITE_ORGANIZATION_SLUG` y `VITE_TURNSTILE_SITE_KEY` en `.env.local`.
+2. Configurar las variables Supabase y `VITE_ORGANIZATION_SLUG` en `.env.local`.
 3. Iniciar sesión y vincular el CLI:
 
    ```bash
@@ -56,7 +56,7 @@ El nombre sigue `AAAAMMDDNNNN_descripcion.sql`. Una migración aplicada no se ed
    ```
 
 5. Crear el usuario propietario en Authentication > Users y vincularlo a la organización.
-6. Desplegar las Edge Functions con `npm run supabase:functions:deploy`.
+6. Configurar `PUBLIC_SITE_ORIGINS` como indica [DEPLOYMENT.md](../DEPLOYMENT.md) y desplegar las Edge Functions con `npm run supabase:functions:deploy` antes de publicar el frontend. El script de `submit-public-inquiry` incluye `--no-verify-jwt` para recibir consultas sin sesión de usuario.
 7. Ejecutar `VERIFY_DATABASE.sql` y `VERIFY_OPERATIONAL_FLOW.sql` desde SQL Editor.
 
 ## Vincular el propietario
@@ -87,8 +87,9 @@ on conflict (organization_id) do update set business_name = excluded.business_na
 ## Seguridad
 
 - El frontend usa únicamente la clave pública (`anon`).
-- `SUPABASE_SERVICE_ROLE_KEY` y `TURNSTILE_SECRET_KEY` viven solo en los secretos de Edge Functions.
+- `SUPABASE_SERVICE_ROLE_KEY` vive solo en los secretos de Edge Functions.
 - `PUBLIC_SITE_ORIGINS` limita el formulario a los dominios autorizados.
+- El formulario público conserva el honeypot y los límites de frecuencia en el servidor.
 - Owner y admin deben completar MFA TOTP antes de entrar al panel.
 - Las funciones de equipo validan el JWT y exigen rol `owner` o `admin`.
 - Las políticas RLS y funciones RPC son parte del esquema versionado; no deben mantenerse solo desde el Dashboard.

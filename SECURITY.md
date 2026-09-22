@@ -13,7 +13,7 @@ No ejecutar `npm audit fix --force`: un cambio mayor automático puede romper au
 ## Secretos
 
 - El navegador recibe únicamente claves `VITE_*` públicas.
-- `SUPABASE_SERVICE_ROLE_KEY` y `TURNSTILE_SECRET_KEY` viven exclusivamente en secretos de Edge Functions.
+- `SUPABASE_SERVICE_ROLE_KEY` vive exclusivamente en secretos de Edge Functions.
 - Ante una exposición, rotar la clave afectada, invalidar sesiones y revisar logs antes de volver a publicar.
 
 ## Reporte de incidentes

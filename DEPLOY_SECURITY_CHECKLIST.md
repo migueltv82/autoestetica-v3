@@ -30,8 +30,9 @@
 
 ## Hosting
 
-- [ ] Están configuradas las variables Supabase, organización y `VITE_TURNSTILE_SITE_KEY`.
-- [ ] `TURNSTILE_SECRET_KEY` y `PUBLIC_SITE_ORIGINS` existen solamente como secretos de Supabase.
+- [ ] Están configuradas las variables Supabase y organización.
+- [ ] `PUBLIC_SITE_ORIGINS` está configurado en Supabase con los dominios autorizados.
+- [ ] `submit-public-inquiry` se actualizó antes de publicar el frontend mediante `npm run supabase:function:inquiry:deploy` (`--no-verify-jwt`).
 - [ ] HTTPS está activo.
 - [ ] Las rutas SPA recargan sin devolver 404.
 - [ ] Los encabezados CSP, anti-iframe, referrer y permissions están presentes.
@@ -40,7 +41,7 @@
 ## Prueba funcional
 
 - [ ] Consulta pública registrada y visible como nueva.
-- [ ] CAPTCHA inválido y envíos repetidos son rechazados.
+- [ ] El honeypot y los límites de frecuencia bloquean envíos automatizados y repetidos.
 - [ ] La tarjeta no abre solo con teléfono; sí abre con enlace secreto o código.
 - [ ] Turno confirmado sin reemplazar otros de la misma franja.
 - [ ] Descuento reflejado en orden, pago, caja y recibo.

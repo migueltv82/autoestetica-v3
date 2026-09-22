@@ -10,7 +10,7 @@ Aplicación web para gestionar un negocio de detailing automotriz. Reúne el sit
 - Formulario de consultas con seguimiento de leídas/no leídas.
 - Contacto y confirmaciones por WhatsApp.
 - Acceso del cliente a sus tarjetas mediante enlace privado o teléfono más código.
-- Formulario protegido con Turnstile, honeypot y límites de frecuencia.
+- Formulario protegido con honeypot y límites de frecuencia.
 - Tarjeta independiente por vehículo y animación al completar el premio.
 
 ### Administración
@@ -46,7 +46,6 @@ Crear `.env.local` en la raíz:
 VITE_SUPABASE_URL=https://TU_PROYECTO.supabase.co
 VITE_SUPABASE_ANON_KEY=TU_CLAVE_PUBLICA
 VITE_ORGANIZATION_SLUG=autoestetica-tucuman
-VITE_TURNSTILE_SITE_KEY=TU_CLAVE_PUBLICA_TURNSTILE
 ```
 
 La clave `service_role` nunca debe incluirse en el frontend ni en archivos versionados.

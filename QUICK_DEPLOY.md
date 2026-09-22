@@ -4,6 +4,8 @@ Esta es la secuencia corta y segura para publicar Autoestética Tucumán. La exp
 
 ## 1. Preparar Supabase
 
+Configurar `PUBLIC_SITE_ORIGINS` siguiendo [DEPLOYMENT.md](DEPLOYMENT.md) antes de desplegar las funciones. Publicar el backend antes del frontend para que el formulario use la versión actualizada de `submit-public-inquiry`.
+
 ```powershell
 npm run supabase:migrations:list
 npm run supabase:db:push
@@ -25,12 +27,9 @@ Agregar en Vercel o Netlify, para Producción y Preview:
 VITE_SUPABASE_URL=https://TU_PROYECTO.supabase.co
 VITE_SUPABASE_ANON_KEY=TU_CLAVE_PUBLICA
 VITE_ORGANIZATION_SLUG=autoestetica-tucuman
-VITE_TURNSTILE_SITE_KEY=TU_CLAVE_PUBLICA_TURNSTILE
 ```
 
 No agregar `SUPABASE_SERVICE_ROLE_KEY` al hosting del frontend.
-
-Antes de desplegar las funciones, configurar `TURNSTILE_SECRET_KEY` y `PUBLIC_SITE_ORIGINS` siguiendo `DEPLOYMENT.md`.
 
 En Supabase > Authentication > URL Configuration:
 

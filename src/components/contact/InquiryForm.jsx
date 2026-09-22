@@ -6,7 +6,6 @@ import { supabase } from "../../lib/supabase";
 import { ORGANIZATION_SLUG } from "../../lib/organization";
 import { Link } from "react-router-dom";
 import "./InquiryForm.css";
-import TurnstileWidget from "./TurnstileWidget";
 
 const VEHICLE_OPTIONS = ["Auto", "Camioneta", "SUV", "Moto", "Bicicleta"];
 
@@ -17,9 +16,19 @@ function InquiryForm() {
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
-  const [captchaToken, setCaptchaToken] = useState("");
-  const [captchaResetKey, setCaptchaResetKey] = useState(0);
   const honeypotRef = useRef(null);
+
+  const missingFields = [
+    !formData.name.trim() && "nombre y apellido",
+    !formData.phone.trim() && "WhatsApp / teléfono",
+    !formData.vehicle && "vehículo",
+    !formData.services.length && "al menos un servicio",
+  ].filter(Boolean);
+  const validationMessage = missingFields.length
+    ? `Completá los datos requeridos: ${new Intl.ListFormat("es").format(missingFields)}.`
+    : !formData.acceptedLegal
+      ? "Aceptá la Política de Privacidad y las Condiciones del Servicio para enviar tu consulta."
+      : "";
 
   const availableServices = useMemo(() => services.map((service) => service.name), [services]);
   const whatsappText = useMemo(() => [
@@ -39,13 +48,12 @@ function InquiryForm() {
   async function handleSubmit(event) {
     event.preventDefault();
     setSubmitAttempted(true);
-    if (!formData.name.trim() || !formData.phone.trim() || !formData.vehicle || !formData.services.length || !formData.acceptedLegal || !captchaToken) return;
+    if (validationMessage) return;
     if (honeypotRef.current?.value) return;
     setIsSubmitting(true);
     setSubmitError("");
     const whatsappWindow = window.open("", "_blank");
     const { error } = await supabase.functions.invoke("submit-public-inquiry", { body: {
-      captchaToken,
       businessSlug: ORGANIZATION_SLUG,
       clientName: formData.name,
       clientPhone: formData.phone,
@@ -59,7 +67,6 @@ function InquiryForm() {
       whatsappWindow?.close();
       console.error(error);
       setSubmitError(error?.context?.error || error?.message || "No pudimos registrar la consulta. Intentá nuevamente.");
-      setCaptchaResetKey((current) => current + 1);
       return;
     }
     const whatsapp = (settings.whatsapp || "5493815448147").replace(/\D/g, "");
@@ -67,11 +74,10 @@ function InquiryForm() {
     if (whatsappWindow) whatsappWindow.location.href = whatsappUrl;
     else window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     setFormData({ name: "", phone: "", vehicle: "", services: [], message: "", acceptedLegal: false });
-    setCaptchaResetKey((current) => current + 1);
     setSubmitAttempted(false);
   }
 
-  const invalid = submitAttempted && (!formData.name.trim() || !formData.phone.trim() || !formData.vehicle || !formData.services.length || !formData.acceptedLegal || !captchaToken);
+  const invalid = submitAttempted && Boolean(validationMessage);
   return (
     <section className="section inquiry-page">
       <div className="container inquiry-shell">
@@ -89,14 +95,14 @@ function InquiryForm() {
         <form className="inquiry-form-panel" onSubmit={handleSubmit} noValidate>
           <input ref={honeypotRef} className="inquiry-honeypot" type="text" name="website" tabIndex="-1" autoComplete="off" aria-hidden="true" />
           <div className="inquiry-form-heading"><span>Consulta rápida</span><strong>Completá los datos principales</strong><p>Los campos marcados son necesarios para poder asesorarte.</p></div>
-          {invalid ? <div className="inquiry-error" role="alert"><AlertTriangle size={16} />Completá los datos requeridos y aceptá la Política de Privacidad y las Condiciones del Servicio.</div> : null}
+          {invalid ? <div className="inquiry-error" role="alert"><AlertTriangle size={16} />{validationMessage}</div> : null}
           {submitError ? <div className="inquiry-error" role="alert"><AlertTriangle size={16} />{submitError}</div> : null}
           <div className="inquiry-form-grid">
             <div className={`inquiry-form-group${submitAttempted && !formData.name.trim() ? " has-error" : ""}`}>
-              <label>Nombre y apellido *</label><input type="text" value={formData.name} onChange={(event) => setFormData({ ...formData, name: event.target.value })} placeholder="Ej: Miguel Torres" autoComplete="name" aria-invalid={submitAttempted && !formData.name.trim()} />
+              <label htmlFor="inquiry-name">Nombre y apellido *</label><input id="inquiry-name" type="text" required value={formData.name} onChange={(event) => setFormData({ ...formData, name: event.target.value })} placeholder="Ej: Miguel Torres" autoComplete="name" aria-invalid={submitAttempted && !formData.name.trim()} />
             </div>
             <div className={`inquiry-form-group${submitAttempted && !formData.phone.trim() ? " has-error" : ""}`}>
-              <label>WhatsApp / Teléfono *</label><input type="tel" inputMode="tel" value={formData.phone} onChange={(event) => setFormData({ ...formData, phone: event.target.value })} placeholder="Código de área + número" autoComplete="tel" aria-invalid={submitAttempted && !formData.phone.trim()} />
+              <label htmlFor="inquiry-phone">WhatsApp / Teléfono *</label><input id="inquiry-phone" type="tel" inputMode="tel" required value={formData.phone} onChange={(event) => setFormData({ ...formData, phone: event.target.value })} placeholder="Código de área + número" autoComplete="tel" aria-invalid={submitAttempted && !formData.phone.trim()} />
             </div>
           </div>
           <div className={`inquiry-form-group${submitAttempted && !formData.vehicle ? " has-error" : ""}`}>
@@ -108,9 +114,8 @@ function InquiryForm() {
               {servicesLoading ? <span>Cargando servicios…</span> : availableServices.map((service) => <button key={service} type="button" className={`option-card option-card-service ${formData.services.includes(service) ? "selected" : ""}`} onClick={() => toggleService(service)} aria-pressed={formData.services.includes(service)}><span>{service}</span>{formData.services.includes(service) ? <Check size={16} /> : null}</button>)}
             </div>
           </div>
-          <div className="inquiry-form-group"><label>Detalle adicional</label><textarea rows="5" value={formData.message} onChange={(event) => setFormData({ ...formData, message: event.target.value })} placeholder="Contanos el estado del vehículo o el resultado que buscás." /></div>
-          <label className={`inquiry-legal-consent${submitAttempted && !formData.acceptedLegal ? " has-error" : ""}`}><input type="checkbox" checked={formData.acceptedLegal} onChange={(event) => setFormData({ ...formData, acceptedLegal: event.target.checked })} /><span>Acepto la <Link to="/privacidad" target="_blank" rel="noreferrer">Política de Privacidad</Link> y las <Link to="/terminos" target="_blank" rel="noreferrer">Condiciones del Servicio</Link>.</span></label>
-          <TurnstileWidget onToken={setCaptchaToken} resetKey={captchaResetKey} />
+          <div className="inquiry-form-group"><label htmlFor="inquiry-message">Detalle adicional</label><textarea id="inquiry-message" rows="5" value={formData.message} onChange={(event) => setFormData({ ...formData, message: event.target.value })} placeholder="Contanos el estado del vehículo o el resultado que buscás." /></div>
+          <label className={`inquiry-legal-consent${submitAttempted && !formData.acceptedLegal ? " has-error" : ""}`}><input type="checkbox" required checked={formData.acceptedLegal} aria-invalid={submitAttempted && !formData.acceptedLegal} onChange={(event) => setFormData({ ...formData, acceptedLegal: event.target.checked })} /><span>Acepto la <Link to="/privacidad" target="_blank" rel="noreferrer">Política de Privacidad</Link> y las <Link to="/terminos" target="_blank" rel="noreferrer">Condiciones del Servicio</Link>.</span></label>
           <div className="inquiry-submit-row"><p className="inquiry-submit-note">Al enviar, registramos la consulta y abrimos WhatsApp con el resumen listo.</p><button type="submit" className="btn-primary inquiry-submit" disabled={isSubmitting || servicesLoading}><MessageCircle size={18} />{isSubmitting ? "Enviando…" : "Enviar consulta"}</button></div>
         </form>
       </div>

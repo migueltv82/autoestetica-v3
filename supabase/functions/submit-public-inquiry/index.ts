@@ -28,28 +28,13 @@ Deno.serve(async (request) => {
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  const turnstileSecret = Deno.env.get("TURNSTILE_SECRET_KEY");
-  if (!supabaseUrl || !serviceRoleKey || !turnstileSecret) {
-    return response(503, { error: "Protección anti-spam no configurada" }, origin);
+  if (!supabaseUrl || !serviceRoleKey) {
+    return response(503, { error: "El servicio de consultas no está disponible" }, origin);
   }
 
   let body: Record<string, unknown>;
   try { body = await request.json(); }
   catch { return response(400, { error: "Solicitud inválida" }, origin); }
-
-  const captchaToken = String(body.captchaToken || "");
-  if (!captchaToken) return response(400, { error: "Completá la verificación de seguridad" }, origin);
-
-  const verification = new FormData();
-  verification.set("secret", turnstileSecret);
-  verification.set("response", captchaToken);
-  const remoteIp = request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For")?.split(",")[0]?.trim();
-  if (remoteIp) verification.set("remoteip", remoteIp);
-  const captchaResponse = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-    method: "POST", body: verification,
-  });
-  const captchaResult = await captchaResponse.json();
-  if (!captchaResult.success) return response(400, { error: "La verificación venció. Intentá nuevamente" }, origin);
 
   const admin = createClient(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false },
