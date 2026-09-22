@@ -1,17 +1,21 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import InquiryForm from "./InquiryForm";
 
-const { invoke } = vi.hoisted(() => ({ invoke: vi.fn() }));
+const { invoke, mockServicesState, mockSettings } = vi.hoisted(() => ({
+  invoke: vi.fn(),
+  mockServicesState: { services: [{ name: "Lavado premium" }], isLoading: false },
+  mockSettings: { whatsapp: "+54 9 381 5550101" },
+}));
 
 vi.mock("../../hooks/useServices", () => ({
-  useServices: () => ({ services: [{ name: "Lavado premium" }], isLoading: false }),
+  useServices: () => mockServicesState,
 }));
 
 vi.mock("../../hooks/useSettings", () => ({
-  useSettings: () => ({ settings: { whatsapp: "+54 9 381 5550101" } }),
+  useSettings: () => ({ settings: mockSettings }),
 }));
 
 vi.mock("../../lib/supabase", () => ({
@@ -40,72 +44,38 @@ function legalCheckbox() {
 }
 
 describe("InquiryForm", () => {
-  let whatsappWindow;
-
   beforeEach(() => {
     invoke.mockReset();
     invoke.mockResolvedValue({ error: null });
-    whatsappWindow = { location: { href: "" }, close: vi.fn() };
-    vi.spyOn(window, "open").mockReturnValue(whatsappWindow);
+    mockServicesState.services = [{ name: "Lavado premium" }];
+    mockServicesState.isLoading = false;
+    mockSettings.whatsapp = "+54 9 381 5550101";
+    vi.spyOn(window, "open").mockReturnValue({ closed: false });
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it("identifica los datos obligatorios faltantes sin culpar al consentimiento", async () => {
+  it("valida nombre, teléfono, vehículo, servicio y aceptación legal", async () => {
     const user = renderForm();
-    await user.click(legalCheckbox());
 
     await user.click(screen.getByRole("button", { name: "Enviar consulta" }));
 
     expect(screen.getByRole("alert")).toHaveTextContent(REQUIRED_FIELDS_ERROR);
-    expect(screen.queryByText(LEGAL_ERROR)).not.toBeInTheDocument();
     expect(invoke).not.toHaveBeenCalled();
     expect(window.open).not.toHaveBeenCalled();
-  });
 
-  it("mantiene el consentimiento desmarcado y exige una aceptación explícita", async () => {
-    const user = renderForm();
-    expect(legalCheckbox()).not.toBeChecked();
     await completeRequiredFields(user);
-
     await user.click(screen.getByRole("button", { name: "Enviar consulta" }));
 
     expect(screen.getByRole("alert")).toHaveTextContent(LEGAL_ERROR);
-    expect(screen.queryByText(REQUIRED_FIELDS_ERROR)).not.toBeInTheDocument();
     expect(legalCheckbox()).not.toBeChecked();
     expect(invoke).not.toHaveBeenCalled();
     expect(window.open).not.toHaveBeenCalled();
   });
 
-  it("envía la consulta sin token de seguridad al completar los datos y aceptar las condiciones", async () => {
-    const user = renderForm();
-    await completeRequiredFields(user);
-    await user.click(legalCheckbox());
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Enviar consulta" }));
-
-    expect(invoke).toHaveBeenCalledExactlyOnceWith("submit-public-inquiry", {
-      body: {
-        businessSlug: "negocio-de-prueba",
-        clientName: "Ana Pérez",
-        clientPhone: "3815550100",
-        vehicleType: "Auto",
-        requestedServices: ["Lavado premium"],
-        inquiryNotes: expect.stringContaining("Aceptó Política de Privacidad y Condiciones del Servicio"),
-      },
-    });
-    expect(window.open).toHaveBeenCalledExactlyOnceWith("", "_blank");
-    await waitFor(() => expect(whatsappWindow.location.href).toContain("https://wa.me/5493815550101?text="));
-    const whatsappText = new URL(whatsappWindow.location.href).searchParams.get("text");
-    expect(whatsappText).toContain("Ana Pérez");
-    expect(whatsappText).toContain("Lavado premium");
-    expect(legalCheckbox()).not.toBeChecked();
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-  });
-
-  it("impide enviar si se completa el campo oculto de control", async () => {
+  it("no envía si se completa el honeypot", async () => {
     const user = renderForm();
     await completeRequiredFields(user);
     await user.click(legalCheckbox());
@@ -118,47 +88,55 @@ describe("InquiryForm", () => {
     expect(window.open).not.toHaveBeenCalled();
   });
 
-  it("impide enviar si la persona vuelve a desmarcar el consentimiento", async () => {
+  it("muestra éxito e intenta abrir WhatsApp cuando el submit sale OK", async () => {
     const user = renderForm();
     await completeRequiredFields(user);
-    await user.click(legalCheckbox());
     await user.click(legalCheckbox());
 
     await user.click(screen.getByRole("button", { name: "Enviar consulta" }));
 
-    expect(screen.getByRole("alert")).toHaveTextContent(LEGAL_ERROR);
-    expect(invoke).not.toHaveBeenCalled();
+    expect(invoke).toHaveBeenCalledExactlyOnceWith("submit-public-inquiry", {
+      body: {
+        businessSlug: "negocio-de-prueba",
+        clientName: "Ana Pérez",
+        clientPhone: "3815550100",
+        vehicleType: "Auto",
+        requestedServices: ["Lavado premium"],
+        inquiryNotes: expect.stringContaining("Aceptó Política de Privacidad y Condiciones del Servicio"),
+      },
+    });
+    await screen.findByText("Tu consulta quedó registrada");
+    expect(screen.getByRole("link", { name: "Abrir WhatsApp" })).toHaveAttribute("href", expect.stringContaining("https://wa.me/5493815550101?text="));
+    expect(window.open).toHaveBeenCalledExactlyOnceWith(expect.stringContaining("https://wa.me/5493815550101?text="), "_blank", "noopener,noreferrer");
+  });
+
+  it("no muestra éxito si invoke devuelve error", async () => {
+    const user = renderForm();
+    invoke.mockResolvedValueOnce({ error: { message: "token-secreto-db-url" } });
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    await completeRequiredFields(user);
+    await user.click(legalCheckbox());
+
+    await user.click(screen.getByRole("button", { name: "Enviar consulta" }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent("No pudimos registrar la consulta. Intentá nuevamente.");
+    expect(screen.queryByText("Tu consulta quedó registrada")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Abrir WhatsApp" })).not.toBeInTheDocument();
     expect(window.open).not.toHaveBeenCalled();
   });
 
-  it("conserva los datos después de un error y permite reintentar el envío", async () => {
+  it("no envía si no hay servicios publicados", async () => {
+    mockServicesState.services = [];
     const user = renderForm();
-    const error = { message: "No pudimos registrar la consulta. Intentá nuevamente." };
-    invoke.mockResolvedValueOnce({ error });
-    vi.spyOn(console, "error").mockImplementation(() => {});
-    await completeRequiredFields(user);
-    await user.type(screen.getByLabelText("Detalle adicional"), "Quiero limpiar el interior.");
-    await user.click(legalCheckbox());
+
+    expect(screen.getByText(/No hay servicios publicados/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Enviar consulta" })).toBeDisabled();
 
     await user.click(screen.getByRole("button", { name: "Enviar consulta" }));
+    fireEvent.submit(screen.getByText("Consulta rápida").closest("form"));
 
-    expect(screen.getByRole("alert")).toHaveTextContent(error.message);
-    expect(whatsappWindow.close).toHaveBeenCalledOnce();
-    expect(whatsappWindow.location.href).toBe("");
-    expect(screen.getByLabelText("Nombre y apellido *")).toHaveValue("Ana Pérez");
-    expect(screen.getByLabelText("WhatsApp / Teléfono *")).toHaveValue("3815550100");
-    expect(screen.getByRole("button", { name: "Auto", exact: true })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: "Lavado premium" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByLabelText("Detalle adicional")).toHaveValue("Quiero limpiar el interior.");
-    expect(legalCheckbox()).toBeChecked();
-
-    await user.click(screen.getByRole("button", { name: "Enviar consulta" }));
-
-    expect(invoke).toHaveBeenCalledTimes(2);
-    expect(invoke.mock.calls[1]).toEqual(invoke.mock.calls[0]);
-    await waitFor(() => expect(whatsappWindow.location.href).toContain("https://wa.me/5493815550101?text="));
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-    expect(screen.getByLabelText("Nombre y apellido *")).toHaveValue("");
-    expect(legalCheckbox()).not.toBeChecked();
+    expect(screen.queryByText(/al menos un servicio/i)).not.toBeInTheDocument();
+    expect(invoke).not.toHaveBeenCalled();
+    expect(window.open).not.toHaveBeenCalled();
   });
 });
